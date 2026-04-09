@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Configurações - Repertório</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <script>
+        /**
+         * 1. PROTEÇÃO DE ESCOPO (O "PULO DO GATO")
+         * Salvamos o require do Electron em uma variável que NINGUÉM mexe.
+         */
+        window.nodeRequire = (typeof require !== 'undefined') ? require : (window.require ? window.require : null);
+        
+        // Impede que PouchDB ache que está no Node.js e quebre tudo
+        if (typeof module === 'object') {
+            window.electronModule = module;
+            window.module = undefined; 
+        }
+
+        // Se o nodeRequire falhou, avisa logo no console do terminal
+        if (!window.nodeRequire) {
+            console.error("CRÍTICO: nodeIntegration falhou. O Electron bloqueou o acesso ao sistema de arquivos.");
+        }
+    </script>
+</head>
+<body>
+
+    <div class="top-bar">
+        <a href="index.html" class="config-icon">
+            <span class="material-icons">arrow_back</span>
+        </a>
+        <div class="logo">Configurações</div>
+        <div style="width: 24px;"></div> 
+    </div>
+
+    <div class="config-content">
+        <div id="desktop-section" class="card">
+            <h2>Gerenciar Pastas</h2>
+            <p>Sincronize pastas do seu computador para alimentar sua biblioteca.</p>
+            
+            <div class="form-row">
+                <input type="text" id="root-folder-input" class="form-input" readonly placeholder="Caminho da pasta...">
+                <button id="select-folder-btn" class="btn-picker">
+                    <span class="material-icons">folder_open</span>
+                    Abrir
+                </button>
+            </div>
+    
+            
+            <div style="margin-top: 24px;">
+                <h3 style="font-size: 0.8rem; color: var(--on-surface-variant); text-transform: uppercase; letter-spacing: 1px;">Pastas Ativas</h3>
+                <div id="folders-list"></div>
+            </div>
+        </div>
+
+        <div class="card">
+  <button id="btn-clear" class="btn-danger" title="Remover todas as músicas e limpar o banco de dados local.">
+        <span class="material-icons">delete_forever</span> Limpar Banco de Dados
+    </button>
+        </div>
+    </div>
+
+    <script src='js/pouchdb.min.js'></script>
+    <script src='js/pouchdb.find.min.js'></script>  
+    <script src="js/database.js"></script>
+    <script src="js/scanner.js"></script>
+   <script>
+    // SÓ CARREGA O CORDOVA SE ESTIVER NO ANDROID
+    if (/Android/i.test(navigator.userAgent)) {
+        const s = document.createElement('script');
+        s.src = 'cordova.js';
+        document.head.appendChild(s);
+    }
+</script>
+
+    <script>
+        // Bloqueador de ruído do Cordova
+        window.onerror = function(msg) {
+            if (msg.indexOf('onFileSystemPathsReady') > -1) return true; 
+        };
+
+        class ConfigApp {
+            constructor() {
+                this.logEl = document.getElementById('log-desktop');
+                this.foldersListEl = document.getElementById('folders-list');
+                this.rootInputEl = document.getElementById('root-folder-input');
+                this.selectBtnEl = document.getElementById('select-folder-btn');
+                this.clearBtnEl = document.getElementById('btn-clear');
+                this.init();
+            }
+
+async init() {
+    // Removido o check do logEl para não travar o resto do código
+    try {
+        if (typeof DBManager !== 'undefined') {
+            await DBManager.init();
+            this.logMessage('> Banco de dados pronto.');
+        }
+        await this.loadFoldersList();
+
+        if (this.selectBtnEl) this.selectBtnEl.onclick = () => this.selectFolder();
+        if (this.clearBtnEl) this.clearBtnEl.onclick = () => this.clearAll();
+
+    } catch (err) {
+        this.logMessage('> ERRO: ' + err.message);
+    }
+}
+
+logMessage(msg) {
+    // Agora ele só loga no terminal do desenvolvedor (F12)
+    console.log(`[${new Date().toLocaleTimeString()}] ${msg}`);
+}
+
+
+
+            async loadFoldersList() {
+                if (!this.foldersListEl) return;
+                try {
+                    const folders = await DBManager.listFolders();
+                    this.foldersListEl.innerHTML = '';
+
+                    if (!folders || folders.length === 0) {
+                        this.foldersListEl.innerHTML = '<div class="folder-card">Nenhuma pasta ativa</div>';
+                        return;
+                    }
+
+for (const folder of folders) {
+    const count = await DBManager.contarMusicasNaPasta(folder.path);
+    const folderCard = document.createElement('div');
+    folderCard.className = 'folder-card'; // O CSS já cuida do flex e do padding
+    
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const folderName = folder.path.split(/[\\/]/).pop() || 'Raiz';
+    const displayPath = isAndroid ? '' : `<span class="text-path">${folder.path}</span>`;
+
+    folderCard.innerHTML = `
+        <div class="folder-info-wrapper">
+            <span class="material-icons" style="color: var(--primary); font-size: 20px;">folder</span>
+            <b style="flex-shrink: 0;">${folderName}</b>
+            ${displayPath} 
+     
+        </div>
+        <div style="display: flex; gap: 8px; flex-shrink: 0;">
+            <button onclick="ConfigApp.instance.refreshFolder('${folder._id}', '${folder.path.replace(/\\/g, '\\\\')}')" class="btn-icon">
+                <span class="material-icons" style="font-size: 18px;">refresh</span>
+            </button>
+            <button onclick="ConfigApp.instance.deleteFolder('${folder._id}', '${folder.path.replace(/\\/g, '\\\\')}')" class="btn-icon delete">
+                <span class="material-icons" style="font-size: 18px;">delete</span>
+            </button>
+        </div>
+    `;
+    this.foldersListEl.appendChild(folderCard);
+}
+                } catch (err) {
+                    this.logMessage('> ERRO ao listar: ' + err.message);
+                }
+            }
+
+            async selectFolder() {
+                try {
+                    const path = await Scanner.abrirPicker();
+                    if (!path) return;
+                    this.rootInputEl.value = path;
+                    const added = await DBManager.addFolder(path);
+                    if (added) {
+                        this.logMessage(`> Escaneando: ${path}`);
+                        await Scanner.escanearPasta(path);
+                        await this.loadFoldersList();
+                    }
+                } catch (err) {
+                    this.logMessage('> ERRO na seleção: ' + err.message);
+                }
+            }
+
+            async refreshFolder(id, path) {
+                if (confirm('Rescanear esta pasta?')) {
+                    await Scanner.escanearPasta(path);
+                    await this.loadFoldersList();
+                    this.logMessage('> Atualizado.');
+                }
+            }
+
+            async deleteFolder(id, path) {
+                if (confirm('Remover esta pasta?')) {
+                    await DBManager.deleteFolder(id);
+                    await this.loadFoldersList();
+                    this.logMessage('> Removido.');
+                }
+            }
+
+            async clearAll() {
+                if (confirm('LIMPAR TUDO?')) {
+                    await DBManager.limparBanco();
+                    await this.loadFoldersList();
+                    this.logMessage('> Banco resetado.');
+                }
+            }
+        }
+
+        // Inicializa o app
+        ConfigApp.instance = new ConfigApp();
+    </script>
+</body>
+</html>

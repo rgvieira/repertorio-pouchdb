@@ -1,0 +1,11 @@
+{
+  "background_color": "#FFF",
+  "display": "standalone",
+  "orientation": "any",
+  "start_url": "index.html",
+  "name": "Repertorio",
+  "short_name": "Repertorio",
+  "version": "com.seuprojeto.repertorio",
+  "description": "Banco de partituras PouchDB",
+  "author": "Seu Nome"
+}

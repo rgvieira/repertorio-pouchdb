@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Repertório - The Melodic Editorial</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#ff9f92",
+                    "on-secondary-container": "#20614f",
+                    "on-primary-container": "#1b387d",
+                    "tertiary": "#a53c30",
+                    "inverse-primary": "#98b1fe",
+                    "error-container": "#f56965",
+                    "on-tertiary": "#fff7f6",
+                    "on-background": "#2d333b",
+                    "surface-container-highest": "#dee3ed",
+                    "surface-bright": "#f8f9ff",
+                    "on-primary-fixed-variant": "#264187",
+                    "surface": "#f8f9ff",
+                    "primary-container": "#abbfff",
+                    "primary-fixed-dim": "#98b1fe",
+                    "outline-variant": "#adb2bc",
+                    "surface-container-low": "#f1f3fa",
+                    "surface-container-high": "#e4e8f2",
+                    "surface-dim": "#d4dae6",
+                    "on-tertiary-fixed-variant": "#7a1c14",
+                    "on-secondary-fixed": "#034e3d",
+                    "secondary": "#2a6a57",
+                    "background": "#f8f9ff",
+                    "error-dim": "#70030f",
+                    "on-surface": "#2d333b",
+                    "inverse-on-surface": "#9b9da2",
+                    "primary-dim": "#355096",
+                    "on-secondary": "#e4fff3",
+                    "on-error": "#fff7f6",
+                    "on-tertiary-container": "#6d130c",
+                    "on-primary-fixed": "#002264",
+                    "error": "#ac3434",
+                    "on-secondary-fixed-variant": "#2c6b59",
+                    "secondary-fixed": "#b7f9e0",
+                    "surface-tint": "#425ca3",
+                    "primary-fixed": "#abbfff",
+                    "tertiary-dim": "#953025",
+                    "surface-variant": "#dee3ed",
+                    "tertiary-fixed": "#ff9f92",
+                    "on-tertiary-fixed": "#4a0001",
+                    "on-primary": "#f9f8ff",
+                    "surface-container-lowest": "#ffffff",
+                    "primary": "#425ca3",
+                    "surface-container": "#ebeef6",
+                    "inverse-surface": "#0b0e12",
+                    "secondary-fixed-dim": "#a9ead3",
+                    "outline": "#767b84",
+                    "secondary-container": "#b7f9e0",
+                    "on-surface-variant": "#5a5f68",
+                    "secondary-dim": "#1b5d4b",
+                    "on-error-container": "#65000b",
+                    "tertiary-fixed-dim": "#ff8a7a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body": [
+                            "Manrope"
+                    ],
+                    "label": [
+                            "Manrope"
+                    ]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .tonal-transition { transition: background-color 0.3s ease; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl shadow-sm dark:shadow-none flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-blue-700 dark:text-blue-400" data-icon="music_note">music_note</span>
+<h1 class="font-headline font-extrabold tracking-tight text-2xl text-blue-800 dark:text-blue-200">Repertório</h1>
+</div>
+<button class="hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors p-2 rounded-full active:scale-95 duration-150">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400" data-icon="settings">settings</span>
+</button>
+</header>
+<main class="pt-24 px-6 max-w-2xl mx-auto">
+<!-- Editorial Header -->
+<section class="mb-10">
+<h2 class="font-headline text-5xl font-bold text-on-background opacity-90 mb-2 leading-tight">Your Gallery</h2>
+<p class="font-body text-on-surface-variant text-lg">Curating 24 masterpieces in your collection.</p>
+</section>
+<!-- Search & Filter -->
+<section class="mb-10 space-y-6">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full pl-14 pr-6 py-4 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-primary/20 text-on-surface placeholder:text-outline font-medium transition-all shadow-sm" placeholder="Search by title or artist..." type="text"/>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<button class="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full font-label font-semibold text-[11px] uppercase tracking-widest whitespace-nowrap">All Songs</button>
+<button class="bg-surface-container-high text-on-surface-variant px-6 py-2 rounded-full font-label font-semibold text-[11px] uppercase tracking-widest whitespace-nowrap hover:bg-surface-container-highest transition-colors">Samba</button>
+<button class="bg-surface-container-high text-on-surface-variant px-6 py-2 rounded-full font-label font-semibold text-[11px] uppercase tracking-widest whitespace-nowrap hover:bg-surface-container-highest transition-colors">Jazz</button>
+<button class="bg-surface-container-high text-on-surface-variant px-6 py-2 rounded-full font-label font-semibold text-[11px] uppercase tracking-widest whitespace-nowrap hover:bg-surface-container-highest transition-colors">Bossa Nova</button>
+<button class="bg-surface-container-high text-on-surface-variant px-6 py-2 rounded-full font-label font-semibold text-[11px] uppercase tracking-widest whitespace-nowrap hover:bg-surface-container-highest transition-colors">Pop</button>
+<button class="bg-surface-container-high text-on-surface-variant px-6 py-2 rounded-full font-label font-semibold text-[11px] uppercase tracking-widest whitespace-nowrap hover:bg-surface-container-highest transition-colors">Rock</button>
+</div>
+</section>
+<!-- Content List (Repertoire Cards) -->
+<section class="space-y-4">
+<!-- Card 1 -->
+<div class="group bg-surface-container-lowest p-5 rounded-lg flex items-center gap-5 hover:bg-surface-container-low transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+<div class="w-16 h-16 rounded-md overflow-hidden bg-surface-dim flex-shrink-0 relative">
+<img alt="Music Cover" class="w-full h-full object-cover" data-alt="Close-up of a jazz guitarist's hands on a hollow body guitar with warm stage lighting and soft bokeh" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuTn0YjJBrDkjdBKeS5MSVxOiRIUj69yal4btDkJOMNK-kUKznmB64ZSnzCmary4ekp9DXtacb27-Eh0jsgwd7cuhDHlWCKb2SSLghGFY6B14m0M_1ox_1tUymwkXGl3PKz1jABTNhFGtvTrgMku3K2JOOFBe8WX1nrgD4QjuHhbASOluvM1MWEy254LSkZES9pgD2aUMrfJmmOWoaGgeCmOSE0iPOP3cRgChUWpjAACh26yer4nKtmkbjrQWOPdkVuh40Ei4POQk"/>
+<div class="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors"></div>
+</div>
+<div class="flex-grow min-w-0">
+<h3 class="font-body font-bold text-lg text-on-surface truncate">Chega de Saudade</h3>
+<p class="text-on-surface-variant font-medium text-sm mb-2">João Gilberto</p>
+<span class="inline-block bg-tertiary-fixed text-on-tertiary-fixed px-3 py-0.5 rounded-full font-label font-bold text-[10px] uppercase tracking-wider">Bossa Nova</span>
+</div>
+<button class="text-outline hover:text-primary transition-colors p-2">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<!-- Card 2 -->
+<div class="group bg-surface-container-lowest p-5 rounded-lg flex items-center gap-5 hover:bg-surface-container-low transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+<div class="w-16 h-16 rounded-md overflow-hidden bg-surface-dim flex-shrink-0 relative">
+<img alt="Music Cover" class="w-full h-full object-cover" data-alt="Macro shot of a classic microphone in a dark studio with moody blue rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBE0r-JG9W5pcbqrFivkbIP8YkTPlm0efrqsVskAfT0YOUbuiVxHuBzyeOKoy8kao3TgRwba771h-uBFPS_yLL14HCwWdDVgCbECRa9G7WlNRlVBG48ZwQ-8gfScgD5fLRRTf4bXbWDMOmiZ0Thf6DnQogneZvvgTSWgdaUs4rZzqJzAf2d0vGBjzi16-SmKYoj9zyduKWjtp71uXaDmZCz1-vHKbHa4wYzwV8ActE7xbBqgPZjs_GY8S27sT982QmGN6-9mIrsEOw"/>
+<div class="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors"></div>
+</div>
+<div class="flex-grow min-w-0">
+<h3 class="font-body font-bold text-lg text-on-surface truncate">Take Five</h3>
+<p class="text-on-surface-variant font-medium text-sm mb-2">The Dave Brubeck Quartet</p>
+<span class="inline-block bg-tertiary-fixed text-on-tertiary-fixed px-3 py-0.5 rounded-full font-label font-bold text-[10px] uppercase tracking-wider">Jazz</span>
+</div>
+<button class="text-outline hover:text-primary transition-colors p-2">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<!-- Card 3 -->
+<div class="group bg-surface-container-lowest p-5 rounded-lg flex items-center gap-5 hover:bg-surface-container-low transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+<div class="w-16 h-16 rounded-md overflow-hidden bg-surface-dim flex-shrink-0 relative">
+<img alt="Music Cover" class="w-full h-full object-cover" data-alt="Abstract colorful light trails reflecting off a wet surface at night, high energy and vibrant colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQuwPRhQPV_y0xkkDcieeqE7BRdlL3oUELPwIYUGMvaChVFSNhSCdCcncIdXqMUmejZDDtnHmB_Nli-NZDV_u053CaLsWgW51XqjNwC8PCfW6MdB8vX9uSpmgnesLpStETZRH6Oq5UbS_Rxxnm2oJaBKY1zgElKb6YZCAbyOa3UjGwsEFOw__mtp1Q-RrWG52C4wxFAnrOxeQbIk7rFReAEGtcOIRmBaDsqLzgK7i3XzgrsgbcDGztwPeJRKjOHgmfo4yWXGvczw0"/>
+<div class="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors"></div>
+</div>
+<div class="flex-grow min-w-0">
+<h3 class="font-body font-bold text-lg text-on-surface truncate">Águas de Março</h3>
+<p class="text-on-surface-variant font-medium text-sm mb-2">Elis Regina &amp; Tom Jobim</p>
+<span class="inline-block bg-tertiary-fixed text-on-tertiary-fixed px-3 py-0.5 rounded-full font-label font-bold text-[10px] uppercase tracking-wider">Samba</span>
+</div>
+<button class="text-outline hover:text-primary transition-colors p-2">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<!-- Card 4 -->
+<div class="group bg-surface-container-lowest p-5 rounded-lg flex items-center gap-5 hover:bg-surface-container-low transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+<div class="w-16 h-16 rounded-md overflow-hidden bg-surface-dim flex-shrink-0 relative">
+<img alt="Music Cover" class="w-full h-full object-cover" data-alt="Minimalist top view of a grand piano keyboard with soft natural light hitting the ivory keys" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZCYaKyKztKKNm6T0nz27zrcfoJRJ7LokZKQea8eMA60L3fB8otQGrmXYAy4zlXdnInVqvMz827TgcqFB5P0V3YsLtUxnf7kxHfM8ZL478rqFWPukayxe-VMvXA-pM9ZiQmpic8owsr0WuHTH1-yDso5KSEw1kqjpfgkZqUJZA30r8PiBKkz8qFY6uqfIz5VEvyZVHyEw4F3gq2vJlG0M4atWbbs-u9XsCGeq2Up0lVpA_LQ9wLWtL1Jpe4uiYRDn-Evt5GqymE_w"/>
+<div class="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors"></div>
+</div>
+<div class="flex-grow min-w-0">
+<h3 class="font-body font-bold text-lg text-on-surface truncate">Fly Me To The Moon</h3>
+<p class="text-on-surface-variant font-medium text-sm mb-2">Frank Sinatra</p>
+<span class="inline-block bg-tertiary-fixed text-on-tertiary-fixed px-3 py-0.5 rounded-full font-label font-bold text-[10px] uppercase tracking-wider">Vocal Jazz</span>
+</div>
+<button class="text-outline hover:text-primary transition-colors p-2">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</section>
+</main>
+<!-- FAB -->
+<button class="fixed bottom-32 right-6 w-16 h-16 bg-gradient-to-br from-primary to-primary-dim text-white rounded-xl shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-40">
+<span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full rounded-t-[2.5rem] z-50 bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl shadow-[0_-4px_40px_rgba(0,0,0,0.06)] flex justify-around items-center px-4 pb-6 pt-3">
+<!-- Active Library -->
+<a class="flex flex-col items-center justify-center bg-blue-100/80 dark:bg-blue-900/40 text-blue-800 dark:text-blue-100 rounded-3xl px-5 py-2 active:scale-90 duration-200 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="library_music" style="font-variation-settings: 'FILL' 1;">library_music</span>
+<span class="font-label text-[11px] font-semibold uppercase tracking-widest mt-1">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="metronome">timer</span>
+<span class="font-label text-[11px] font-semibold uppercase tracking-widest mt-1">Metronome</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings_voice">settings_voice</span>
+<span class="font-label text-[11px] font-semibold uppercase tracking-widest mt-1">Tuner</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="timer">timer</span>
+<span class="font-label text-[11px] font-semibold uppercase tracking-widest mt-1">Practice</span>
+</a>
+</nav>
+</body></html>

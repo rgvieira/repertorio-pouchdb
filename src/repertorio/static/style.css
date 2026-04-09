@@ -1,0 +1,718 @@
+/* ===== VARIÁVEIS E RESET ===== */
+:root {
+    --primary: #2196F3;
+    --primary-dark: #1976D2;
+    --primary-light: #BBDEFB;
+    --gray-50: #FAFAFA;
+    --gray-100: #F5F5F5;
+    --gray-200: #EEEEEE;
+    --gray-300: #E0E0E0;
+    --gray-600: #757575;
+    --gray-800: #424242;
+    --text-primary: #212121;
+    --text-secondary: #757575;
+    --divider: #E0E0E0;
+    --white: #FFFFFF;
+    --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --shadow-2: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    --transition: all 0.2s ease-in-out;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--gray-100);
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+/* ===== TOP BAR (MATERIAL DESIGN) ===== */
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--primary);
+    color: white;
+    padding: 0 24px;
+    height: 64px;
+    box-shadow: var(--shadow-2);
+}
+
+.right-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    /* Espaço entre a toolbar e o ícone de config */
+}
+
+/* Grupo da esquerda (logo + toolbar) */
+.left-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    /* Espaçamento entre o logo e os botões */
+}
+
+/* Ajustes na toolbar – remova margens que forçavam alinhamento à direita */
+.header-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    /* Espaço entre os botões */
+    /* Remova ou comente as linhas abaixo, se existirem:
+    margin-left: auto;
+    margin-right: 8px;
+    */
+}
+
+/* (Opcional) Se houver a regra com erro de digitação "header-toolbar", corrija ou remova */
+
+.header-toolbar .tool-btn {
+    color: white;
+    background: transparent;
+    border: none;
+    padding: 6px;
+    /* um pouco menor que antes */
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.header-toolbar .tool-btn .material-icons {
+    font-size: 1.4rem;
+    /* ajuste conforme preferir */
+}
+
+.header-toolbar .tool-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.header-toolbar .tool-btn.active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.top-right {
+    display: flex;
+    align-items: center;
+}
+
+.config-icon {
+    color: white;
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: var(--transition);
+    border-radius: 50%;
+    padding: 8px;
+}
+
+.config-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: rotate(30deg);
+}
+
+/* ===== MAIN CONTENT ===== */
+main {
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 0 24px;
+}
+
+/* ===== CAMPO DE BUSCA ===== */
+.search-filter-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.search-container {
+    flex: 1;
+    position: relative;
+}
+
+.search-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+.genero-select {
+    width: auto;
+    min-width: 150px;
+    padding: 6px 12px;
+    /* reduz a altura vertical */
+    font-size: 0.9rem;
+    height: auto;
+    /* evita altura fixa */
+    line-height: 1.2;
+    /* opcional, para compactar mais */
+    border-radius: 4px;
+    border: 1px solid var(--divider);
+    background-color: var(--white);
+    font-family: 'Roboto', sans-serif;
+
+
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%232196F3" d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 24px;
+}
+
+.genero-select:hover {
+    border-color: var(--primary);
+}
+
+.genero-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+@media (max-width: 600px) {
+    .search-filter-container {
+        flex-direction: column;
+    }
+
+    .genero-select {
+        width: 100%;
+    }
+}
+
+/* ===== TABELA DE PARTITURAS ===== */
+.music-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--white);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: var(--shadow-1);
+}
+
+.music-table th,
+.music-table td {
+    padding: 16px 20px;
+    text-align: left;
+    /* Alinhamento à esquerda conforme solicitado */
+    border-bottom: 1px solid var(--divider);
+}
+
+.music-table th {
+    background-color: var(--primary);
+    color: white;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.music-table tbody tr {
+    transition: var(--transition);
+}
+
+.music-table tbody tr:hover {
+    background-color: var(--gray-50);
+}
+
+/* Coluna de ações */
+.actions-cell {
+    white-space: nowrap;
+    text-align: left;
+}
+
+/* Links de ação (apenas ícones) */
+.action-link {
+    display: inline-block;
+    color: var(--text-secondary);
+    text-decoration: none;
+    margin-right: 12px;
+    transition: var(--transition);
+    position: relative;
+}
+
+.action-link:last-child {
+    margin-right: 0;
+}
+
+.action-link:hover {
+    color: var(--primary);
+}
+
+.action-link .material-icons {
+    font-size: 1.3rem;
+    /* Tamanho menor (antes 1.4rem) */
+    vertical-align: middle;
+}
+
+/* Tooltips personalizados (usando data-tooltip) */
+.action-link[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 150%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--gray-800);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: 'Roboto', sans-serif;
+    white-space: nowrap;
+    box-shadow: var(--shadow-1);
+    z-index: 100;
+    pointer-events: none;
+    letter-spacing: 0.3px;
+}
+
+/* Fallback para tooltips nativos via title (já funcionam sem CSS) */
+
+/* ===== MENSAGEM DE NENHUM RESULTADO ===== */
+.no-results {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    background-color: var(--white);
+    border-radius: 4px;
+    box-shadow: var(--shadow-1);
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+    .top-bar {
+        padding: 0 16px;
+    }
+
+    .logo {
+        font-size: 1.1rem;
+    }
+
+    .logo .material-icons {
+        font-size: 1.8rem;
+    }
+
+    main {
+        padding: 0 16px;
+        margin: 16px auto;
+    }
+
+    .search-container {
+        max-width: 100%;
+    }
+
+    .music-table th,
+    .music-table td {
+        padding: 12px 10px;
+    }
+
+    .action-link .material-icons {
+        font-size: 1.2rem;
+    }
+
+    .action-link {
+        margin-right: 8px;
+    }
+}
+
+/* Para telas muito pequenas, tabela rolável horizontalmente */
+@media (max-width: 600px) {
+    .music-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+/* ===== PÁGINA DE CONFIGURAÇÕES ===== */
+
+/* Cabeçalho da página */
+.viewer-header {
+    margin-bottom: 24px;
+}
+
+.viewer-title {
+    font-weight: 400;
+    font-size: 2rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Seções de configuração */
+.config-section {
+    background-color: var(--white);
+    border-radius: 4px;
+    box-shadow: var(--shadow-1);
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.config-section h3 {
+    font-weight: 500;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--divider);
+}
+
+/* Linha de formulário (input + botão) */
+.form-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Input de texto */
+.form-input {
+    flex: 1;
+    min-width: 250px;
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-family: 'Roboto', sans-serif;
+    border: 1px solid var(--divider);
+    border-radius: 4px;
+    background-color: var(--white);
+    transition: var(--transition);
+}
+
+.form-input:hover {
+    border-color: var(--primary);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+/* Botão texto (padrão Material Design) */
+.text-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.text-button:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+.text-button .material-icons {
+    font-size: 1.2rem;
+}
+
+/* Botão texto secundário (para ações como "Não" no modal) */
+.text-button.secondary {
+    color: var(--text-secondary);
+}
+
+.text-button.secondary:hover {
+    background-color: var(--gray-200);
+    color: var(--text-primary);
+}
+
+/* Spinners HTMX */
+.htmx-indicator {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+    display: inline-flex;
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Mensagens de feedback */
+.mensagem {
+    padding: 16px 20px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-weight: 400;
+    border-left: 4px solid transparent;
+    background-color: var(--white);
+    box-shadow: var(--shadow-1);
+}
+
+.mensagem.success {
+    border-left-color: #4CAF50;
+    color: #2E7D32;
+}
+
+.mensagem.error {
+    border-left-color: #F44336;
+    color: #C62828;
+}
+
+.mensagem.info {
+    border-left-color: var(--primary);
+    color: var(--primary-dark);
+}
+
+/* Modal customizado */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    background-color: var(--white);
+    border-radius: 4px;
+    box-shadow: var(--shadow-2);
+    padding: 24px;
+    max-width: 400px;
+    width: 90%;
+}
+
+.modal-content h3 {
+    font-weight: 500;
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.modal-content p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Responsividade para configurações */
+@media (max-width: 600px) {
+    .config-section {
+        padding: 16px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-input {
+        min-width: auto;
+    }
+
+    .text-button {
+        justify-content: center;
+    }
+
+    .modal-content {
+        padding: 20px;
+    }
+}
+
+/* ===== PÁGINA DO VISUALIZADOR DE PDF ===== */
+
+.viewer-header {
+    margin-bottom: 24px;
+}
+
+.viewer-title {
+    font-weight: 400;
+    font-size: 2rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Barra de ferramentas */
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+    background-color: var(--white);
+    padding: 12px 16px;
+    border-radius: 4px;
+    box-shadow: var(--shadow-1);
+}
+
+/* Botões de ferramenta (apenas ícone com tooltip) */
+.tool-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-family: 'Roboto', sans-serif;
+    font-size: 0;
+    /* Esconde o texto visualmente, mantendo acessível para leitores de tela */
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+}
+
+/* Se preferir manter o texto, remova a linha 'font-size: 0' e ajuste o gap */
+.tool-btn .material-icons {
+    font-size: 1.5rem;
+    /* Tamanho do ícone (pode ajustar para 1.3rem se quiser menor) */
+}
+
+.tool-btn:hover {
+    background-color: var(--primary-light);
+    color: var(--primary);
+}
+
+.tool-btn.active {
+    color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+/* Tooltips personalizados (usando data-tooltip) */
+.tool-btn[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 150%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--gray-800);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: 'Roboto', sans-serif;
+    white-space: nowrap;
+    box-shadow: var(--shadow-1);
+    z-index: 100;
+    pointer-events: none;
+    letter-spacing: 0.3px;
+}
+
+/* Container do PDF */
+.pdf-container {
+    background-color: var(--gray-200);
+    border-radius: 4px;
+    box-shadow: var(--shadow-2);
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    overflow: auto;
+    min-height: 500px;
+}
+
+#pdf-canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 2px;
+    box-shadow: var(--shadow-1);
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+    .toolbar {
+        padding: 8px;
+        gap: 4px;
+    }
+
+    .tool-btn .material-icons {
+        font-size: 1.3rem;
+    }
+
+    .pdf-container {
+        padding: 8px;
+    }
+}
+
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--primary);
+    color: white;
+    padding: 0 24px;
+    height: 64px;
+    box-shadow: var(--shadow-2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+header-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    /* reduzido para aproximar */
+    margin-left: auto;
+    /* empurra para a direita */
+    margin-right: 8px;
+    /* espaço antes do config */
+}
+
+.header-toolbar .tool-btn {
+    color: white;
+    background: transparent;
+    border: none;
+    padding: 6px;
+    /* um pouco menor */
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 0;
+}
+
+.header-toolbar .tool-btn .material-icons {
+    font-size: 1.4rem;
+    /* um pouco menor */
+}
+
+.header-toolbar .tool-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.header-toolbar .tool-btn.active {
+    background-color: rgba(255, 255, 255, 0.25);
+}

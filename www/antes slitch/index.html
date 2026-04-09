@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/tailwind.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Repertório</title>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="left-group">
+            <span class="logo">Repertório</span>
+        </div>
+        <div class="right-group">
+            <a href="config.html" class="config-icon"><span class="material-icons">settings</span></a>
+        </div>
+    </div>
+
+    <main>
+        <div class="search-filter-container">
+            <div class="search-wrapper">
+                <span class="material-icons search-icon">search</span>
+                <input type="text" id="busca" class="search-input" placeholder="Buscar...">
+            </div>
+            <select id="genero-select" class="genero-select">
+                <option value="">Todos os Gêneros</option>
+            </select>
+        </div>
+
+        <div id="tabela-container">
+            <table class="music-table">
+                <thead>
+                    <tr>
+                        <th>Gênero</th>
+                        <th>Artista</th>
+                        <th>Título</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-musicas"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="cordova.js"></script>
+    <!-- CDN para desenvolvimento; em produção, baixe e coloque na pasta js/ -->
+
+    <script src='js/pouchdb.min.js'></script>
+    <script src='js/pouchdb.find.min.js'></script>    
+    <script src="js/database.js"></script>
+    <script src="js/scanner.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

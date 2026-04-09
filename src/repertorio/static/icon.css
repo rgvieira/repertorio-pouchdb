@@ -1,0 +1,566 @@
+/* =========================================
+   MATERIAL DESIGN - TEMA AZUL PROFISSIONAL
+   ========================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f5f5f5;
+    color: #212121;
+    line-height: 1.5;
+}
+
+/* Top Bar com elevação (sombra) */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #007bff;
+    /* azul primário */
+    color: white;
+    padding: 12px 24px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 10;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.top-right a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: background-color 0.2s;
+}
+
+.top-right a:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.config-icon {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    /* se for SVG, ou use filter para branco */
+    color: white;
+}
+
+/* Conteúdo principal */
+main {
+    padding: 32px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Cards (como a .config-section) */
+.config-section {
+    background-color: white;
+    border-radius: 8px;
+    padding: 24px;
+    margin: 24px 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s;
+}
+
+.config-section:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.config-section h3 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin-bottom: 16px;
+    color: #007bff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.config-section h3::before {
+    font-family: 'Material Icons';
+    content: "settings";
+    font-size: 24px;
+    color: #007bff;
+}
+
+/* Botão no estilo Material */
+.btn-picker {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 24px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.btn-picker:hover {
+    background-color: #0069d9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.btn-picker:active {
+    background-color: #0062cc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Tabela com visual limpo e linhas separadas */
+/* Tabela: alinhamento consistente */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+table th,
+table td {
+    padding: 14px 12px;
+    /* mesmo padding para cabeçalho e células */
+    text-align: left;
+    /* alinhamento à esquerda */
+    vertical-align: middle;
+    border-bottom: 1px solid #e9ecef;
+}
+
+table th {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 500;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+table td {
+    color: #212529;
+    font-size: 0.9rem;
+}
+
+/* Remove borda inferior da última linha */
+table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Hover nas linhas */
+table tbody tr:hover td {
+    background-color: #f1f3f5;
+}
+
+.music-table th,
+.music-table td {
+    text-align: left;
+}
+
+/* Mensagens de feedback (sucesso/erro) */
+.mensagem {
+    padding: 16px 24px;
+    border-radius: 4px;
+    margin: 20px 0;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mensagem.sucesso {
+    background-color: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.mensagem.erro {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+/* Adiciona ícones nas mensagens (requer Material Icons) */
+.mensagem.sucesso::before {
+    font-family: 'Material Icons';
+    content: "check_circle";
+    font-size: 24px;
+    color: #28a745;
+}
+
+.mensagem.erro::before {
+    font-family: 'Material Icons';
+    content: "error";
+    font-size: 24px;
+    color: #dc3545;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .top-bar {
+        padding: 10px 16px;
+    }
+
+    main {
+        padding: 24px 16px;
+    }
+
+    table,
+    th,
+    td {
+        font-size: 0.8rem;
+    }
+
+    .config-section {
+        padding: 20px;
+    }
+}
+
+/* Estilo para campo de busca */
+.search-container {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-radius: 4px;
+    padding: 4px 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+    max-width: 500px;
+}
+
+.search-icon {
+    color: #757575;
+    margin-right: 8px;
+}
+
+.search-input {
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    padding: 10px 0;
+    width: 100%;
+    font-family: 'Roboto', sans-serif;
+}
+
+.search-input::placeholder {
+    color: #aaa;
+}
+
+/* Ações da tabela como links com ícones */
+.actions-cell {
+    white-space: nowrap;
+}
+
+.action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 12px;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+}
+
+.action-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.action-link .material-icons {
+    font-size: 18px;
+}
+
+/* Cabeçalho do visualizador */
+.viewer-header {
+    margin-bottom: 24px;
+}
+
+.viewer-title {
+    font-size: 1.75rem;
+    font-weight: 400;
+    color: #007bff;
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+/* Barra de ferramentas */
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding: 16px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Botões da barra de ferramentas (herdam .btn-picker) */
+.tool-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    background-color: #f5f5f5;
+    color: #333;
+    box-shadow: none;
+    text-transform: none;
+    letter-spacing: normal;
+    transition: background-color 0.2s;
+}
+
+.tool-btn:hover {
+    background-color: #e0e0e0;
+    box-shadow: none;
+}
+
+.tool-btn .material-icons {
+    font-size: 20px;
+}
+
+/* Botão ativo (ferramenta selecionada) */
+.tool-btn.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.tool-btn.active .material-icons {
+    color: white;
+}
+
+/* Container do PDF */
+.pdf-container {
+    background-color: #fafafa;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+}
+
+#pdf-canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Linha do formulário (input + botão lado a lado) */
+.form-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Campo de texto no estilo Material */
+.form-input {
+    flex: 1;
+    min-width: 250px;
+    padding: 10px 12px;
+    font-size: 1rem;
+    font-family: 'Roboto', sans-serif;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Ajuste nos botões para exibir ícones corretamente */
+.btn-picker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.btn-picker .material-icons {
+    font-size: 20px;
+}
+
+/* Indicadores de carregamento HTMX */
+.htmx-indicator {
+    display: none;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Modal overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
+    width: 90%;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #007bff;
+    font-weight: 500;
+}
+
+.modal-content p {
+    margin: 16px 0;
+    font-size: 1rem;
+}
+
+/* Modal overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    /* oculto por padrão */
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
+    width: 90%;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #007bff;
+    font-weight: 500;
+}
+
+.modal-content p {
+    margin: 16px 0;
+    font-size: 1rem;
+}
+
+/* Spinner animation (já existente, mas incluída para referência) */
+.htmx-indicator {
+    display: none;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Botão estilo texto (ícone + label, sem fundo, apenas cor primária) */
+.text-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: #007bff;
+    /* cor primária */
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    /* para links como o Voltar */
+}
+
+.text-button:hover {
+    background-color: rgba(0, 123, 255, 0.08);
+    /* fundo sutil ao passar o mouse */
+}
+
+.text-button .material-icons {
+    color: #007bff;
+    font-size: 20px;
+}
+
+/* Para links que usam a classe, garantir que não tenham sublinhado */
+a.text-button {
+    text-decoration: none;
+}

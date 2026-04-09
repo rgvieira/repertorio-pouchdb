@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="initial-scale=1, width=device-width, viewport-fit=cover" name="viewport"/>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <title>Repertório</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="top-bar">
+        <div class="logo">
+            <span class="material-icons">music_note</span>
+            <span>Repertório</span>
+        </div>
+        <a class="config-icon" href="config.html"><span class="material-icons">settings</span></a>
+    </div>
+
+    <main>
+
+
+        <div class="search-filter-container">
+            <div class="search-wrapper">
+                <span class="material-icons search-icon">search</span>
+                <input class="search-input" id="busca" placeholder="Buscar música ou artista..." type="text"/>
+            </div>
+            <select class="genero-select" id="genero-select">
+                <option value="">Todos os Gêneros</option>
+            </select>
+        </div>
+
+        <div class="music-list" id="tabela-container">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="text-align: left; border-bottom: 2px solid var(--outline); color: var(--on-surface-variant); font-size: 0.8rem;">
+                        <th style="padding: 8px;">Gênero</th>
+                        <th style="padding: 8px;">Artista</th>
+                        <th style="padding: 8px;">Título</th>
+                        <th style="padding: 8px; text-align: center;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-musicas">
+                    </tbody>
+            </table>
+        </div>
+    </main>
+
+    <a class="fab" href="config.html"><span class="material-icons">add</span></a>
+
+    <nav class="bottom-nav">
+        <a class="nav-item active" href="#"><span class="material-icons">library_music</span><span>Biblioteca</span></a>
+        <a class="nav-item" href="#"><span class="material-icons">search</span><span>Busca</span></a>
+        <a class="nav-item" href="#"><span class="material-icons">person</span><span>Perfil</span></a>
+    </nav>
+
+    <script src="cordova.js"></script>
+    <script src="js/pouchdb.min.js"></script>
+    <script src="js/pouchdb.find.min.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/scanner.js"></script>
+    <script src="js/app.js"></script>
+
+    <script>
+        window.onerror = function(msg) { if (msg.includes('hasService')) return true; };
+        // Garante a inicialização
+        setTimeout(() => {
+            if (typeof onDeviceReady === 'function' && !window.app_initialized) onDeviceReady();
+        }, 1200);
+    </script>
+</body>
+</html>

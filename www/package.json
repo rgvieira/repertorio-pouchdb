@@ -1,0 +1,34 @@
+{
+  "name": "com.seuprojeto.repertorio",
+  "displayName": "Repertorio",
+  "version": "1.0.0",
+  "description": "Banco de partituras PouchDB",
+  "main": "cdv-electron-main.js",
+  "homepage": "https://cordova.io",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Seu Nome",
+    "email": "contato@exemplo.com"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "electron": "electron .",
+    "dev": "nodemon --exec electron . --watch cdv-electron-main.js --watch index.html --watch js/"
+  },
+  "dependencies": {
+    "electron-devtools-installer": "^3.2.0",
+    "pouchdb": "^8.0.1",
+    "pouchdb-adapter-node-websql": "^7.0.0"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "nodemon": "^3.0.0",
+    "electron-reload": "^2.0.0"
+  },
+  "cordova": {
+    "services": {
+      "File": "plugins/cordova-plugin-file/src/browser/FileProxy.js",
+      "InAppBrowser": "plugins/cordova-plugin-inappbrowser/src/browser/InAppBrowserProxy.js"
+    }
+  }
+}

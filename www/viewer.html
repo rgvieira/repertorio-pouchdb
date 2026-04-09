@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Visualizador - Repertório</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; background: #333; overflow: hidden; }
+        
+        .top-bar { 
+            height: 56px; background: #fff; display: flex; align-items: center; 
+            padding: 0 16px; z-index: 100; border-bottom: 1px solid #ccc;
+        }
+
+        .pdf-container { 
+            flex: 1; overflow: auto; background: #525659; 
+            display: flex; justify-content: center; position: relative; 
+        }
+
+        /* Camada de baixo: O PDF */
+        #pdf-canvas { background: white; display: block; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+
+        /* Camada de cima: O Desenho (Transparente) */
+        #draw-canvas { position: absolute; left: 50%; transform: translateX(-50%); cursor: crosshair; }
+
+        .tool-btn { border: none; background: none; padding: 8px; cursor: pointer; border-radius: 8px; color: #186879; display: flex; align-items: center; }
+        .tool-btn.active { background: rgba(24, 104, 121, 0.15); font-weight: bold; }
+        
+        .nav-controls { display: flex; align-items: center; gap: 10px; margin: 0 15px; font-weight: bold; color: #186879; }
+        .header-actions { display: flex; gap: 2px; margin-left: auto; align-items: center; }
+
+        @media print {
+            .top-bar { display: none !important; }
+            body { background: white; }
+            .pdf-container { overflow: visible; display: block; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <a href="index.html" style="color:#186879; text-decoration:none;"><span class="material-icons">arrow_back</span></a>
+    
+    <div class="nav-controls">
+        <button class="tool-btn" onclick="mudarPagina(-1)"><span class="material-icons">chevron_left</span></button>
+        <span id="page-info">1 / 1</span>
+        <button class="tool-btn" onclick="mudarPagina(1)"><span class="material-icons">chevron_right</span></button>
+    </div>
+
+    <div class="header-actions">
+        <button class="tool-btn active" id="btn-pen" onclick="setTool('pen')" title="Lápis"><span class="material-icons">edit</span></button>
+        <button class="tool-btn" id="btn-highlight" onclick="setTool('highlight')" title="Marca-texto"><span class="material-icons">highlight</span></button>
+        <button class="tool-btn" id="btn-rect" onclick="setTool('rect')" title="Retângulo"><span class="material-icons">rectangle</span></button>
+        <button class="tool-btn" id="btn-circle" onclick="setTool('circle')" title="Círculo"><span class="material-icons">radio_button_unchecked</span></button>
+        <button class="tool-btn" id="btn-triangle" onclick="setTool('triangle')" title="Triângulo"><span class="material-icons">change_history</span></button>
+        <button class="tool-btn" id="btn-hex" onclick="setTool('hex')" title="Hexágono"><span class="material-icons">hexagon</span></button>
+        <button class="tool-btn" id="btn-text" onclick="setTool('text')" title="Texto"><span class="material-icons">text_fields</span></button>
+        
+        <button class="tool-btn" onclick="document.getElementById('cor').click()"><span class="material-icons">color_lens</span></button>
+        <input type="color" id="cor" value="#0000ff" style="display:none">
+        
+        <button class="tool-btn" onclick="imprimir()" title="Imprimir"><span class="material-icons">print</span></button>
+        <button class="tool-btn" onclick="limpar()" title="Limpar Tudo"><span class="material-icons">delete_sweep</span></button>
+    </div>
+</div>
+
+<div class="pdf-container" id="pdf-container">
+    <canvas id="pdf-canvas"></canvas>
+    <canvas id="draw-canvas"></canvas>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    let pdfDoc = null, pageNum = 1;
+    const pdfCanvas = document.getElementById('pdf-canvas');
+    const pdfCtx = pdfCanvas.getContext('2d');
+    const drawCanvas = document.getElementById('draw-canvas');
+    const drawCtx = drawCanvas.getContext('2d');
+
+    let tool = 'pen', drawing = false, startX, startY, annotations = [];
+    let tempAnnotation = null;
+
+    async function init() {
+        const params = new URLSearchParams(window.location.search);
+        const file = params.get('file');
+        if (file) {
+            pdfDoc = await pdfjsLib.getDocument(decodeURIComponent(file)).promise;
+            render();
+        }
+    }
+
+    async function render() {
+        if (!pdfDoc) return;
+        const page = await pdfDoc.getPage(pageNum);
+        const container = document.getElementById('pdf-container');
+        const viewportOrig = page.getViewport({ scale: 1.0 });
+        
+        // Ajuste de tamanho baseado no container
+        const scale = (container.clientWidth - 40) / viewportOrig.width;
+        const viewport = page.getViewport({ scale: scale });
+
+        // Sincroniza dimensões de ambos os canvas
+        pdfCanvas.width = drawCanvas.width = viewport.width;
+        pdfCanvas.height = drawCanvas.height = viewport.height;
+        
+        await page.render({ canvasContext: pdfCtx, viewport: viewport }).promise;
+        
+        document.getElementById('page-info').innerText = pageNum + ' / ' + pdfDoc.numPages;
+        redesenharCamadaDesenho();
+    }
+
+    function redesenharCamadaDesenho() {
+        // Limpa apenas o canvas de cima (transparente)
+        drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+        
+        const all = annotations.concat(tempAnnotation ? [tempAnnotation] : []);
+        
+        all.forEach(a => {
+            if (a.page !== pageNum) return;
+            drawCtx.beginPath();
+            drawCtx.strokeStyle = a.color;
+            drawCtx.fillStyle = a.color;
+            drawCtx.lineCap = 'round';
+            drawCtx.lineJoin = 'round';
+            drawCtx.globalAlpha = 1.0;
+
+            if (a.type === 'pen') {
+                drawCtx.lineWidth = 3;
+                drawCtx.moveTo(a.pts[0].x, a.pts[0].y);
+                a.pts.forEach(p => drawCtx.lineTo(p.x, p.y));
+                drawCtx.stroke();
+            } else if (a.type === 'highlight') {
+                drawCtx.lineWidth = 25; drawCtx.globalAlpha = 0.15; // Opacidade sutil
+                drawCtx.moveTo(a.pts[0].x, a.pts[0].y);
+                a.pts.forEach(p => drawCtx.lineTo(p.x, p.y));
+                drawCtx.stroke();
+            } else if (a.type === 'rect') {
+                drawCtx.lineWidth = 3;
+                drawCtx.strokeRect(a.x, a.y, a.w, a.h);
+            } else if (a.type === 'circle') {
+                drawCtx.lineWidth = 3;
+                let r = Math.sqrt(Math.pow(a.w, 2) + Math.pow(a.h, 2));
+                drawCtx.arc(a.x, a.y, r, 0, Math.PI * 2);
+                drawCtx.stroke();
+            } else if (a.type === 'triangle') {
+                drawCtx.lineWidth = 3;
+                drawCtx.moveTo(a.x + a.w / 2, a.y);
+                drawCtx.lineTo(a.x, a.y + a.h);
+                drawCtx.lineTo(a.x + a.w, a.y + a.h);
+                drawCtx.closePath();
+                drawCtx.stroke();
+            } else if (a.type === 'hex') {
+                drawCtx.lineWidth = 3;
+                const s = Math.abs(a.w);
+                for (let i = 0; i < 6; i++) {
+                    const px = a.x + s * Math.cos(i * Math.PI / 3);
+                    const py = a.y + s * Math.sin(i * Math.PI / 3);
+                    if (i === 0) drawCtx.moveTo(px, py); else drawCtx.lineTo(px, py);
+                }
+                drawCtx.closePath(); drawCtx.stroke();
+            } else if (a.type === 'text') {
+                drawCtx.font = "bold 24px Arial";
+                drawCtx.fillText(a.txt, a.x, a.y);
+            }
+        });
+        drawCtx.globalAlpha = 1.0;
+    }
+
+    drawCanvas.onmousedown = (e) => {
+        drawing = true;
+        const r = drawCanvas.getBoundingClientRect();
+        startX = e.clientX - r.left;
+        startY = e.clientY - r.top;
+        const color = document.getElementById('cor').value;
+
+        if (tool === 'text') {
+            const t = prompt("Texto:");
+            if (t) {
+                annotations.push({ type: 'text', color: color, x: startX, y: startY, txt: t, page: pageNum });
+                redesenharCamadaDesenho();
+            }
+            drawing = false;
+        } else if (tool === 'pen' || tool === 'highlight') {
+            tempAnnotation = { type: tool, color: color, pts: [{ x: startX, y: startY }], page: pageNum };
+        } else {
+            tempAnnotation = { type: tool, color: color, x: startX, y: startY, w: 0, h: 0, page: pageNum };
+        }
+    };
+
+    drawCanvas.onmousemove = (e) => {
+        if (!drawing || !tempAnnotation) return;
+        const r = drawCanvas.getBoundingClientRect();
+        const currX = e.clientX - r.left;
+        const currY = e.clientY - r.top;
+
+        if (tool === 'pen' || tool === 'highlight') {
+            tempAnnotation.pts.push({ x: currX, y: currY });
+        } else {
+            tempAnnotation.w = currX - startX;
+            tempAnnotation.h = currY - startY;
+        }
+        redesenharCamadaDesenho(); // Move suave sem piscar o PDF
+    };
+
+    drawCanvas.onmouseup = () => {
+        if (tempAnnotation) annotations.push(tempAnnotation);
+        tempAnnotation = null;
+        drawing = false;
+        redesenharCamadaDesenho();
+    };
+
+    function setTool(t) {
+        tool = t;
+        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-' + t).classList.add('active');
+    }
+
+    function mudarPagina(d) {
+        if (!pdfDoc) return;
+        let n = pageNum + d;
+        if (n > 0 && n <= pdfDoc.numPages) { 
+            pageNum = n; 
+            render(); 
+        }
+    }
+
+    function imprimir() {
+        // MERGE REAL: Une as duas camadas em um único canvas para gerar a imagem
+        const mergeCanvas = document.createElement('canvas');
+        mergeCanvas.width = pdfCanvas.width;
+        mergeCanvas.height = pdfCanvas.height;
+        const mCtx = mergeCanvas.getContext('2d');
+        
+        mCtx.drawImage(pdfCanvas, 0, 0);
+        mCtx.drawImage(drawCanvas, 0, 0);
+        
+        const dataUrl = mergeCanvas.toDataURL('image/jpeg', 0.9);
+        const win = window.open('', '_blank');
+        win.document.write(`<html><body style="margin:0;"><img src="${dataUrl}" style="width:100%" onload="window.print();window.close();"></body></html>`);
+        win.document.close();
+    }
+
+    function limpar() { 
+        if(confirm("Limpar anotações desta página?")) { 
+            annotations = annotations.filter(a => a.page !== pageNum); 
+            redesenharCamadaDesenho(); 
+        } 
+    }
+
+    window.onload = init;
+    window.onresize = () => render();
+</script>
+</body>
+</html>

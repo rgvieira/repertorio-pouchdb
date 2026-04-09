@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#510017",
+                    "surface-container-highest": "#ddd9ff",
+                    "inverse-primary": "#96a5ff",
+                    "tertiary": "#176a21",
+                    "secondary-dim": "#4840a9",
+                    "tertiary-fixed": "#9df197",
+                    "error-container": "#f74b6d",
+                    "outline": "#75729e",
+                    "tertiary-container": "#9df197",
+                    "inverse-on-surface": "#9b98c6",
+                    "error": "#b41340",
+                    "primary-dim": "#39489b",
+                    "on-surface": "#2c2a51",
+                    "on-secondary-fixed": "#2b208c",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-container": "#3f37a0",
+                    "on-secondary-fixed-variant": "#4941aa",
+                    "tertiary-dim": "#025d16",
+                    "surface-bright": "#f9f5ff",
+                    "on-tertiary-container": "#005c15",
+                    "on-tertiary": "#d1ffc8",
+                    "surface-tint": "#4555a8",
+                    "secondary-fixed": "#d0ccff",
+                    "on-secondary": "#f5f1ff",
+                    "on-primary-fixed": "#00083f",
+                    "outline-variant": "#aca8d7",
+                    "on-primary-fixed-variant": "#1b2c7f",
+                    "secondary-container": "#d0ccff",
+                    "on-surface-variant": "#595781",
+                    "surface-container-high": "#e3dfff",
+                    "on-tertiary-fixed": "#00460e",
+                    "on-tertiary-fixed-variant": "#12661e",
+                    "on-primary": "#f2f1ff",
+                    "surface-container": "#e9e5ff",
+                    "on-background": "#2c2a51",
+                    "primary-fixed": "#96a5ff",
+                    "primary-fixed-dim": "#8998f0",
+                    "background": "#f9f5ff",
+                    "surface-container-low": "#f3eeff",
+                    "surface-dim": "#d4cfff",
+                    "error-dim": "#a70138",
+                    "tertiary-fixed-dim": "#90e28a",
+                    "primary-container": "#96a5ff",
+                    "surface": "#f9f5ff",
+                    "secondary": "#544db6",
+                    "on-primary-container": "#0f2176",
+                    "secondary-fixed-dim": "#c1bdff",
+                    "on-error": "#ffefef",
+                    "inverse-surface": "#0b082f",
+                    "surface-variant": "#ddd9ff",
+                    "primary": "#4555a8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Plus Jakarta Sans"],
+                    "label": ["Plus Jakarta Sans"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#f9f5ff]/70 dark:bg-slate-950/70 backdrop-blur-3xl flex items-center justify-between px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-[#ddd9ff]/30 dark:hover:bg-slate-800 transition-colors scale-95 duration-200 ease-out">
+<span class="material-symbols-outlined text-[#5C6BC0] dark:text-[#96a5ff]">arrow_back</span>
+</button>
+<h1 class="font-headline tracking-tight font-bold text-on-surface text-xl">Configurações</h1>
+</div>
+<button class="p-2 rounded-full hover:bg-[#ddd9ff]/30 dark:hover:bg-slate-800 transition-colors scale-95 duration-200 ease-out">
+<span class="material-symbols-outlined text-[#5C6BC0] dark:text-[#96a5ff]">settings</span>
+</button>
+</header>
+<main class="pt-24 px-6 max-w-2xl mx-auto space-y-8">
+<!-- Hero Section -->
+<section class="mb-10 text-center">
+<div class="inline-flex items-center justify-center p-4 rounded-full bg-surface-container-highest mb-4">
+<span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<h2 class="text-display-sm font-headline font-extrabold tracking-tight mb-2">Editorial Serenity</h2>
+<p class="text-on-surface-variant text-body-md">Mantenha seu ambiente de prática afinado e organizado.</p>
+</section>
+<!-- Section 1: Sincronização -->
+<section class="space-y-4">
+<label class="font-label text-xs font-bold uppercase tracking-widest text-primary ml-2">Sincronização</label>
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_8px_24px_rgba(44,42,81,0.04)]">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-primary-container rounded-xl">
+<span class="material-symbols-outlined text-on-primary-container">sync</span>
+</div>
+<div>
+<h3 class="font-bold text-on-surface">Arquivos da Biblioteca</h3>
+<p class="text-sm text-tertiary font-medium">Files Syncing</p>
+</div>
+</div>
+</div>
+<button class="w-full py-4 px-6 rounded-full bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity active:scale-95 duration-150">
+<span class="material-symbols-outlined">rocket_launch</span>
+                    Scan Root
+                </button>
+<div class="mt-4 flex items-center gap-2 text-xs text-on-surface-variant px-2">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                    Último scan realizado há 14 minutos
+                </div>
+</div>
+</section>
+<!-- Section 2: Banco de Dados -->
+<section class="space-y-4">
+<label class="font-label text-xs font-bold uppercase tracking-widest text-primary ml-2">Banco de Dados</label>
+<div class="bg-surface-container-low rounded-xl overflow-hidden shadow-none border border-outline-variant/15">
+<div class="p-6 space-y-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant">storage</span>
+<div>
+<h3 class="font-bold text-on-surface">Manutenção</h3>
+<p class="text-sm text-tertiary">Database Optimized</p>
+</div>
+</div>
+<button class="px-4 py-2 rounded-full bg-surface-container-high text-primary font-bold text-sm hover:bg-surface-container-highest transition-colors">
+                            Otimizar
+                        </button>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant">cloud_download</span>
+<div>
+<h3 class="font-bold text-on-surface">Backup em Nuvem</h3>
+<p class="text-sm text-on-surface-variant">Ativo via Google Drive</p>
+</div>
+</div>
+<button class="px-4 py-2 rounded-full bg-surface-container-high text-primary font-bold text-sm hover:bg-surface-container-highest transition-colors">
+                            Gerenciar
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Geral -->
+<section class="space-y-4">
+<label class="font-label text-xs font-bold uppercase tracking-widest text-primary ml-2">Geral</label>
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_8px_24px_rgba(44,42,81,0.04)] space-y-6">
+<!-- Dark Mode Toggle -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant">dark_mode</span>
+<div>
+<h3 class="font-bold text-on-surface">Modo Escuro</h3>
+<p class="text-sm text-on-surface-variant">Ajuste visual para ambientes escuros</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-12 h-7 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Practice Reminders -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant">notifications_active</span>
+<div>
+<h3 class="font-bold text-on-surface">Lembretes de Prática</h3>
+<p class="text-sm text-on-surface-variant">Notificações diárias motivacionais</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-12 h-7 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</section>
+<!-- System Status Log (Terminal Style) -->
+<section class="space-y-4">
+<label class="font-label text-xs font-bold uppercase tracking-widest text-primary ml-2">System Status Log</label>
+<div class="bg-inverse-surface rounded-xl p-5 shadow-inner overflow-hidden">
+<div class="flex items-center gap-2 mb-3 border-b border-on-surface-variant/20 pb-3">
+<div class="w-3 h-3 rounded-full bg-error"></div>
+<div class="w-3 h-3 rounded-full bg-secondary"></div>
+<div class="w-3 h-3 rounded-full bg-tertiary"></div>
+<span class="text-[10px] font-mono text-outline-variant ml-2 uppercase tracking-widest">Live Activity</span>
+</div>
+<div class="font-mono text-sm space-y-2 max-h-40 overflow-y-auto no-scrollbar">
+<p class="text-tertiary-fixed"><span class="text-outline-variant">[14:32]</span> Database connected successfully.</p>
+<p class="text-primary-fixed"><span class="text-outline-variant">[14:33]</span> Fetching latest practice sessions...</p>
+<p class="text-white/80"><span class="text-outline-variant">[14:35]</span> Syncing: 42 new files detected in root.</p>
+<p class="text-tertiary-fixed"><span class="text-outline-variant">[14:38]</span> Cache optimization complete.</p>
+<p class="text-white/80"><span class="text-outline-variant">[14:40]</span> Listening for new events...</p>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-2 bg-[#ffffff] dark:bg-slate-900 z-50 rounded-t-[24px] shadow-[0_-8px_24px_rgba(44,42,81,0.06)]">
+<a class="flex flex-col items-center justify-center text-[#595781] dark:text-slate-400 px-5 py-2 hover:bg-[#f3eeff] dark:hover:bg-slate-800 rounded-full scale-90 duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">library_music</span>
+<span class="font-headline text-[11px] font-bold uppercase tracking-wider mt-1">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#595781] dark:text-slate-400 px-5 py-2 hover:bg-[#f3eeff] dark:hover:bg-slate-800 rounded-full scale-90 duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">timer</span>
+<span class="font-headline text-[11px] font-bold uppercase tracking-wider mt-1">Metronome</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#595781] dark:text-slate-400 px-5 py-2 hover:bg-[#f3eeff] dark:hover:bg-slate-800 rounded-full scale-90 duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">tune</span>
+<span class="font-headline text-[11px] font-bold uppercase tracking-wider mt-1">Tuner</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-gradient-to-br from-[#4555a8] to-[#96a5ff] text-white rounded-full px-5 py-2 scale-90 duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">exercise</span>
+<span class="font-headline text-[11px] font-bold uppercase tracking-wider mt-1">Practice</span>
+</a>
+</nav>
+</body></html>

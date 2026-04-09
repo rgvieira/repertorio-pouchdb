@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Repertório - Sheet Music Viewer</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#ff9f92",
+                    "on-secondary-container": "#20614f",
+                    "on-primary-container": "#1b387d",
+                    "tertiary": "#a53c30",
+                    "inverse-primary": "#98b1fe",
+                    "error-container": "#f56965",
+                    "on-tertiary": "#fff7f6",
+                    "on-background": "#2d333b",
+                    "surface-container-highest": "#dee3ed",
+                    "surface-bright": "#f8f9ff",
+                    "on-primary-fixed-variant": "#264187",
+                    "surface": "#f8f9ff",
+                    "primary-container": "#abbfff",
+                    "primary-fixed-dim": "#98b1fe",
+                    "outline-variant": "#adb2bc",
+                    "surface-container-low": "#f1f3fa",
+                    "surface-container-high": "#e4e8f2",
+                    "surface-dim": "#d4dae6",
+                    "on-tertiary-fixed-variant": "#7a1c14",
+                    "on-secondary-fixed": "#034e3d",
+                    "secondary": "#2a6a57",
+                    "background": "#f8f9ff",
+                    "error-dim": "#70030f",
+                    "on-surface": "#2d333b",
+                    "inverse-on-surface": "#9b9da2",
+                    "primary-dim": "#355096",
+                    "on-secondary": "#e4fff3",
+                    "on-error": "#fff7f6",
+                    "on-tertiary-container": "#6d130c",
+                    "on-primary-fixed": "#002264",
+                    "error": "#ac3434",
+                    "on-secondary-fixed-variant": "#2c6b59",
+                    "secondary-fixed": "#b7f9e0",
+                    "surface-tint": "#425ca3",
+                    "primary-fixed": "#abbfff",
+                    "tertiary-dim": "#953025",
+                    "surface-variant": "#dee3ed",
+                    "tertiary-fixed": "#ff9f92",
+                    "on-tertiary-fixed": "#4a0001",
+                    "on-primary": "#f9f8ff",
+                    "surface-container-lowest": "#ffffff",
+                    "primary": "#425ca3",
+                    "surface-container": "#ebeef6",
+                    "inverse-surface": "#0b0e12",
+                    "secondary-fixed-dim": "#a9ead3",
+                    "outline": "#767b84",
+                    "secondary-container": "#b7f9e0",
+                    "on-surface-variant": "#5a5f68",
+                    "secondary-dim": "#1b5d4b",
+                    "on-error-container": "#65000b",
+                    "tertiary-fixed-dim": "#ff8a7a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #f8f9ff;
+        }
+        .sheet-shadow {
+            box-shadow: 0 4px 40px rgba(0,0,0,0.06);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface overflow-hidden">
+<!-- Top Navigation Bar (Shared Component Logic Applied) -->
+<!-- SUPPRESSION RULE: The TopAppBar is rendered here as a contextual header for the viewer task. -->
+<header class="fixed top-0 w-full z-50 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-blue-50/50 transition-colors active:scale-95 duration-150 text-blue-700">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<div class="flex flex-col">
+<h1 class="font-headline font-bold text-xl tracking-tight text-on-surface">Nocturne Op. 9 No. 2</h1>
+<span class="text-[10px] font-label font-semibold uppercase tracking-widest text-on-surface-variant">Frédéric Chopin • Piano Solo</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-blue-50/50 transition-colors text-blue-700">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-blue-50/50 transition-colors text-blue-700">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Main Content: Sheet Music Canvas -->
+<main class="h-screen w-screen pt-24 pb-32 px-4 md:px-8 flex justify-center items-start overflow-y-auto bg-surface">
+<div class="w-full max-w-4xl bg-surface-container-lowest rounded-lg sheet-shadow p-8 md:p-16 min-h-[1200px] relative">
+<!-- Placeholder for PDF/Sheet Content -->
+<div class="flex flex-col gap-12 opacity-80 select-none">
+<!-- Title Block Asymmetric -->
+<div class="mb-12">
+<h2 class="font-headline font-extrabold text-4xl mb-2 text-primary">Nocturne</h2>
+<p class="text-on-surface-variant font-medium">Andante</p>
+</div>
+<!-- Abstract Musical Notation (Visual Representation) -->
+<div class="space-y-16">
+<!-- Stave 1 -->
+<div class="h-24 w-full border-y border-outline-variant/20 relative flex items-center">
+<div class="absolute left-0 top-0 bottom-0 flex flex-col justify-between py-2">
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+</div>
+<div class="ml-4 text-3xl font-serif text-on-surface/40">𝄞</div>
+</div>
+<!-- Stave 2 -->
+<div class="h-24 w-full border-y border-outline-variant/20 relative flex items-center">
+<div class="absolute left-0 top-0 bottom-0 flex flex-col justify-between py-2">
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+</div>
+<div class="ml-4 text-3xl font-serif text-on-surface/40">𝄢</div>
+</div>
+<!-- Stave 3 -->
+<div class="h-24 w-full border-y border-outline-variant/20 relative flex items-center">
+<div class="absolute left-0 top-0 bottom-0 flex flex-col justify-between py-2">
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+</div>
+<div class="ml-4 text-3xl font-serif text-on-surface/40">𝄞</div>
+</div>
+</div>
+<!-- Subtle Texture Placeholder -->
+<div class="absolute inset-0 opacity-[0.03] pointer-events-none">
+<img class="w-full h-full object-cover mix-blend-multiply" data-alt="extreme close-up of high quality cream colored textured paper with subtle grain and organic fibers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPoEFTw39g9WMgMWVpw-BDpAgCpeATBLgOemz7CdCqGCpqGhWBm-UYHURtzReyQVLXQL7Y_UitIrg8-6l60xzqGoYFEkiqQiVMhsV1aBgcfJbCkOb7d6qxHK2R71TVOyfogpAHcOIGbSPdk8uRAIokiSPvOX6zybNu5Bwj26wd4K17RgDmfp0PpPybgs77oyCN77qr6Fl96mKP9eLSaQmZNjKkkn9L9Xvwg0WEMGaB20Uh3qsN8SGFMbL0bDr4-n5PUWI6yO2VySE"/>
+</div>
+</div>
+<!-- Page Number -->
+<div class="absolute bottom-8 right-8">
+<span class="font-label text-[10px] tracking-widest font-bold text-outline">PAGE 01 / 08</span>
+</div>
+</div>
+</main>
+<!-- Contextual "Floating Maestro" Controls -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3">
+<!-- Main Control Bar -->
+<div class="bg-white/70 backdrop-blur-2xl border border-white/40 shadow-xl rounded-full px-6 py-3 flex items-center gap-6">
+<!-- Paging Controls -->
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low hover:bg-surface-container-high transition-colors active:scale-90 text-primary">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low hover:bg-surface-container-high transition-colors active:scale-90 text-primary">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<!-- Divider -->
+<div class="w-[1px] h-6 bg-outline-variant/30"></div>
+<!-- Zoom/Tool Controls -->
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-primary/10 transition-colors text-primary font-label text-[10px] font-bold">
+<span class="material-symbols-outlined">zoom_in</span>
+<span>100%</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary/10 transition-colors text-primary">
+<span class="material-symbols-outlined">auto_stories</span>
+</button>
+</div>
+<!-- Divider -->
+<div class="w-[1px] h-6 bg-outline-variant/30"></div>
+<!-- Playback/Metronome Interaction -->
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-primary text-on-primary shadow-lg shadow-primary/20 hover:bg-primary-dim transition-all active:scale-90">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<!-- Secondary Toggle (Metronome Glass) -->
+<button class="w-14 h-14 bg-secondary-container/80 backdrop-blur-xl border border-white/20 shadow-xl rounded-2xl flex flex-col items-center justify-center text-on-secondary-container hover:bg-secondary-container transition-all active:scale-95">
+<span class="material-symbols-outlined text-xl">timer</span>
+<span class="text-[8px] font-bold tracking-tighter uppercase mt-0.5">88 BPM</span>
+</button>
+</div>
+<!-- Navigation Shell Logic (Suppressed on Viewer Focus, but kept in skeleton for consistency) -->
+<!-- Only rendered for top-level destinations. This sub-page hides the global BottomNavBar to focus on the content. -->
+</body></html>

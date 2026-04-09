@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block header_toolbar %}
+<button class="tool-btn" onclick="window.ativarFerramenta('pen', event)" data-tooltip="Caneta">
+    <span class="material-icons">create</span>
+</button>
+<button class="tool-btn" onclick="window.abrirSeletorCor()" data-tooltip="Cor da caneta">
+    <span class="material-icons">color_lens</span>
+</button>
+<input type="color" id="corCaneta" value="#0000ff" style="display: none;">
+<button class="tool-btn" onclick="window.ativarFerramenta('highlight', event)" data-tooltip="Marca-texto">
+    <span class="material-icons">highlight</span>
+</button>
+<button class="tool-btn" onclick="window.limparTudo()" data-tooltip="Limpar todas as anotações">
+    <span class="material-icons">delete_sweep</span>
+</button>
+<button class="tool-btn" onclick="window.salvarAnotacoes()" data-tooltip="Salvar anotações">
+    <span class="material-icons">save</span>
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="viewer-header">
+    <h2 class="viewer-title">
+        <span class="material-icons">picture_as_pdf</span>
+        {{ titulo }}
+    </h2>
+</div>
+<div id="viewer-mensagem" class="mensagem" style="display: none;"></div>
+<div id="pdf-container" class="pdf-container">
+    <canvas id="pdf-canvas"></canvas>
+</div>
+
+<script type="module">
+    // Importa os arquivos locais (versão .mjs)
+    import * as pdfjsLib from '/static/pdfjs-dist/pdf.mjs';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/static/pdfjs-dist/pdf.worker.mjs';
+
+    // Opção 2 (fallback): usar CDN caso a opção 1 não funcione no seu ambiente
+    // pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.149/pdf.worker.min.js';
+
+    // ================== VARIÁVEIS GLOBAIS ==================
+    const url = "/pdf/" + encodeURIComponent("{{ arquivo }}");
+    let pdfDoc = null;
+    let pageNum = 1;
+    const canvas = document.getElementById('pdf-canvas');
+    const ctx = canvas.getContext('2d');
+    let ferramentaAtual = 'pen';
+    let corCanetaAtual = '#0000ff';      // azul padrão
+    let desenhando = false;
+    let anotacoes = [];
+
+    // ================== FUNÇÕES AUXILIARES ==================
+    function mostrarMensagem(texto, tipo = 'erro') {
+        const msgDiv = document.getElementById('viewer-mensagem');
+        msgDiv.textContent = texto;
+        msgDiv.className = 'mensagem ' + tipo; // 'erro', 'sucesso', 'info'
+        msgDiv.style.display = 'block';
+        setTimeout(() => { msgDiv.style.display = 'none'; }, 5000);
+    }
+
+    // Renderiza a página atual do PDF
+    function renderPage(num) {
+        pdfDoc.getPage(num).then(page => {
+            const viewport = page.getViewport({ scale: 1.5 });
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            const renderContext = { canvasContext: ctx, viewport: viewport };
+            page.render(renderContext).promise.then(() => {
+                // Após renderizar, redesenha as anotações da página
+                redesenharAnotacoes();
+            });
+        });
+    }
+
+    // Redesenha todas as anotações da página atual no canvas
+    function redesenharAnotacoes() {
+        anotacoes.forEach(anot => {
+            if (anot.page !== pageNum) return;
+            if (anot.pontos.length < 2) return; // precisa de ao menos dois pontos
+
+            ctx.beginPath();
+            ctx.strokeStyle = anot.cor;
+            ctx.lineWidth = anot.tipo === 'pen' ? 2 : 15;
+            ctx.moveTo(anot.pontos[0].x, anot.pontos[0].y);
+            for (let i = 1; i < anot.pontos.length; i++) {
+                ctx.lineTo(anot.pontos[i].x, anot.pontos[i].y);
+            }
+            ctx.stroke();
+        });
+    }
+
+    // Carrega as anotações salvas para este arquivo
+    async function carregarAnotacoes() {
+        try {
+            const response = await fetch('/anotacoes/' + encodeURIComponent("{{ nome_arquivo }}"));
+            if (!response.ok) throw new Error('Erro ao carregar anotações');
+            const dados = await response.json();
+            anotacoes = dados; // substitui o array
+            redesenharAnotacoes();
+        } catch (err) {
+            console.warn('Nenhuma anotação anterior ou erro:', err);
+            // Se não houver anotações, apenas continua
+        }
+    }
+
+    // ================== FUNÇÕES CHAMADAS PELOS BOTÕES ==================
+    window.ativarFerramenta = function (tipo, event) {
+        ferramentaAtual = tipo;
+        document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.closest('.tool-btn').classList.add('active');
+    };
+
+    window.abrirSeletorCor = function () {
+        document.getElementById('corCaneta').click();
+    };
+
+    window.limparTudo = function () {
+        anotacoes = [];
+        renderPage(pageNum); // redesenha a página sem anotações
+    };
+
+    window.salvarAnotacoes = function () {
+        fetch('/salvar_anotacoes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ arquivo: "{{ arquivo }}", anotacoes: anotacoes })
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Erro na rede');
+                return response.json();
+            })
+            .then(data => {
+                mostrarMensagem('Anotações salvas com sucesso!', 'sucesso');
+            })
+            .catch(err => {
+                console.error(err);
+                mostrarMensagem('Erro ao salvar: ' + err.message, 'erro');
+            });
+    };
+
+    // ================== EVENTOS DE DESENHO ==================
+    canvas.addEventListener('mousedown', (e) => {
+        desenhando = true;
+        ctx.beginPath();
+        ctx.moveTo(e.offsetX, e.offsetY);
+        anotacoes.push({
+            tipo: ferramentaAtual,
+            cor: ferramentaAtual === 'pen' ? corCanetaAtual : 'rgba(255,255,0,0.3)',
+            pontos: [{ x: e.offsetX, y: e.offsetY }],
+            page: pageNum
+        });
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (!desenhando) return;
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.strokeStyle = ferramentaAtual === 'pen' ? corCanetaAtual : 'rgba(255,255,0,0.02)';
+        ctx.lineWidth = ferramentaAtual === 'pen' ? 2 : 15;
+        ctx.stroke();
+
+        const ultima = anotacoes[anotacoes.length - 1];
+        ultima.pontos.push({ x: e.offsetX, y: e.offsetY });
+    });
+
+    canvas.addEventListener('mouseup', () => {
+        desenhando = false;
+    });
+
+    // Atualiza a cor da caneta quando o seletor mudar
+    document.getElementById('corCaneta').addEventListener('input', (e) => {
+        corCanetaAtual = e.target.value;
+    });
+
+    // ================== INICIALIZAÇÃO ==================
+    pdfjsLib.getDocument(url).promise
+        .then(pdf => {
+            pdfDoc = pdf;
+            return carregarAnotacoes().then(() => pdfDoc);
+        })
+        .then(() => {
+            renderPage(pageNum);
+        })
+        .catch(error => {
+            console.error('Erro ao carregar PDF:', error);
+            document.getElementById('pdf-container').innerHTML =
+                '<p style="color: red; padding: 20px;">❌ Não foi possível carregar a partitura. Verifique o arquivo ou o caminho.</p>';
+        });
+</script>
+{% endblock %}

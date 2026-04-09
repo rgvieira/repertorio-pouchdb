@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="viewer-header">
+    <h2 class="viewer-title">
+        <span class="material-icons">settings</span>
+        Configurações
+    </h2>
+</div>
+
+<div id="config-message" class="mensagem" style="display: none;"></div>
+
+<form hx-post="/config/salvar" hx-target="#config-message" hx-swap="innerHTML">
+    <div class="config-section">
+        <h3>Pastas de Músicas</h3>
+        <div id="lista-pastas">
+            {% for pasta in root_paths %}
+            <div class="pasta-item" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <input type="text" name="root_paths" value="{{ pasta }}" readonly
+                    style="flex: 1; padding: 8px; background-color: #f5f5f5;">
+                <button type="button" class="remover-pasta text-button secondary"
+                    onclick="this.closest('.pasta-item').remove()">
+                    <span class="material-icons">delete</span>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 16px;">
+            <button type="button" id="selecionar-pasta" class="text-button">
+                <span class="material-icons">folder_open</span> Selecionar pasta
+            </button>
+            <button type="submit" class="text-button">
+                <span class="material-icons">save</span> Salvar
+            </button>
+        </div>
+    </div>
+</form>
+
+<div style="margin-top: 24px;">
+    <button hx-post="/config/reescanear" hx-target="#config-message" class="text-button">
+        <span class="material-icons">refresh</span> REESCANEAR
+    </button>
+</div>
+
+<script>
+
+    document.getElementById('selecionar-pasta').addEventListener('click', async function () {
+        const response = await fetch('/config/picker');
+        const data = await response.json();
+        console.log('Resposta do servidor:', data);
+
+        if (data.path) {
+            const lista = document.getElementById('lista-pastas');
+            const novoItem = document.createElement('div');
+            novoItem.className = 'pasta-item';
+            novoItem.style = 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'root_paths';
+            input.value = data.path;
+            input.readOnly = true;
+            input.style.flex = '1';
+            input.style.padding = '8px';
+            input.style.backgroundColor = '#f5f5f5';
+
+            const btnRemove = document.createElement('button');
+            btnRemove.type = 'button';
+            btnRemove.className = 'remover-pasta text-button secondary';
+            btnRemove.innerHTML = '<span class="material-icons">delete</span>';
+            btnRemove.onclick = function () { this.closest('.pasta-item').remove(); };
+
+            novoItem.appendChild(input);
+            novoItem.appendChild(btnRemove);
+            lista.appendChild(novoItem);
+        } else if (data.cancelled) {
+            // Usuário cancelou – não faz nada
+        } else {
+            alert('Erro ao selecionar pasta: ' + (data.error || 'desconhecido'));
+        }
+    });
+</script>
+
+
+<style>
+    .pasta-item input[readonly] {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: default;
+    }
+
+    .pasta-item button {
+        padding: 8px;
+    }
+
+    .text-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: none;
+        border: none;
+        color: var(--primary);
+        font-weight: 500;
+        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 4px;
+    }
+
+    .text-button:hover {
+        background-color: var(--primary-light);
+    }
+
+    .text-button.secondary {
+        color: var(--text-secondary);
+    }
+
+    .text-button.secondary:hover {
+        background-color: var(--gray-200);
+    }
+</style>
+{% endblock %}

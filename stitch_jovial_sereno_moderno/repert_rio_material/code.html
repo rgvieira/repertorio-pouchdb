@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#510017",
+                        "surface-container-highest": "#ddd9ff",
+                        "inverse-primary": "#96a5ff",
+                        "tertiary": "#176a21",
+                        "secondary-dim": "#4840a9",
+                        "tertiary-fixed": "#9df197",
+                        "error-container": "#f74b6d",
+                        "outline": "#75729e",
+                        "tertiary-container": "#9df197",
+                        "inverse-on-surface": "#9b98c6",
+                        "error": "#b41340",
+                        "primary-dim": "#39489b",
+                        "on-surface": "#2c2a51",
+                        "on-secondary-fixed": "#2b208c",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#3f37a0",
+                        "on-secondary-fixed-variant": "#4941aa",
+                        "tertiary-dim": "#025d16",
+                        "surface-bright": "#f9f5ff",
+                        "on-tertiary-container": "#005c15",
+                        "on-tertiary": "#d1ffc8",
+                        "surface-tint": "#4555a8",
+                        "secondary-fixed": "#d0ccff",
+                        "on-secondary": "#f5f1ff",
+                        "on-primary-fixed": "#00083f",
+                        "outline-variant": "#aca8d7",
+                        "on-primary-fixed-variant": "#1b2c7f",
+                        "secondary-container": "#d0ccff",
+                        "on-surface-variant": "#595781",
+                        "surface-container-high": "#e3dfff",
+                        "on-tertiary-fixed": "#00460e",
+                        "on-tertiary-fixed-variant": "#12661e",
+                        "on-primary": "#f2f1ff",
+                        "surface-container": "#e9e5ff",
+                        "on-background": "#2c2a51",
+                        "primary-fixed": "#96a5ff",
+                        "primary-fixed-dim": "#8998f0",
+                        "background": "#f9f5ff",
+                        "surface-container-low": "#f3eeff",
+                        "surface-dim": "#d4cfff",
+                        "error-dim": "#a70138",
+                        "tertiary-fixed-dim": "#90e28a",
+                        "primary-container": "#96a5ff",
+                        "surface": "#f9f5ff",
+                        "secondary": "#544db6",
+                        "on-primary-container": "#0f2176",
+                        "secondary-fixed-dim": "#c1bdff",
+                        "on-error": "#ffefef",
+                        "inverse-surface": "#0b082f",
+                        "surface-variant": "#ddd9ff",
+                        "primary": "#4555a8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Plus Jakarta Sans"],
+                        "label": ["Plus Jakarta Sans"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-shadow {
+            box-shadow: 0 8px 24px rgba(44, 42, 81, 0.06);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface selection:bg-primary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#f9f5ff]/70 dark:bg-slate-950/70 backdrop-blur-3xl">
+<div class="flex items-center justify-between px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-[#ddd9ff]/30 transition-colors scale-95 duration-200 ease-out">
+<span class="material-symbols-outlined text-[#5C6BC0]">arrow_back</span>
+</button>
+<h1 class="text-xl font-bold text-[#2c2a51] tracking-tight font-['Plus_Jakarta_Sans']">Editorial Serenity</h1>
+</div>
+<button class="p-2 rounded-full hover:bg-[#ddd9ff]/30 transition-colors scale-95 duration-200 ease-out">
+<span class="material-symbols-outlined text-[#5C6BC0]">settings</span>
+</button>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-5xl mx-auto">
+<!-- Hero Section -->
+<section class="mb-12">
+<div class="flex flex-col gap-2 mb-8">
+<span class="text-label text-xs font-bold uppercase tracking-[0.05em] text-primary">Coleção Particular</span>
+<h2 class="text-4xl font-extrabold tracking-tighter text-on-surface">Minha Biblioteca</h2>
+<p class="text-on-surface-variant max-w-md mt-2">Um espaço curado para o seu progresso musical e exploração artística.</p>
+</div>
+<!-- Search Bar -->
+<div class="relative group">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full bg-surface-container-low border-none rounded-full py-4 pl-12 pr-6 focus:ring-1 focus:ring-primary text-on-surface placeholder-on-surface-variant/50 transition-all editorial-shadow" placeholder="Buscar em seu repertório..." type="text"/>
+</div>
+</section>
+<!-- Bento Grid Library -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Card 1: Chopin -->
+<div class="group bg-surface-container-lowest rounded-xl p-6 editorial-shadow transition-all hover:translate-y-[-4px]">
+<div class="aspect-square rounded-lg mb-6 overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Vintage grand piano in a dimly lit classical music hall with dust motes dancing in a single beam of light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJtGI5bXxsHZZ0S6bOsBKSiivJNkzieq7yjPHW6K_4-_863XrFBk2p1K08z5LOv-C1ZvijqOVYwVhrvf2f4G-9vBPk3aRSbDpQmBEgSoo0sMNR7-AXUUYvj397raqxmybH0pqdwU27SdWSclNDWiVFY17-89Y3VNm6oNtSJolMtz4abBhLfBDLDelkgQSlcwnno03ZUSGXaq5DBin1zhTky1FOuFkmm1JqxyEYc11ZvD54hhkl44egCaMYevhl_WSwPWNhiGdrjP0"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-start">
+<span class="text-label text-[10px] font-bold uppercase tracking-wider text-tertiary px-2 py-1 bg-tertiary/10 rounded-full">Erudito</span>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<h3 class="text-xl font-bold mt-2 leading-tight">Chopin Nocturne Op. 9</h3>
+<p class="text-sm text-on-surface-variant">Frédéric Chopin</p>
+<div class="mt-4 flex items-center justify-between">
+<div class="h-1 w-24 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-[75%] rounded-full shadow-[0_0_8px_rgba(23,106,33,0.3)]"></div>
+</div>
+<span class="text-[10px] font-bold text-tertiary">75% CONCLUÍDO</span>
+</div>
+</div>
+</div>
+<!-- Card 2: Bossa Nova -->
+<div class="group bg-surface-container-lowest rounded-xl p-6 editorial-shadow transition-all hover:translate-y-[-4px]">
+<div class="aspect-square rounded-lg mb-6 overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Acoustic guitar leaning against a sun-drenched wall in Rio de Janeiro with tropical plants and soft shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXWjoivC1WpZyTL5krh5LslfKB2oqY25A5BasGp4GeTOxeom8C6AsabnkWDZfG7nXfBKtLpzcniPyLmjEyZtTuIicIIhipPGVZF6S4AA2038ZE1FluV-kUjChac-9RNNeOyuXgaFmPIb9qv50SbfYdXDUYu2FEB2liURWpItJWj-z4IUDaE9H0516n3hnNm8rfUF9ZTObms-WjR-Xdmq00wdyB3U0lUs_KcO5gg2Ytj_c2q_v_EhOlbBQlVR066G-vJ6yeEF9bTxk"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-start">
+<span class="text-label text-[10px] font-bold uppercase tracking-wider text-primary px-2 py-1 bg-primary/10 rounded-full">Bossa Nova</span>
+<span class="material-symbols-outlined text-outline text-sm">favorite</span>
+</div>
+<h3 class="text-xl font-bold mt-2 leading-tight">Chega de Saudade</h3>
+<p class="text-sm text-on-surface-variant">Tom Jobim &amp; Vinícius</p>
+<div class="mt-4 flex items-center justify-between">
+<div class="h-1 w-24 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-[40%] rounded-full shadow-[0_0_8px_rgba(23,106,33,0.3)]"></div>
+</div>
+<span class="text-[10px] font-bold text-tertiary">40% CONCLUÍDO</span>
+</div>
+</div>
+</div>
+<!-- Card 3: Take Five -->
+<div class="group bg-surface-container-lowest rounded-xl p-6 editorial-shadow transition-all hover:translate-y-[-4px]">
+<div class="aspect-square rounded-lg mb-6 overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Shiny brass saxophone resting on a velvet stool in a smoky jazz club with blue and purple neon highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYGUdJTcqfZM5AYQ1H4OqFgQWEeqC04o0NjHMn8T-j6D3WvKiA7oa6rEWuEPwEl3xiBDiB3r5_t54aPQPXjbtcvRc5V_w39Pvy2ay-Ghscds4n-phvW_CgVWyx05mPkNNQO1s1f_A_7OsTO-N6RAN3QlKqpd-iwlF_5Uddkedg1j4VhXUZ8J8YXHwxJ0SgQKKNXSFSn7sl-JhazReEW7tWmETSpzOvHAf0oRpb2RtjXfScdLXENaRGhPzIfcbGDsqredieKXmpJ44"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-start">
+<span class="text-label text-[10px] font-bold uppercase tracking-wider text-secondary px-2 py-1 bg-secondary/10 rounded-full">Jazz</span>
+<span class="material-symbols-outlined text-outline text-sm">schedule</span>
+</div>
+<h3 class="text-xl font-bold mt-2 leading-tight">Take Five</h3>
+<p class="text-sm text-on-surface-variant">Dave Brubeck Quartet</p>
+<div class="mt-4 flex items-center justify-between">
+<div class="h-1 w-24 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-[95%] rounded-full shadow-[0_0_8px_rgba(23,106,33,0.3)]"></div>
+</div>
+<span class="text-[10px] font-bold text-tertiary">MASTERIZADO</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Secondary Section: Categories -->
+<section class="mt-16">
+<h3 class="text-2xl font-bold tracking-tight mb-6">Categorias</h3>
+<div class="flex flex-wrap gap-4">
+<button class="px-6 py-3 bg-surface-container-high text-primary font-semibold rounded-full hover:bg-primary hover:text-white transition-all">Piano Solo</button>
+<button class="px-6 py-3 bg-surface-container-high text-primary font-semibold rounded-full hover:bg-primary hover:text-white transition-all">Violão Brasileiro</button>
+<button class="px-6 py-3 bg-surface-container-high text-primary font-semibold rounded-full hover:bg-primary hover:text-white transition-all">Teoria &amp; Harmonia</button>
+<button class="px-6 py-3 bg-surface-container-high text-primary font-semibold rounded-full hover:bg-primary hover:text-white transition-all">Improvisação</button>
+</div>
+</section>
+</main>
+<!-- FAB -->
+<button class="fixed bottom-32 right-6 w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-br from-[#4555a8] to-[#96a5ff] text-white shadow-lg shadow-primary/20 hover:scale-110 transition-transform z-40">
+<span class="material-symbols-outlined">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-2 bg-[#ffffff] dark:bg-slate-900 rounded-t-[24px] shadow-[0_-8px_24px_rgba(44,42,81,0.06)] z-50">
+<div class="flex flex-col items-center justify-center bg-gradient-to-br from-[#4555a8] to-[#96a5ff] text-white rounded-full px-5 py-2 scale-90 duration-150 ease-in-out">
+<span class="material-symbols-outlined">library_music</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-wider">Library</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#595781] dark:text-slate-400 px-5 py-2 hover:bg-[#f3eeff] dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined">timer</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-wider">Metronome</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#595781] dark:text-slate-400 px-5 py-2 hover:bg-[#f3eeff] dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined">tune</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-wider">Tuner</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#595781] dark:text-slate-400 px-5 py-2 hover:bg-[#f3eeff] dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined">exercise</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-wider">Practice</span>
+</div>
+</nav>
+</body></html>

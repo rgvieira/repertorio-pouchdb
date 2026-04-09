@@ -1,0 +1,17 @@
+{
+  "browserWindow": {
+    "width": 800,
+    "height": 600,
+    "webPreferences": {
+      "devTools": true,
+      "nodeIntegration": true,
+      "contextIsolation": false,
+      "sandbox": false
+    }
+  },
+  "browserWindowInstance": {
+    "loadURL": {
+      "url": "index.html"
+    }
+  }
+}

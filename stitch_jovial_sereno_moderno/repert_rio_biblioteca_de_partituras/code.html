@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Melodic Editorial - Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#2c6b59",
+                    "tertiary-container": "#ff9f92",
+                    "on-primary": "#f9f8ff",
+                    "surface-container-high": "#e4e8f2",
+                    "primary-fixed": "#abbfff",
+                    "outline": "#767b84",
+                    "surface-container": "#ebeef6",
+                    "on-surface-variant": "#5a5f68",
+                    "on-secondary-fixed": "#034e3d",
+                    "tertiary-fixed-dim": "#ff8a7a",
+                    "surface-variant": "#dee3ed",
+                    "on-tertiary-fixed-variant": "#7a1c14",
+                    "primary-container": "#abbfff",
+                    "tertiary-dim": "#953025",
+                    "on-primary-fixed": "#002264",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed-variant": "#264187",
+                    "secondary-fixed": "#b7f9e0",
+                    "on-primary-container": "#1b387d",
+                    "on-surface": "#2d333b",
+                    "on-tertiary": "#fff7f6",
+                    "error-container": "#f56965",
+                    "inverse-primary": "#98b1fe",
+                    "tertiary": "#a53c30",
+                    "on-error-container": "#65000b",
+                    "primary-fixed-dim": "#98b1fe",
+                    "tertiary-fixed": "#ff9f92",
+                    "secondary-container": "#b7f9e0",
+                    "primary": "#425ca3",
+                    "primary-dim": "#355096",
+                    "outline-variant": "#adb2bc",
+                    "on-error": "#fff7f6",
+                    "on-secondary": "#e4fff3",
+                    "background": "#f8f9ff",
+                    "surface": "#f8f9ff",
+                    "on-background": "#2d333b",
+                    "secondary-fixed-dim": "#a9ead3",
+                    "secondary": "#2a6a57",
+                    "inverse-on-surface": "#9b9da2",
+                    "error": "#ac3434",
+                    "on-secondary-container": "#20614f",
+                    "surface-dim": "#d4dae6",
+                    "secondary-dim": "#1b5d4b",
+                    "surface-bright": "#f8f9ff",
+                    "inverse-surface": "#0b0e12",
+                    "error-dim": "#70030f",
+                    "on-tertiary-fixed": "#4a0001",
+                    "surface-container-low": "#f1f3fa",
+                    "surface-container-highest": "#dee3ed",
+                    "surface-tint": "#425ca3",
+                    "on-tertiary-container": "#6d130c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-40 bg-gradient-to-b from-[#f8f9ff] to-transparent shadow-none">
+<div class="flex items-center justify-between px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#425ca3] dark:text-blue-400 hover:bg-slate-200/50 transition-colors p-2 rounded-full active:scale-95 duration-200">menu</button>
+<h1 class="font-['Plus_Jakarta_Sans'] font-bold text-2xl tracking-tight text-[#425ca3] dark:text-blue-400 italic">The Melodic Editorial</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="material-symbols-outlined text-[#425ca3] dark:text-blue-400 hover:bg-slate-200/50 transition-colors p-2 rounded-full active:scale-95 duration-200">search</button>
+</div>
+</div>
+</header>
+<main class="px-6 max-w-5xl mx-auto">
+<!-- Editorial Title Section -->
+<section class="mt-8 mb-10">
+<h2 class="font-headline text-[3.5rem] leading-tight font-bold text-primary tracking-tight mb-2 opacity-90">Repertório</h2>
+<p class="text-on-surface-variant font-body max-w-md">Your personal archive of curated scores and digital manuscripts, organized for performance.</p>
+</section>
+<!-- Search Bar -->
+<div class="mb-8 group">
+<div class="relative flex items-center bg-surface-container-low rounded-xl px-6 py-4 focus-within:shadow-[0_4px_40px_rgba(45,51,59,0.06)] transition-all duration-300">
+<span class="material-symbols-outlined text-outline mr-3">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-body placeholder:text-outline-variant" placeholder="Search by composer, title, or tags..." type="text"/>
+<span class="material-symbols-outlined text-outline ml-3 cursor-pointer">tune</span>
+</div>
+</div>
+<!-- Category Chips -->
+<div class="flex gap-3 overflow-x-auto pb-4 no-scrollbar mb-8">
+<button class="px-6 py-2 bg-secondary-container text-on-secondary-container rounded-full font-label text-[0.75rem] font-bold uppercase tracking-wider whitespace-nowrap">All Scores</button>
+<button class="px-6 py-2 bg-surface-container-highest text-on-surface-variant hover:bg-surface-variant transition-colors rounded-full font-label text-[0.75rem] font-bold uppercase tracking-wider whitespace-nowrap">Piano</button>
+<button class="px-6 py-2 bg-surface-container-highest text-on-surface-variant hover:bg-surface-variant transition-colors rounded-full font-label text-[0.75rem] font-bold uppercase tracking-wider whitespace-nowrap">Jazz</button>
+<button class="px-6 py-2 bg-surface-container-highest text-on-surface-variant hover:bg-surface-variant transition-colors rounded-full font-label text-[0.75rem] font-bold uppercase tracking-wider whitespace-nowrap">Classical</button>
+<button class="px-6 py-2 bg-surface-container-highest text-on-surface-variant hover:bg-surface-variant transition-colors rounded-full font-label text-[0.75rem] font-bold uppercase tracking-wider whitespace-nowrap">My Uploads</button>
+</div>
+<!-- Sheet Music Grid (Asymmetric) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
+<!-- Card 1 -->
+<div class="group cursor-pointer">
+<div class="relative overflow-hidden rounded-lg bg-surface-container-lowest shadow-[0_4px_40px_rgba(45,51,59,0.06)] transition-all duration-300 group-hover:-translate-y-2">
+<div class="aspect-[3/4] relative bg-surface-container-high flex items-center justify-center p-8 overflow-hidden">
+<img class="w-full h-full object-cover shadow-lg rounded-sm transform rotate-1 group-hover:rotate-0 transition-transform duration-500" data-alt="close-up of a vintage cream sheet music page with elegant black musical notation and Italian tempo markings in soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCSOmh1sKJP-qK03HuCtbi0ou-U3Bpm0AF57e2bhfPSsmeBKKu2z-MuuHSA0q2mXwutIVqUUz908p58N6VIik_RAuMNHb5fMrHaMPZWGUbaQ4EqWRtv-dxI9sGSs2eCo9LDTc8tzm0wP-qVoSpjdnWnyx9GUBkzswvZdaX456ioD2WhYAQ8yVVc6VXhthfT2-AP37m4P8gsfmPDUQMc_vMniekAaOoyjduO5--F1U6Uv7aUt74_1znA6rD75_LZL371kfDJecnN2w"/>
+<div class="absolute top-4 left-4">
+<span class="px-3 py-1 bg-tertiary/10 text-tertiary rounded-full font-label text-[0.65rem] font-bold uppercase tracking-tighter backdrop-blur-md">Classical</span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline text-lg font-bold text-on-surface group-hover:text-primary transition-colors">Nocturne Op. 9 No. 2</h3>
+<span class="material-symbols-outlined text-outline-variant text-sm">more_vert</span>
+</div>
+<p class="text-on-surface-variant font-body text-sm mb-4">Frédéric Chopin</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#425ca3] text-lg">picture_as_pdf</span>
+<span class="font-label text-[0.7rem] font-bold text-outline-variant uppercase">PDF Archive</span>
+</div>
+<span class="text-primary font-bold text-sm underline underline-offset-4">Open Score</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group cursor-pointer md:mt-16">
+<div class="relative overflow-hidden rounded-lg bg-surface-container-lowest shadow-[0_4px_40px_rgba(45,51,59,0.06)] transition-all duration-300 group-hover:-translate-y-2">
+<div class="aspect-[3/4] relative bg-secondary-fixed-dim flex items-center justify-center p-8 overflow-hidden">
+<div class="w-full h-full border-2 border-dashed border-secondary/30 rounded-sm flex flex-col items-center justify-center bg-white/40 backdrop-blur-sm">
+<span class="material-symbols-outlined text-secondary text-5xl mb-2">auto_stories</span>
+<span class="font-label text-xs text-secondary font-bold">Jazz Anthology</span>
+</div>
+<div class="absolute top-4 left-4">
+<span class="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full font-label text-[0.65rem] font-bold uppercase tracking-tighter backdrop-blur-md">Jazz</span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline text-lg font-bold text-on-surface group-hover:text-primary transition-colors">Autumn Leaves</h3>
+<span class="material-symbols-outlined text-outline-variant text-sm">more_vert</span>
+</div>
+<p class="text-on-surface-variant font-body text-sm mb-4">Joseph Kosma</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#425ca3] text-lg">picture_as_pdf</span>
+<span class="font-label text-[0.7rem] font-bold text-outline-variant uppercase">Standard Real Book</span>
+</div>
+<span class="text-primary font-bold text-sm underline underline-offset-4">View PDF</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group cursor-pointer">
+<div class="relative overflow-hidden rounded-lg bg-surface-container-lowest shadow-[0_4px_40px_rgba(45,51,59,0.06)] transition-all duration-300 group-hover:-translate-y-2">
+<div class="aspect-[3/4] relative bg-surface-container-high flex items-center justify-center p-8 overflow-hidden">
+<img class="w-full h-full object-cover shadow-lg rounded-sm transform -rotate-1 group-hover:rotate-0 transition-transform duration-500" data-alt="clean minimalist sheet music page with Erik Satie's minimalist score, bright white paper with black staff lines and soft shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyl1xRoXLb_Z-T1YOMMIFFU-gYls2soiClg4pKZeQEpdzgBh2fFHSXatu5sg0vitJ9UOxPdFWqXs1gcvn0AsCksuL13ZjgYqkTGBrmL2N06uuatI4crop4yS6mxcM92Aie1eOovG7V94FTSBcBJo18vgStWjC1y704XpoA779eMNa2TKu9-kw1VIKWXHFypllGHiaMTd5CbJ7GdZHWJjKQkLTN7t9sNyeLsC6H9JkPjVklthGC5192PKyDgyQbD2eDG6-i7yceqHw"/>
+<div class="absolute top-4 left-4">
+<span class="px-3 py-1 bg-tertiary/10 text-tertiary rounded-full font-label text-[0.65rem] font-bold uppercase tracking-tighter backdrop-blur-md">Piano</span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline text-lg font-bold text-on-surface group-hover:text-primary transition-colors">Gymnopédie No. 1</h3>
+<span class="material-symbols-outlined text-outline-variant text-sm">more_vert</span>
+</div>
+<p class="text-on-surface-variant font-body text-sm mb-4">Erik Satie</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#425ca3] text-lg">picture_as_pdf</span>
+<span class="font-label text-[0.7rem] font-bold text-outline-variant uppercase">Original Edition</span>
+</div>
+<span class="text-primary font-bold text-sm underline underline-offset-4">Open Score</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group cursor-pointer md:mt-16">
+<div class="relative overflow-hidden rounded-lg bg-surface-container-lowest shadow-[0_4px_40px_rgba(45,51,59,0.06)] transition-all duration-300 group-hover:-translate-y-2">
+<div class="aspect-[3/4] relative bg-primary-container flex items-center justify-center p-8 overflow-hidden">
+<div class="w-full h-full border-2 border-dashed border-primary/30 rounded-sm flex flex-col items-center justify-center bg-white/60 backdrop-blur-md">
+<span class="material-symbols-outlined text-primary text-5xl mb-2">upload_file</span>
+<span class="font-label text-[0.65rem] text-primary font-bold uppercase tracking-widest px-4 text-center">Manuscript Scan #42</span>
+</div>
+<div class="absolute top-4 left-4">
+<span class="px-3 py-1 bg-primary/10 text-primary rounded-full font-label text-[0.65rem] font-bold uppercase tracking-tighter backdrop-blur-md">My Uploads</span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline text-lg font-bold text-on-surface group-hover:text-primary transition-colors">The Melodic Study</h3>
+<span class="material-symbols-outlined text-outline-variant text-sm">more_vert</span>
+</div>
+<p class="text-on-surface-variant font-body text-sm mb-4">Personal Composition</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#425ca3] text-lg">picture_as_pdf</span>
+<span class="font-label text-[0.7rem] font-bold text-outline-variant uppercase">Uploaded 2d ago</span>
+</div>
+<span class="text-primary font-bold text-sm underline underline-offset-4">Review PDF</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-28 right-8 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary-dim text-white shadow-[0_8px_30px_rgb(66,92,163,0.3)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#f8f9ff]/60 dark:bg-slate-900/60 backdrop-blur-xl shadow-[0_-4px_40px_rgba(45,51,59,0.06)] rounded-t-[32px]">
+<div class="flex flex-col items-center justify-center bg-[#425ca3] text-white rounded-full px-5 py-2 transition-all duration-300 ease-out">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">library_music</span>
+<span class="font-['Manrope'] text-[10px] font-semibold uppercase tracking-wider mt-0.5">Library</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#425ca3]/60 px-5 py-2 hover:bg-[#425ca3]/10 transition-all duration-300 rounded-full">
+<span class="material-symbols-outlined">timer</span>
+<span class="font-['Manrope'] text-[10px] font-semibold uppercase tracking-wider mt-0.5">Metronome</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#425ca3]/60 px-5 py-2 hover:bg-[#425ca3]/10 transition-all duration-300 rounded-full">
+<span class="material-symbols-outlined">tune</span>
+<span class="font-['Manrope'] text-[10px] font-semibold uppercase tracking-wider mt-0.5">Tuner</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#425ca3]/60 px-5 py-2 hover:bg-[#425ca3]/10 transition-all duration-300 rounded-full">
+<span class="material-symbols-outlined">timer</span>
+<span class="font-['Manrope'] text-[10px] font-semibold uppercase tracking-wider mt-0.5">Practice</span>
+</div>
+</nav>
+</body></html>

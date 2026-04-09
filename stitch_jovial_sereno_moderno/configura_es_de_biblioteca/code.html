@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ajuste seu Ritmo - Configurações</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#2c6b59",
+                        "tertiary-container": "#ff9f92",
+                        "on-primary": "#f9f8ff",
+                        "surface-container-high": "#e4e8f2",
+                        "primary-fixed": "#abbfff",
+                        "outline": "#767b84",
+                        "surface-container": "#ebeef6",
+                        "on-surface-variant": "#5a5f68",
+                        "on-secondary-fixed": "#034e3d",
+                        "tertiary-fixed-dim": "#ff8a7a",
+                        "surface-variant": "#dee3ed",
+                        "on-tertiary-fixed-variant": "#7a1c14",
+                        "primary-container": "#abbfff",
+                        "tertiary-dim": "#953025",
+                        "on-primary-fixed": "#002264",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#264187",
+                        "secondary-fixed": "#b7f9e0",
+                        "on-primary-container": "#1b387d",
+                        "on-surface": "#2d333b",
+                        "on-tertiary": "#fff7f6",
+                        "error-container": "#f56965",
+                        "inverse-primary": "#98b1fe",
+                        "tertiary": "#a53c30",
+                        "on-error-container": "#65000b",
+                        "primary-fixed-dim": "#98b1fe",
+                        "tertiary-fixed": "#ff9f92",
+                        "secondary-container": "#b7f9e0",
+                        "primary": "#425ca3",
+                        "primary-dim": "#355096",
+                        "outline-variant": "#adb2bc",
+                        "on-error": "#fff7f6",
+                        "on-secondary": "#e4fff3",
+                        "background": "#f8f9ff",
+                        "surface": "#f8f9ff",
+                        "on-background": "#2d333b",
+                        "secondary-fixed-dim": "#a9ead3",
+                        "secondary": "#2a6a57",
+                        "inverse-on-surface": "#9b9da2",
+                        "error": "#ac3434",
+                        "on-secondary-container": "#20614f",
+                        "surface-dim": "#d4dae6",
+                        "secondary-dim": "#1b5d4b",
+                        "surface-bright": "#f8f9ff",
+                        "inverse-surface": "#0b0e12",
+                        "error-dim": "#70030f",
+                        "on-tertiary-fixed": "#4a0001",
+                        "surface-container-low": "#f1f3fa",
+                        "surface-container-highest": "#dee3ed",
+                        "surface-tint": "#425ca3",
+                        "on-tertiary-container": "#6d130c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-50 bg-gradient-to-b from-[#f8f9ff] to-transparent">
+<div class="flex items-center justify-between px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#425ca3] p-2 hover:bg-slate-200/50 transition-colors active:scale-95 duration-200 rounded-full">
+                    menu
+                </button>
+<h1 class="font-['Plus_Jakarta_Sans'] font-bold text-2xl tracking-tight text-[#425ca3] italic">The Melodic Editorial</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="material-symbols-outlined text-[#425ca3] p-2 hover:bg-slate-200/50 transition-colors active:scale-95 duration-200 rounded-full">
+                    search
+                </button>
+</div>
+</div>
+</header>
+<main class="max-w-5xl mx-auto px-6 pt-12 space-y-16">
+<!-- Hero Section / Title -->
+<section class="relative">
+<div class="absolute -top-12 -left-6 w-32 h-32 bg-primary/5 rounded-full blur-3xl"></div>
+<h2 class="font-headline font-extrabold text-5xl md:text-7xl text-on-surface tracking-tight leading-none mb-4">
+                Ajuste seu Ritmo
+            </h2>
+<p class="text-on-surface-variant text-lg max-w-md font-medium">
+                Gerencie seus manuscritos e partituras digitais com a precisão de um maestro.
+            </p>
+</section>
+<!-- Bento Grid for Settings -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Section 1: Sincronização -->
+<div class="md:col-span-5 glass-card bg-surface-container-lowest rounded-lg p-8 shadow-[0_4px_40px_rgba(45,51,59,0.04)] flex flex-col justify-between overflow-hidden relative group">
+<div class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-9xl">sync</span>
+</div>
+<div>
+<span class="font-label text-xs tracking-widest text-primary uppercase mb-4 block">Sincronização</span>
+<h3 class="font-headline font-bold text-2xl text-on-surface mb-4">Biblioteca Local</h3>
+<p class="text-on-surface-variant mb-8 text-sm leading-relaxed">
+                        Detecte automaticamente novos arquivos PDF e XML no armazenamento do seu dispositivo para manter seu repertório atualizado.
+                    </p>
+</div>
+<button class="flex items-center justify-center gap-3 bg-gradient-to-r from-primary to-primary-dim text-white font-bold py-4 px-6 rounded-xl hover:shadow-lg hover:shadow-primary/20 transition-all active:scale-95">
+<span class="material-symbols-outlined">search_check</span>
+                    Scan Device Storage
+                </button>
+</div>
+<!-- Section 2: Gerenciamento de Arquivos -->
+<div class="md:col-span-7 space-y-6">
+<div class="bg-surface-container-low rounded-lg p-8 flex flex-col gap-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">folder_open</span>
+</div>
+<div>
+<span class="font-label text-xs tracking-widest text-secondary uppercase block">Gerenciamento de Arquivos</span>
+<h3 class="font-headline font-bold text-xl text-on-surface">Diretórios e Nuvem</h3>
+</div>
+</div>
+<div class="grid gap-4">
+<!-- Default Folders -->
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl hover:bg-white transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline">folder_special</span>
+<span class="font-semibold text-on-surface">Pastas Padrão</span>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<!-- Cloud Sync -->
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl hover:bg-white transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline">cloud_done</span>
+<div>
+<span class="font-semibold text-on-surface block">Google Drive</span>
+<span class="text-xs text-on-surface-variant">Conectado como maestro@melodic.com</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">settings</span>
+</div>
+</div>
+<!-- Auto-indexing Toggle -->
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline">find_in_page</span>
+<span class="font-semibold text-on-surface">Indexação Automática</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 3: Banco de Dados (Danger Zone) -->
+<div class="md:col-span-12 glass-card bg-surface-container-low rounded-lg p-8 border border-error-container/10">
+<div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+<div class="flex items-center gap-6">
+<div class="w-14 h-14 bg-tertiary/10 rounded-2xl flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-3xl">database</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-xl text-on-surface">Banco de Dados</h3>
+<p class="text-on-surface-variant text-sm max-w-lg">
+                                Limpar o índice removerá todas as referências aos seus arquivos locais, mas não excluirá os arquivos reais do disco.
+                            </p>
+</div>
+</div>
+<button class="w-full md:w-auto px-8 py-4 rounded-xl font-bold text-tertiary bg-tertiary-container/20 hover:bg-tertiary hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">delete_sweep</span>
+                        Clear Index
+                    </button>
+</div>
+</div>
+</div>
+<!-- System Stats Asymmetric Layout -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8">
+<div class="p-8 rounded-lg bg-surface-container-high relative overflow-hidden">
+<div class="relative z-10">
+<span class="text-primary font-bold text-4xl block mb-2">1,284</span>
+<span class="font-label text-xs text-on-surface-variant uppercase tracking-widest">Partituras Indexadas</span>
+</div>
+<div class="absolute -bottom-4 -right-4 text-primary/5">
+<span class="material-symbols-outlined text-9xl" style="font-variation-settings: 'FILL' 1;">music_note</span>
+</div>
+</div>
+<div class="p-8 rounded-lg bg-secondary-container/30 relative overflow-hidden flex flex-col justify-end min-h-[160px]">
+<div class="relative z-10">
+<span class="text-on-secondary-container font-bold text-4xl block mb-2">4.2 GB</span>
+<span class="font-label text-xs text-on-secondary-container/60 uppercase tracking-widest">Espaço Ocupado</span>
+</div>
+<div class="absolute top-0 right-0 p-4">
+<div class="w-24 h-2 bg-on-secondary-container/10 rounded-full overflow-hidden">
+<div class="w-3/4 h-full bg-secondary"></div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#f8f9ff]/60 backdrop-blur-xl shadow-[0_-4px_40px_rgba(45,51,59,0.06)] rounded-t-[32px]">
+<div class="flex flex-col items-center justify-center text-[#425ca3]/60 px-5 py-2 hover:bg-[#425ca3]/10 transition-all duration-300 ease-out rounded-full">
+<span class="material-symbols-outlined">library_music</span>
+<span class="font-['Manrope'] text-[10px] font-semibold uppercase tracking-wider mt-1">Library</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#425ca3]/60 px-5 py-2 hover:bg-[#425ca3]/10 transition-all duration-300 ease-out rounded-full">
+<span class="material-symbols-outlined">timer</span>
+<span class="font-['Manrope'] text-[10px] font-semibold uppercase tracking-wider mt-1">Metronome</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#425ca3]/60 px-5 py-2 hover:bg-[#425ca3]/10 transition-all duration-300 ease-out rounded-full">
+<span class="material-symbols-outlined">tune</span>
+<span class="font-['Manrope'] text-[10px] font-semibold uppercase tracking-wider mt-1">Tuner</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-[#425ca3] text-white rounded-full px-5 py-2 transition-all duration-300 ease-out">
+<span class="material-symbols-outlined">timer</span>
+<span class="font-['Manrope'] text-[10px] font-semibold uppercase tracking-wider mt-1">Practice</span>
+</div>
+</nav>
+<!-- Floating Maestro (Contextual Component) -->
+<div class="fixed bottom-28 left-1/2 -translate-x-1/2 w-[90%] max-w-md glass-card border border-white/40 p-4 rounded-xl flex items-center gap-4 shadow-2xl">
+<div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+<img alt="Current Score" class="w-full h-full object-cover" data-alt="Blurred close up of classical music sheet with vintage paper texture and elegant typography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABL-cnjsbW2QsJs2fqljIGPjEsCvbv8DBXg3lCVtMv_60vA-y77rydToFMUerCKwHMP8xIZc0KB3K8stZOGMdR1xPoXBLi6A0wQuAFhWjkF3_kdhFr3MCWk9fuN0eg4nP9b3YhMHQ_y2QCrdSXO_XzF_0ePDxG9gQRF2gYyFkfrbggsXiFJCWYXJOAOF5sXCOw3xy8YbUEUNZmpyqr6O59JfxdfvJNSvGiYy7CgMxvIwPnHsIZS3E0r1gobT2Btn-aGv2Lw72IRUw"/>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-sm text-on-surface truncate">Nocturne Op. 9 No. 2</h4>
+<p class="text-xs text-on-surface-variant">Frédéric Chopin</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="material-symbols-outlined text-primary">play_arrow</button>
+<button class="material-symbols-outlined text-outline">more_vert</button>
+</div>
+</div>
+</body></html>

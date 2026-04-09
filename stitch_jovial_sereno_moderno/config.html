@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Configurações</title>
+    <style>
+        .config-content { padding: 16px; }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card h2 { margin: 0 0 12px 0; font-size: 1.2rem; color: var(--primary); }
+        .card p { margin: 0 0 16px 0; color: #666; font-size: 0.9rem; }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .btn .material-icons { margin-right: 8px; }
+        .btn-danger { background: #d32f2f; }
+        
+        .log {
+            background: #222;
+            color: #0f0;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            height: 150px;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="left-group">
+            <a href="index.html" style="color: white; text-decoration: none; display: flex; align-items: center;">
+                <span class="material-icons">arrow_back</span>
+                <span style="margin-left: 10px;">Configurações</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="config-content">
+        <div id="mobile-scan-section" class="card">
+            <h2>Sincronização (Dispositivo)</h2>
+            <p>Escanear a pasta raiz de documentos do dispositivo em busca de partituras (PDF, MSCZ, etc).</p>
+            <button id="btn-scan-mobile" class="btn">
+                <span class="material-icons">refresh</span> Escanear Raiz
+            </button>
+            <div id="log-mobile" class="log">Aguardando ação...</div>
+        </div>
+
+        <div id="desktop-folder-management" class="card" style="display: none;">
+            <h2>Gerenciar Pastas (Desktop)</h2>
+            <p>Adicione pastas locais para escanear em busca de partituras. Cada pasta será escaneada recursivamente.</p>
+            <div style="display: flex; margin-bottom: 10px;">
+                <input type="text" id="folder-path-input" placeholder="Caminho da pasta (ex: C:/Musicas)" style="flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-right: 8px;">
+                <button id="btn-add-folder" class="btn">
+                    <span class="material-icons">add</span> Adicionar
+                </button>
+            </div>
+            <h3>Pastas Configuradas:</h3>
+            <ul id="configured-folders-list" style="list-style: none; padding: 0;">
+                </ul>
+            <div id="log-desktop" class="log">Aguardando ação...</div>
+            <button id="btn-scan-all-folders" class="btn" style="margin-top: 15px;">
+                <span class="material-icons">refresh</span> Escanear Todas as Pastas
+            </button>
+        </div>
+
+        <div class="card">
+            <h2>Banco de Dados</h2>
+            <p>Atenção: Isso removerá permanentemente o índice de músicas do aplicativo.</p>
+            <button id="btn-clear" class="btn btn-danger">
+                <span class="material-icons">delete</span> Limpar Tudo
+            </button>
+            <p style="margin-top: 10px; font-size: 0.8em; color: #999;">Isso não remove as pastas configuradas, apenas as músicas indexadas.</p>
+        </div>
+    </div>
+
+    <script src="cordova.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pouchdb@8.0.1/dist/pouchdb.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pouchdb@8.0.1/dist/pouchdb.find.min.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/scanner.js"></script>
+    
+    <script>
+        document.addEventListener('deviceready', () => {
+            // Definição dos elementos
+            const mobileScanSection = document.getElementById('mobile-scan-section');
+            const desktopFolderManagement = document.getElementById('desktop-folder-management');
+            const logMobileDiv = document.getElementById('log-mobile');
+            const logDesktopDiv = document.getElementById('log-desktop');
+            const folderPathInput = document.getElementById('folder-path-input');
+            const configuredFoldersList = document.getElementById('configured-folders-list');
+
+            // Função de log corrigida
+            const addLog = (msg, targetLogDiv) => {
+                if (!targetLogDiv) return;
+                const line = document.createElement('div');
+                line.textContent = `> ${msg}`;
+                targetLogDiv.appendChild(line);
+                targetLogDiv.scrollTop = targetLogDiv.scrollHeight;
+            };
+
+            // Detecção de Ambiente
+            const isMobile = (cordova.platformId === 'android' || cordova.platformId === 'ios');
+            if (isMobile) {
+                mobileScanSection.style.display = 'block';
+                desktopFolderManagement.style.display = 'none';
+            } else {
+                mobileScanSection.style.display = 'none';
+                desktopFolderManagement.style.display = 'block';
+                loadConfiguredFolders(); 
+            }
+
+            // --- Mobile Scan Logic ---
+            document.getElementById('btn-scan-mobile').addEventListener('click', async () => {
+                addLog("Iniciando busca de arquivos na raiz do dispositivo...", logMobileDiv);
+                try {
+                    const targetPath = cordova.file.externalRootDirectory || cordova.file.documentsDirectory;
+                    addLog("Escaneando: " + targetPath, logMobileDiv);
+                    await Scanner.escanearPasta(targetPath);
+                    addLog("Escaneamento concluído com sucesso!", logMobileDiv);
+                } catch (e) {
+                    addLog("Erro: " + (e.message || "Falha ao acessar arquivos."), logMobileDiv);
+                }
+            });
+
+            // --- Desktop Folder Management Logic ---
+            async function loadConfiguredFolders() {
+                configuredFoldersList.innerHTML = '';
+                const folders = await DBManager.listFolders();
+                if (folders.length === 0) {
+                    configuredFoldersList.innerHTML = '<li>Nenhuma pasta configurada.</li>';
+                    return;
+                }
+                folders.forEach(folder => {
+                    const li = document.createElement('li');
+                    li.style.marginBottom = '8px';
+                    li.innerHTML = `
+                        <span>${folder.path}</span>
+                        <button class="btn" style="margin-left: 10px; padding: 5px 10px;" data-folder-id="${folder._id}" data-action="refresh">
+                            <span class="material-icons" style="font-size: 1rem;">refresh</span>
+                        </button>
+                        <button class="btn btn-danger" style="margin-left: 5px; padding: 5px 10px;" data-folder-id="${folder._id}" data-action="delete">
+                            <span class="material-icons" style="font-size: 1rem;">delete</span>
+                        </button>
+                    `;
+                    configuredFoldersList.appendChild(li);
+                });
+            }
+
+            document.getElementById('btn-add-folder').addEventListener('click', async () => {
+                const path = folderPathInput.value.trim();
+                if (!path) {
+                    addLog("Por favor, insira um caminho.", logDesktopDiv);
+                    return;
+                }
+                try {
+                    const added = await DBManager.addFolder(path);
+                    if (added) {
+                        addLog(`Escaneando: ${path}...`, logDesktopDiv);
+                        await Scanner.escanearPasta(path);
+                        folderPathInput.value = '';
+                        loadConfiguredFolders();
+                    }
+                } catch (e) {
+                    addLog(`Erro: ${e.message}`, logDesktopDiv);
+                }
+            });
+
+            // Delegação de cliques para a lista de pastas
+            configuredFoldersList.addEventListener('click', async (event) => {
+                const target = event.target.closest('button');
+                if (!target) return;
+                const folderId = target.dataset.folderId;
+                const action = target.dataset.action;
+
+                if (action === 'refresh') {
+                    const folders = await DBManager.listFolders();
+                    const folder = folders.find(f => f._id === folderId);
+                    if (folder) {
+                        addLog(`Re-escaneando: ${folder.path}`, logDesktopDiv);
+                        await Scanner.escanearPasta(folder.path);
+                    }
+                } else if (action === 'delete') {
+                    if (confirm("Remover pasta?")) {
+                        await DBManager.deleteFolder(folderId);
+                        loadConfiguredFolders();
+                    }
+                }
+            });
+
+            document.getElementById('btn-scan-all-folders').addEventListener('click', async () => {
+                const folders = await DBManager.listFolders();
+                for (const folder of folders) {
+                    addLog(`Escaneando: ${folder.path}`, logDesktopDiv);
+                    await Scanner.escanearPasta(folder.path);
+                }
+                addLog("Concluído!", logDesktopDiv);
+            });
+
+            // --- Limpar Banco ---
+            document.getElementById('btn-clear').addEventListener('click', async () => {
+                if(confirm("Deseja realmente apagar o banco de dados?")) {
+                    try {
+                        await DBManager.limparBanco();
+                        addLog("Banco limpo.", isMobile ? logMobileDiv : logDesktopDiv);
+                        alert("Dados removidos.");
+                    } catch (e) {
+                        addLog("Erro: " + e.message, isMobile ? logMobileDiv : logDesktopDiv);
+                    }
+                }
+            });
+        }, false);
+    </script>
+</body>
+</html>
