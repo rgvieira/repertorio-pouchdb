@@ -74,12 +74,9 @@ p.subtitle {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-.top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 16px;
-    background-color: var(--surface);
+.top-bar span:active {
+    background-color: rgba(0,0,0,0.1);
+    border-radius: 50%;
 }
 
 /* FORÇAR APARIÇÃO DA SETA NO CONFIG */
@@ -225,11 +222,65 @@ p.subtitle {
     border: none;
 }
 
+/* Container do FAB no topo */
 .fab-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 999;
+    position: relative;
+    margin-left: auto;
+}
+
+.fab-trigger {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary, #186879); /* Usando sua cor padrão */
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Menu Dropdown */
+.fab-menu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    display: none; /* Escondido por padrão */
+    flex-direction: column;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    min-width: 180px;
+    z-index: 1000;
+}
+
+.fab-menu.open {
+    display: flex;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.menu-item:hover {
+    background: #f5f5f5;
+}
+
+.menu-item .material-icons {
+    color: #186879;
+    font-size: 20px;
 }
 
 .fab-button {
