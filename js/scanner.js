@@ -46,35 +46,43 @@ const Scanner = {
             input.type = 'file';
             input.webkitdirectory = true;
 
- input.onchange = async (e) => {
-    // 1. Detecta se é Electron (Desktop) ou Navegador (Web)
-    const isElectron = (typeof process !== 'undefined' && process.versions && !!process.versions.electron);
-
+input.onchange = async (e) => {
     if (e.target.files.length > 0) {
-        
+        // 1. Detecta o ambiente sem frescura
+        const isElectron = (typeof process !== 'undefined' && !!(process.versions && process.versions.electron));
+        const file = e.target.files[0];
+
         // --- SE FOR NAVEGADOR (WEB/CELULAR) ---
         if (!isElectron) {
-            console.warn("Navegador detectado: bloqueando acesso ao sistema de arquivos.");
-            alert("⚠️ O escaneamento de pastas locais só funciona na versão instalada para Computador.");
-            resolve(null); 
+            console.warn("Modo Web: Bloqueando acesso ao FS.");
+            alert("⚠️ O scanner só funciona no Desktop. No celular, use o botão de Adicionar Manual.");
+            resolve(null);
             return;
         }
 
-        // --- SE FOR ELECTRON (DESKTOP) ---
+        // --- SE FOR DESKTOP (ELECTRON) ---
         try {
-            const filePath = e.target.files[0].path; // Atributo exclusivo do Electron
-            const path = window.require('path');    // Só chama o require se for Electron
+            const filePath = file.path; // No Electron isso funciona
             
-            // Obtém o caminho da pasta
-            const absolutePath = path.dirname(filePath).replace(/[\\/]+$/, '');
+            if (!filePath) {
+                resolve(null);
+                return;
+            }
+
+            // A MÁGICA SEM DIRNAME:
+            // Pegamos a posição da última barra (seja / ou \)
+            const lastSlash = Math.max(filePath.lastIndexOf('/'), filePath.lastIndexOf('\\'));
             
-            console.log("Pasta selecionada via Electron:", absolutePath);
+            // Cortamos a string até a última barra. Isso É o dirname.
+            const absolutePath = filePath.substring(0, lastSlash);
+
+            console.log("Caminho extraído (JS Puro):", absolutePath);
             resolve(absolutePath);
+
         } catch (err) {
-            console.error("Erro no Electron:", err);
+            console.error("Erro ao processar:", err);
             resolve(null);
         }
-
     } else {
         resolve(null);
     }
