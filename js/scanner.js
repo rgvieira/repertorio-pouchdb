@@ -46,20 +46,39 @@ const Scanner = {
             input.type = 'file';
             input.webkitdirectory = true;
 
-            input.onchange = async (e) => {
-                if (e.target.files.length > 0) {
-                    // No Electron, o atributo .path contém o caminho absoluto real do SO
-                    const filePath = e.target.files[0].path;
-                    const path = window.require('path');
-                    
-                    // Pegamos o diretório pai do primeiro arquivo para ter o caminho da pasta
-                    const absolutePath = path.dirname(filePath).replace(/[\\/]+$/, ''); // Garante que não há barra final
-                    console.log("Pasta selecionada via Picker:", absolutePath);
-                    resolve(absolutePath);
-                } else {
-                    resolve(null);
-                }
-            };
+ input.onchange = async (e) => {
+    // 1. Detecta se é Electron (Desktop) ou Navegador (Web)
+    const isElectron = (typeof process !== 'undefined' && process.versions && !!process.versions.electron);
+
+    if (e.target.files.length > 0) {
+        
+        // --- SE FOR NAVEGADOR (WEB/CELULAR) ---
+        if (!isElectron) {
+            console.warn("Navegador detectado: bloqueando acesso ao sistema de arquivos.");
+            alert("⚠️ O escaneamento de pastas locais só funciona na versão instalada para Computador.");
+            resolve(null); 
+            return;
+        }
+
+        // --- SE FOR ELECTRON (DESKTOP) ---
+        try {
+            const filePath = e.target.files[0].path; // Atributo exclusivo do Electron
+            const path = window.require('path');    // Só chama o require se for Electron
+            
+            // Obtém o caminho da pasta
+            const absolutePath = path.dirname(filePath).replace(/[\\/]+$/, '');
+            
+            console.log("Pasta selecionada via Electron:", absolutePath);
+            resolve(absolutePath);
+        } catch (err) {
+            console.error("Erro no Electron:", err);
+            resolve(null);
+        }
+
+    } else {
+        resolve(null);
+    }
+};
             
             input.click();
         });

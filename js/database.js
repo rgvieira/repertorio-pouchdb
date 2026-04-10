@@ -1,14 +1,21 @@
-/**
- * Gerenciamento do banco de dados PouchDB
- */
-window.isElectron = (typeof window !== 'undefined' && window.process && window.process.type === 'renderer');
+// 1. Detecta se é Electron de verdade
+const isElectron = (typeof process !== 'undefined' && process.versions && !!process.versions.electron);
 
-if (!window.isElectron) {
-    console.warn("Ambiente Web detectado. Recursos de sistema de arquivos desativados.");
-    // Cria um 'require' falso para não dar erro de 'function not found'
-    window.require = window.require || function(module) {
-        console.warn(`O módulo ${module} não está disponível no navegador.`);
-        return {}; 
+if (isElectron) {
+    // Se for Electron, usa o require real do sistema
+    window.remoteRequire = window.require;
+    console.log("🚀 Modo Desktop: Acesso total ao sistema liberado.");
+} else {
+    // Se for Navegador, cria o "fake" para não dar erro de função inexistente
+    console.warn("🌐 Modo Web: Acesso ao sistema bloqueado pelo navegador.");
+    window.remoteRequire = function(module) {
+        return { 
+            readdirSync: () => [], 
+            existsSync: () => false,
+            join: (...args) => args.join('/'),
+            dirname: (p) => p.substring(0, p.lastIndexOf('/')),
+            sep: "/"
+        };
     };
 }
 // Definimos a variável, mas não a inicializamos imediatamente.
