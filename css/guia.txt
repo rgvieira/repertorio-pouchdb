@@ -1,0 +1,76 @@
+# Guia de Estilo e Implementação CSS: Repertório (Sonata Blue)
+
+Este documento descreve como aplicar o estilo visual das telas geradas ao seu projeto real.
+
+## 1. Abordagem: Tailwind CSS
+As interfaces foram construídas utilizando **Tailwind CSS**. Isso significa que a maioria dos estilos está definida diretamente nas classes do HTML (ex: `class="bg-[#1A237E] text-white p-4 rounded-lg"`).
+
+### Como aplicar ao seu projeto:
+1. **Importe o Tailwind:** Adicione o script do Tailwind no seu `base.html` para renderização imediata ou configure o CLI do Tailwind no seu ambiente de desenvolvimento.
+2. **Fontes:** Estamos usando a fonte **Manrope**. Adicione este link ao seu `<head>`:
+   ```html
+   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+   ```
+
+## 2. Tokens de Design (Paleta de Cores)
+
+| Nome | Hexadecimal | Uso Recomendado |
+| :--- | :--- | :--- |
+| **Primary (Marinho)** | `#1A237E` | Cabeçalhos, botões principais, ícones ativos. |
+| **Surface (Fundo)** | `#FBF8FF` | Fundo principal da página. |
+| **Accent (Ouro/Tonal)** | `#705D00` | Destaques sutis, bordas de estado ativo. |
+| **Text Primary** | `#000666` | Títulos e textos de alta ênfase. |
+| **Secondary Container** | `#E4E1EA` | Cartões, campos de busca, fundos secundários. |
+
+## 3. Estrutura do `style.css` (Para Estilos Customizados)
+Se você preferir usar um arquivo CSS tradicional em vez de Tailwind puro, aqui estão as definições base que você deve colocar no seu `static/style.css`:
+
+```css
+:root {
+  --primary: #1A237E;
+  --primary-dark: #000666;
+  --surface: #FBF8FF;
+  --text-main: #1C1B1F;
+  --radius: 8px;
+  --font-main: 'Manrope', sans-serif;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--surface);
+  color: var(--text-main);
+  margin: 0;
+}
+
+.top-bar {
+  background-color: rgba(251, 248, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #E4E1EA;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  padding: 12px 24px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  transition: transform 0.2s ease;
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+```
+
+## 4. Visualizando o Código de uma Tela
+Para ver o CSS exato aplicado a um componente específico (como o visualizador de PDF ou a lista de músicas):
+1. Selecione a tela no Canvas.
+2. No menu superior da tela, clique em **"</> View Code"**.
+3. Você verá o HTML completo com todas as classes CSS integradas.

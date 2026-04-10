@@ -1,0 +1,570 @@
+/* style.css - Repertoire Design System: Harmonic Air */
+:root {
+    --primary: #4A90A2;
+    --primary-container: #a5eafe;
+    --on-primary-container: #001f26;
+    --surface: #f6fafb;
+    --on-surface: #186879;
+    --surface-variaFnt: #eef5f6;
+    --on-surface-variant: #566163;
+    --outline: #ced8da;
+    --background: #fbfdfd;
+    --font-family: 'Manrope', sans-serif;
+    --border-radius-full: 9999px;
+    --border-radius-lg: 24px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--background);
+    color: var(--on-surface);
+    line-height: 1.5;
+    padding-top: 64px;
+    padding-bottom: 100px;
+}
+
+html, body {
+    width: 100%;
+    overflow-x: hidden; /* Evita que o app "balance" horizontalmente */
+}
+
+/* Ajuste de Tipografia Responsiva */
+h1 {
+    font-size: clamp(1.5rem, 5vw, 2rem); /* Diminui em celulares, aumenta em telas grandes */
+    font-weight: 800;
+    color: #186879;
+    letter-spacing: -0.025em;
+    margin-bottom: 8px;
+}
+
+p.subtitle {
+    color: var(--on-surface-variant);
+    font-size: 0.95rem;
+    margin-bottom: 24px;
+}
+
+/* Top Bar */
+.config-icon {
+    display: flex !important; /* MUDOU DE NONE PARA FLEX */
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #186879 !important; /* Garante que a cor não seja branca */
+    width: 44px;
+    height: 44px;
+}
+
+.config-icon span {
+    font-size: 28px !important;
+}
+
+.fab-header {
+    position: relative;
+    width: 45px;
+    height: 45px;
+    background-color: #186879;
+    color: white;
+    border-radius: 12px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.top-bar span:active {
+    background-color: rgba(0,0,0,0.1);
+    border-radius: 50%;
+}
+
+/* FORÇAR APARIÇÃO DA SETA NO CONFIG */
+.top-bar a.btn-back {
+    display: flex !important; /* Garante que o link exista como bloco */
+    align-items: center;
+    justify-content: center;
+    text-decoration: none !important;
+    color: var(--on-surface) !important; /* Usa a cor do seu root (#186879) */
+    width: 44px;
+    height: 44px;
+    z-index: 1001;
+}
+
+.top-bar a.btn-back span.material-icons {
+    font-size: 30px !important; /* Aumenta a seta para ser clicável */
+    color: #186879 !important; /* Cor exata da sua paleta */
+    display: block !important;
+}
+
+.logo {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--on-surface);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Search and Filters */
+/* Local: Substitua a regra .search-filter-container atual */
+.search-filter-container {
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Adicione isto para telas maiores que celulares */
+@media (min-width: 600px) {
+    .search-filter-container {
+        flex-direction: row; /* Busca e Filtro ficam lado a lado */
+    }
+    .search-wrapper { flex: 2; }
+    .genero-select { flex: 1; }
+}
+
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    color: var(--on-surface-variant);
+}
+
+.search-input {
+    width: 100%;
+    padding: 14px 14px 14px 48px;
+    background-color: var(--surface-variant);
+    border: none;
+    border-radius: var(--border-radius-full);
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--on-surface);
+    transition: all 0.2s ease;
+}
+
+.search-input:focus {
+    outline: 2px solid var(--primary);
+    background-color: #ffffff;
+}
+
+.genero-select {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: var(--surface-variant);
+    border: 1px solid var(--outline);
+    border-radius: var(--border-radius-lg);
+    font-family: inherit;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23566163' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+}
+
+/* Music List / Table Support */
+.music-list td .btn-icon {
+    padding: 6px;
+    border-radius: 8px;
+    background: var(--surface-variant);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s;
+}
+
+.music-list td .btn-icon:active {
+    transform: scale(0.9);
+}
+
+/* Bottom Nav */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: rgba(246, 250, 251, 0.9);
+    backdrop-filter: blur(16px);
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0 24px;
+    border-top: 1px solid var(--outline);
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    color: var(--on-surface-variant);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.nav-item.active {
+    color: var(--primary);
+}
+
+.nav-item .material-icons {
+    font-size: 24px;
+}
+
+/* Floating Action Button */
+.fab {
+    position: fixed;
+    bottom: 100px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background-color: #186879;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(24, 104, 121, 0.3);
+    border: none;
+}
+
+/* Container do FAB no topo */
+.fab-container {
+    position: relative;
+    margin-left: auto;
+}
+
+.fab-trigger {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary, #186879); /* Usando sua cor padrão */
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Menu Dropdown */
+.fab-menu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    display: none; /* Escondido por padrão */
+    flex-direction: column;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    min-width: 180px;
+    z-index: 1000;
+}
+
+.fab-menu.open {
+    display: flex;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.menu-item:hover {
+    background: #f5f5f5;
+}
+
+.menu-item .material-icons {
+    color: #186879;
+    font-size: 20px;
+}
+
+.fab-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background-color: #2196F3;
+    color: white;
+    border-radius: 50%;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.fab-button:active {
+    background-color: #1976D2;
+    transform: scale(0.9);
+}
+
+/* Configurações & Cards */
+.config-content { padding: 16px 24px; }
+
+.card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--outline);
+}
+
+.card h2 { 
+    margin: 0 0 8px 0; 
+    font-size: 1.25rem; 
+    font-weight: 800;
+    color: var(--on-surface); 
+}
+
+.card p { 
+    margin: 0 0 20px 0; 
+    color: var(--on-surface-variant); 
+    font-size: 0.9rem; 
+}
+
+/* Local: Substitua a regra .form-row */
+.form-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap; /* Permite que o botão pule para baixo se não houver espaço */
+}
+
+@media (max-width: 400px) {
+    .form-input {
+        width: 100%; /* Input ocupa linha toda no mobile muito pequeno */
+        flex: none;
+    }
+    .btn-picker {
+        width: 100%; /* Botão ocupa linha toda no mobile muito pequeno */
+        justify-content: center;
+    }
+}
+
+.form-input {
+    flex-grow: 1;
+    padding: 14px;
+    background-color: var(--surface-variant);
+    border: 1px solid var(--outline);
+    border-radius: var(--border-radius-full);
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: var(--on-surface);
+}
+
+.btn-picker {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: var(--border-radius-full);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: opacity 0.2s;
+}
+
+.btn-picker:hover { opacity: 0.9; }
+
+.btn-danger {
+    background: #ffebf0;
+    color: #d32f2f;
+    border: 1px solid #ffcdd2;
+    padding: 12px 20px;
+    border-radius: var(--border-radius-full);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* Console de Log */
+.log {
+    background: #1e292b;
+    color: #a5eafe;
+    padding: 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    border-radius: 12px;
+    height: 120px;
+    overflow-y: auto;
+    margin-top: 16px;
+    line-height: 1.4;
+}
+
+/* Pastas Monitoradas */
+.folder-info-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Local: Dentro das regras de .folder-card ou .text-path */
+.text-path, .folder-info-wrapper b {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adiciona os "..." automaticamente */
+    min-width: 0; /* Importante para o flexbox permitir o encolhimento */
+}
+
+.folder-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    margin-top: 8px;
+    background: white;
+    border: 1px solid var(--outline);
+    border-radius: 12px;
+    /* Remova o white-space: nowrap; daqui se existir */
+    gap: 8px; 
+}
+
+.text-path {
+    color: var(--on-surface-variant);
+    font-size: 0.75rem;
+    opacity: 0.7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0 8px;
+    flex: 1;
+}
+
+.badge {
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+    padding: 2px 10px;
+    border-radius: var(--border-radius-full);
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.btn-icon {
+    background: white;
+    color: var(--primary);
+    border: 1px solid var(--outline);
+    padding: 6px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.btn-icon:hover { background: var(--primary-container); }
+.btn-icon.delete:hover { background: #ffebee; color: #d32f2f; }
+
+/* Viewer Specific */
+.viewer-body { 
+    margin: 0; 
+    padding: 0; 
+    height: 100vh; 
+    overflow: hidden; 
+    background: #263238; 
+}
+
+.viewer-toolbar {
+    height: 64px;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 100;
+}
+
+.viewer-toolbar a { 
+    color: white; 
+    text-decoration: none; 
+    display: flex; 
+    align-items: center; 
+    gap: 12px;
+    font-weight: 700;
+}
+
+#pdf-frame { 
+    width: 100%; 
+    height: calc(100vh - 64px); 
+    border: none; 
+    background: white;
+}
+
+/* Botão Voltar */
+.btn-back {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: inherit;
+    width: 40px;
+    height: 40px;
+}
+
+/* --- RESPONSIVIDADE ADICIONAL --- */
+
+/* Tablets e iPads */
+@media (min-width: 768px) {
+    .config-content, .search-filter-container {
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .top-bar {
+        padding: 0 calc(50% - 400px); /* Alinha a barra com o conteúdo central */
+    }
+
+    .bottom-nav {
+        padding: 12px calc(50% - 400px) 24px;
+    }
+}
+
+/* Ajuste para o FAB não ficar muito longe no Desktop */
+@media (min-width: 1200px) {
+    .fab {
+        right: calc(50% - 450px);
+    }
+}
+
+/* Suporte para Orientação Paisagem (Landscape) em celulares */
+@media (max-height: 500px) {
+    body { padding-top: 48px; }
+    .top-bar { height: 48px; }
+    .card { padding: 16px; }
+}
