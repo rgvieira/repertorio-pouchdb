@@ -26,20 +26,58 @@
             console.error("CRÍTICO: nodeIntegration falhou. O Electron bloqueou o acesso ao sistema de arquivos.");
         }
     </script>
+    <style>
+    /* Local: Adicione no head para complementar o style.css */
+    
+    .config-content {
+        max-width: 800px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 16px; /* Respiro lateral em celulares */
+    }
+
+    /* Faz o formulário de pasta quebrar em celulares pequenos */
+    @media (max-width: 450px) {
+        .form-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .btn-picker {
+            justify-content: center;
+            width: 100%;
+        }
+    }
+
+    /* Garante que o texto do caminho da pasta não quebre o layout */
+    .folder-info-wrapper {
+        min-width: 0; /* Permite que o flex encolha os textos */
+    }
+    
+    .text-path {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block; /* Garante que o ellipsis funcione */
+    }
+
+    .folder-card {
+        gap: 10px;
+        flex-wrap: wrap; /* Em celulares minúsculos, os botões pulam para baixo */
+    }
+</style>
 </head>
 <body>
 
 
-<div class="top-bar" style="display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 56px; background: #fff; border-bottom: 1px solid #ddd;">
-    
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <a href="index.html" style="text-decoration: none; color: #186879; display: flex; align-items: center;">
+<div class="top-bar" style="display: flex; align-items: center; padding: 0 16px; height: 56px; background: #fff; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 1000;">
+    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+        <a href="index.html" style="text-decoration: none; color: #186879; display: flex; align-items: center; flex-shrink: 0;">
             <span class="material-icons">arrow_back</span>
         </a>
-        <div class="logo" style="font-weight: 800; color: #186879; font-size: 1.1rem;">Configurações</div>
+        <div class="logo" style="font-weight: 800; color: #186879; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            Configurações
+        </div>
     </div>
-
-    <div style="width: 24px;"></div> 
 </div>
 
     <div class="config-content">
@@ -62,11 +100,12 @@
             </div>
         </div>
 
-        <div class="card">
-  <button id="btn-clear" class="btn-danger" title="Remover todas as músicas e limpar o banco de dados local.">
-        <span class="material-icons">delete_forever</span> Limpar Banco de Dados
+ <div style="display: flex; justify-content: flex-start;">
+    <button id="btn-clear" class="btn-danger" style="width: auto; max-width: 100%;" title="Remover músicas...">
+        <span class="material-icons">delete_forever</span> 
+        <span class="btn-text">Limpar Banco de Dados</span>
     </button>
-        </div>
+</div>
     </div>
 
     <script src='js/pouchdb.min.js'></script>
@@ -142,22 +181,20 @@ for (const folder of folders) {
     const folderName = folder.path.split(/[\\/]/).pop() || 'Raiz';
     const displayPath = isAndroid ? '' : `<span class="text-path">${folder.path}</span>`;
 
-    folderCard.innerHTML = `
-        <div class="folder-info-wrapper">
+// Local: Dentro da função loadFoldersList(), no loop for(const folder of folders)
+folderCard.innerHTML = `
+    <div class="folder-info-wrapper" style="flex: 1; min-width: 0;">
+        <div style="display: flex; align-items: center; gap: 8px;">
             <span class="material-icons" style="color: var(--primary); font-size: 20px;">folder</span>
-            <b style="flex-shrink: 0;">${folderName}</b>
-            ${displayPath} 
-     
+            <b style="color: #333; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${folderName}
+            </b>
         </div>
-        <div style="display: flex; gap: 8px; flex-shrink: 0;">
-            <button onclick="ConfigApp.instance.refreshFolder('${folder._id}', '${folder.path.replace(/\\/g, '\\\\')}')" class="btn-icon">
-                <span class="material-icons" style="font-size: 18px;">refresh</span>
-            </button>
-            <button onclick="ConfigApp.instance.deleteFolder('${folder._id}', '${folder.path.replace(/\\/g, '\\\\')}')" class="btn-icon delete">
-                <span class="material-icons" style="font-size: 18px;">delete</span>
-            </button>
+        ${displayPath ? `<div class="text-path" style="font-size: 0.7rem; color: #888; margin-left: 28px;">${folder.path}</div>` : ''}
+    </div>
+    <div style="display: flex; gap: 4px; flex-shrink: 0;">
         </div>
-    `;
+`;
     this.foldersListEl.appendChild(folderCard);
 }
                 } catch (err) {

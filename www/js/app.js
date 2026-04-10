@@ -152,9 +152,9 @@ function renderizarTabela(musicas) {
         const termo = encodeURIComponent(`${m.titulo} ${m.artista || ''}`);
 
         tr.innerHTML = `
-            <td style="padding:12px; font-size: 0.85rem;">${m.genero || '---'}</td>
-            <td style="padding:12px; font-size: 0.85rem;">${m.artista || '---'}</td>
-            <td style="padding:12px"><b>${m.titulo}</b></td>
+<td style="font-size: 0.8rem;">${m.genero}</td>
+    <td style="font-size: 0.8rem;">${m.artista}</td>
+    <td style="font-weight: 600;">${m.titulo}</td>
             <td style="padding:12px; text-align:center; display: flex; gap: 8px; justify-content: center;">
                 
                 ${pathOriginal ? `

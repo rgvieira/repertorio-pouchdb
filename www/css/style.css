@@ -29,9 +29,14 @@ body {
     padding-bottom: 100px;
 }
 
-/* Typography */
+html, body {
+    width: 100%;
+    overflow-x: hidden; /* Evita que o app "balance" horizontalmente */
+}
+
+/* Ajuste de Tipografia Responsiva */
 h1 {
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 5vw, 2rem); /* Diminui em celulares, aumenta em telas grandes */
     font-weight: 800;
     color: #186879;
     letter-spacing: -0.025em;
@@ -107,11 +112,21 @@ p.subtitle {
 }
 
 /* Search and Filters */
+/* Local: Substitua a regra .search-filter-container atual */
 .search-filter-container {
     padding: 16px 24px;
     display: flex;
     flex-direction: column;
     gap: 12px;
+}
+
+/* Adicione isto para telas maiores que celulares */
+@media (min-width: 600px) {
+    .search-filter-container {
+        flex-direction: row; /* Busca e Filtro ficam lado a lado */
+    }
+    .search-wrapper { flex: 2; }
+    .genero-select { flex: 1; }
 }
 
 .search-wrapper {
@@ -332,10 +347,23 @@ p.subtitle {
     font-size: 0.9rem; 
 }
 
+/* Local: Substitua a regra .form-row */
 .form-row {
     display: flex;
     gap: 12px;
     align-items: center;
+    flex-wrap: wrap; /* Permite que o botão pule para baixo se não houver espaço */
+}
+
+@media (max-width: 400px) {
+    .form-input {
+        width: 100%; /* Input ocupa linha toda no mobile muito pequeno */
+        flex: none;
+    }
+    .btn-picker {
+        width: 100%; /* Botão ocupa linha toda no mobile muito pequeno */
+        justify-content: center;
+    }
 }
 
 .form-input {
@@ -402,6 +430,14 @@ p.subtitle {
     min-width: 0;
 }
 
+/* Local: Dentro das regras de .folder-card ou .text-path */
+.text-path, .folder-info-wrapper b {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adiciona os "..." automaticamente */
+    min-width: 0; /* Importante para o flexbox permitir o encolhimento */
+}
+
 .folder-card {
     display: flex;
     align-items: center;
@@ -411,8 +447,8 @@ p.subtitle {
     background: white;
     border: 1px solid var(--outline);
     border-radius: 12px;
-    white-space: nowrap;
-    overflow: hidden;
+    /* Remova o white-space: nowrap; daqui se existir */
+    gap: 8px; 
 }
 
 .text-path {
@@ -498,4 +534,37 @@ p.subtitle {
     color: inherit;
     width: 40px;
     height: 40px;
+}
+
+/* --- RESPONSIVIDADE ADICIONAL --- */
+
+/* Tablets e iPads */
+@media (min-width: 768px) {
+    .config-content, .search-filter-container {
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .top-bar {
+        padding: 0 calc(50% - 400px); /* Alinha a barra com o conteúdo central */
+    }
+
+    .bottom-nav {
+        padding: 12px calc(50% - 400px) 24px;
+    }
+}
+
+/* Ajuste para o FAB não ficar muito longe no Desktop */
+@media (min-width: 1200px) {
+    .fab {
+        right: calc(50% - 450px);
+    }
+}
+
+/* Suporte para Orientação Paisagem (Landscape) em celulares */
+@media (max-height: 500px) {
+    body { padding-top: 48px; }
+    .top-bar { height: 48px; }
+    .card { padding: 16px; }
 }

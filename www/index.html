@@ -9,17 +9,17 @@
     <link rel="stylesheet" href="css/style.css">
     <style>
         /* Ajuste do FAB Menu para aparecer sobre os elementos */
-        .fab-menu {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 60px;
-            background: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            border-radius: 8px;
-            min-width: 180px;
-            z-index: 999;
-        }
+ /* Local: Adicione ou substitua no seu <style> */
+.fab-menu {
+    right: 0;
+    top: 50px; /* Ajustado para não sobrepor o botão trigger */
+    width: 200px; /* Um pouco mais largo para facilitar o toque */
+}
+
+/* Garante que os ícones do menu sejam fáceis de clicar em qualquer celular */
+.tooltip-item {
+    min-height: 48px; 
+}
         .fab-menu.open { display: block; }
         .menu-item {
             display: flex;
@@ -31,6 +31,38 @@
         }
         .menu-item:hover { background: #f5f5f5; }
         .fab-container { position: relative; }
+
+        /* Local: Adicione no final da sua tag <style> que já existe no head */
+
+.music-list {
+    width: 100%;
+    overflow-x: auto; /* Permite scroll horizontal na tabela se necessário em telas minúsculas */
+    -webkit-overflow-scrolling: touch;
+}
+
+table {
+    min-width: 450px; /* Garante que os dados não fiquem encavalados */
+}
+
+/* Esconde o Gênero em telas muito pequenas para dar espaço ao Título */
+@media (max-width: 480px) {
+    th:nth-child(1), td:nth-child(1) {
+        display: none; 
+    }
+    table {
+        min-width: 100%; /* Em telas pequenas, ocupa apenas o que tem */
+    }
+}
+
+/* Ajuste do Título para não quebrar a linha e sim colocar "..." */
+#lista-musicas td {
+    max-width: 150px; /* Limite para o texto não empurrar a tabela */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 12px 8px;
+}
+
     </style>
 </head>
 <body>
@@ -62,7 +94,7 @@
     </div>
 </div>
 
-<main>
+<main style="max-width: 900px; margin: 0 auto; width: 100%;">
     <div class="search-filter-container">
         <div class="search-wrapper">
             <span class="material-icons search-icon">search</span>

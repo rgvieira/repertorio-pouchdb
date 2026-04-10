@@ -6,16 +6,82 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <title>Músicas do Repertório</title>
-    <style>
-        .top-bar { height: 56px; background: #fff; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid #ddd; }
-        .back-area { display: flex; align-items: center; cursor: pointer; color: #186879; }
-        .logo-title { margin-left: 8px; font-weight: 700; font-size: 1.1rem; color: #186879; }
-        .music-list { padding: 10px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px; border-bottom: 2px solid #eee; font-size: 0.8rem; color: #666; }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
-        .btn-icon { background: none; border: none; cursor: pointer; padding: 4px; display: inline-flex; align-items: center; }
-    </style>
+<style>
+    .top-bar { 
+        height: 56px; 
+        background: #fff; 
+        display: flex; 
+        align-items: center; 
+        padding: 0 16px; 
+        border-bottom: 1px solid #ddd; 
+        position: sticky; 
+        top: 0; 
+        z-index: 100;
+    }
+    .back-area { display: flex; align-items: center; cursor: pointer; color: #186879; min-width: 0; }
+    .logo-title { 
+        margin-left: 8px; 
+        font-weight: 700; 
+        font-size: 1.1rem; 
+        color: #186879;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .music-list { 
+        padding: 0; /* Remove padding lateral para ganhar espaço no mobile */
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    
+    th { 
+        text-align: left; 
+        padding: 12px 8px; 
+        border-bottom: 2px solid #eee; 
+        font-size: 0.75rem; 
+        color: #666; 
+        text-transform: uppercase;
+    }
+
+    td { padding: 12px 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
+    
+    .btn-icon { background: none; border: none; cursor: pointer; padding: 8px; display: inline-flex; align-items: center; }
+
+    /* RESPONSIVIDADE ESPECÍFICA */
+    
+    /* Celulares Médios/Pequenos */
+    @media (max-width: 600px) {
+        /* Esconde Gênero e Artista para priorizar o Título */
+        th:nth-child(1), td:nth-child(1),
+        th:nth-child(2), td:nth-child(2) {
+            display: none;
+        }
+        
+        /* Ajusta as larguras das colunas restantes */
+        th:nth-child(3) { width: 70%; } /* Título */
+        th:nth-child(4) { width: 30%; } /* Ações */
+
+        .logo-title { font-size: 1rem; }
+    }
+
+@media (max-width: 600px) {
+    .show-mobile {
+        display: block !important;
+        font-size: 0.7rem;
+    }
+}
+
+    /* Evita que o título da música quebre a linha e empurre a tabela */
+    .truncar-texto {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+    }
+</style>
 </head>
 <body>
 
@@ -110,29 +176,31 @@
         },
 
         renderLinha(m) {
-            const tbody = document.getElementById('lista-musicas');
-            const tr = document.createElement('tr');
-            
-            // Tratamento do caminho para Windows/Linux
-            const pathSeguro = m.fullPath.replace(/\\/g, '\\\\');
+    const tbody = document.getElementById('lista-musicas');
+    const tr = document.createElement('tr');
+    
+    const pathSeguro = m.fullPath.replace(/\\/g, '\\\\');
 
-            tr.innerHTML = `
-                <td style="font-size: 0.85rem; color:#666;">${m.genero || '---'}</td>
-                <td style="font-size: 0.85rem; color:#666;">${m.artista || '---'}</td>
-                <td><b>${m.titulo}</b></td>
-                <td style="text-align:center;">
-                    <div style="display: flex; gap: 12px; justify-content: center;">
-                        <button class="btn-icon" onclick="visualizarArquivo('${pathSeguro}', '${encodeURIComponent(m.titulo)}')" title="Ver PDF">
-                            <span class="material-icons" style="color: #186879;">visibility</span>
-                        </button>
-                        <button class="btn-icon" onclick="removerDaLista('${m._id}')" title="Remover da lista">
-                            <span class="material-icons" style="color: #d32f2f;">playlist_remove</span>
-                        </button>
-                    </div>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        }
+    tr.innerHTML = `
+        <td style="font-size: 0.8rem; color:#666;">${m.genero || '---'}</td>
+        <td style="font-size: 0.8rem; color:#666;">${m.artista || '---'}</td>
+        <td>
+            <b class="truncar-texto" title="${m.titulo}">${m.titulo}</b>
+            <small style="display: none; color: #888;" class="show-mobile">${m.artista || ''}</small>
+        </td>
+        <td style="text-align:center;">
+            <div style="display: flex; gap: 4px; justify-content: center;">
+                <button class="btn-icon" onclick="visualizarArquivo('${pathSeguro}', '${encodeURIComponent(m.titulo)}')" title="Ver PDF">
+                    <span class="material-icons" style="color: #186879; font-size: 22px;">visibility</span>
+                </button>
+                <button class="btn-icon" onclick="removerDaLista('${m._id}')" title="Remover">
+                    <span class="material-icons" style="color: #d32f2f; font-size: 22px;">playlist_remove</span>
+                </button>
+            </div>
+        </td>
+    `;
+    tbody.appendChild(tr);
+}
     };
 
     window.onload = () => Page.init();

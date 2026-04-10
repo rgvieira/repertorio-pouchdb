@@ -9,25 +9,59 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; background: #333; overflow: hidden; }
         
-        .top-bar { 
-            height: 56px; background: #fff; display: flex; align-items: center; 
-            padding: 0 16px; z-index: 100; border-bottom: 1px solid #ccc;
-        }
+/* Local: No bloco <style>, substitua as classes correspondentes */
 
-        .music-title {
-            margin-left: 10px; font-weight: 600; color: #186879;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1;
-        }
+.top-bar { 
+    height: 56px; 
+    background: #fff; 
+    display: flex; 
+    align-items: center; 
+    padding: 0 12px; /* Reduzido para dar espaço */
+    z-index: 100; 
+    border-bottom: 1px solid #ccc;
+    gap: 8px;
+}
 
-        .pdf-container { 
-            flex: 1; overflow: auto; background: #525659; 
-            display: flex; justify-content: center; position: relative; 
-        }
+.music-title {
+    font-weight: 700; 
+    color: #186879;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    flex: 1; /* Ocupa o espaço que sobrar */
+    min-width: 0; 
+    font-size: 0.9rem;
+}
+
+.header-actions { 
+    display: flex; 
+    align-items: center; 
+    gap: 2px; /* Compactado para mobile */
+    flex-shrink: 0; /* Impede que os botões sumam */
+}
+
+/* Esconde o texto dos controles de página em telas muito pequenas */
+@media (max-width: 380px) {
+    #page-info { font-size: 0.65rem; }
+    .nav-controls { gap: 0; }
+}
+
+/* Local: No bloco <style> */
+.pdf-container { 
+    flex: 1; 
+    overflow: auto; 
+    background: #525659; 
+    display: flex; 
+    justify-content: center; 
+    align-items: flex-start; /* Alinha o PDF no topo para facilitar o scroll */
+    position: relative; 
+    padding: 10px 0;
+}
 
         #pdf-canvas { background: white; display: block; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
         #draw-canvas { position: absolute; left: 50%; transform: translateX(-50%); cursor: crosshair; }
 
-        .header-actions { display: flex; align-items: center; gap: 4px; }
+
 
         /* Paginação menor e compacta */
         .nav-controls { display: flex; align-items: center; gap: 2px; color: #186879; font-size: 0.75rem; }
@@ -129,6 +163,20 @@
             render();
         }
     }
+// Local: No final do bloco <script>, antes do init()
+
+function handleTouch(e) {
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent(
+        e.type === 'touchstart' ? 'mousedown' : e.type === 'touchmove' ? 'mousemove' : 'mouseup', 
+        { clientX: touch.clientX, clientY: touch.clientY }
+    );
+    drawCanvas.dispatchEvent(mouseEvent);
+}
+
+drawCanvas.addEventListener("touchstart", (e) => { e.preventDefault(); handleTouch(e); }, {passive: false});
+drawCanvas.addEventListener("touchmove", (e) => { e.preventDefault(); handleTouch(e); }, {passive: false});
+drawCanvas.addEventListener("touchend", (e) => { handleTouch(e); }, {passive: false});
 
     function toggleFab() { document.getElementById('fab-menu').classList.toggle('open'); }
 
@@ -139,22 +187,47 @@
         toggleFab();
     }
 
-    async function render() {
-        if (!pdfDoc) return;
+ // Local: Dentro da função async function render()
+async function render() {
+    if (!pdfDoc) return;
+    
+    try {
         const page = await pdfDoc.getPage(pageNum);
         const container = document.getElementById('pdf-container');
+        
+        // 1. Cálculo da escala responsiva
+        const availableWidth = container.clientWidth - 20; 
         const viewportOrig = page.getViewport({ scale: 1.0 });
-        const scale = (container.clientWidth - 40) / viewportOrig.width;
+        const scale = availableWidth / viewportOrig.width;
         const viewport = page.getViewport({ scale: scale });
 
+        // 2. Ajuste dos tamanhos dos Canvas
         pdfCanvas.width = drawCanvas.width = viewport.width;
         pdfCanvas.height = drawCanvas.height = viewport.height;
         
-        await page.render({ canvasContext: pdfCanvas.getContext('2d'), viewport: viewport }).promise;
+        // 3. O PULO DO GATO: Renderizar o conteúdo do PDF de fato
+        const renderContext = {
+            canvasContext: pdfCanvas.getContext('2d'),
+            viewport: viewport
+        };
+        
+        // Aguarda a renderização terminar antes de desenhar as anotações
+        await page.render(renderContext).promise;
+
+        // 4. Atualiza informações de página e redesenha os seus riscos/anotações
         document.getElementById('page-info').innerText = pageNum + '/' + pdfDoc.numPages;
         redesenharCamadaDesenho();
+        
+    } catch (error) {
+        console.error("Erro ao renderizar página:", error);
     }
+}
 
+// ADICIONE ISTO: Faz o PDF reajustar se o usuário girar o celular
+window.onresize = () => {
+    clearTimeout(window.resizer);
+    window.resizer = setTimeout(render, 200);
+};
     function redesenharCamadaDesenho() {
         drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
         const all = annotations.concat(tempAnnotation ? [tempAnnotation] : []);
