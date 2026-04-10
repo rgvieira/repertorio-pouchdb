@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Repertórios</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <script>
+        window.nodeRequire = (typeof require !== 'undefined') ? require : (window.require ? window.require : null);
+        if (typeof module === 'object') {
+            window.electronModule = module;
+            window.module = undefined; 
+        }
+    </script>
+    <style>
+        .folder-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: rgba(0,0,0,0.03);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .folder-info-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
+        }
+        .btn-icon {
+            background: none; border: none; cursor: pointer; color: #186879;
+            padding: 8px; border-radius: 50%; display: flex; transition: background 0.2s;
+            align-items: center; justify-content: center;
+        }
+        .btn-icon:hover { background: rgba(0,0,0,0.05); }
+        .btn-icon.delete { color: #d32f2f; }
+
+        #edit-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: none; align-items: center;
+            justify-content: center; z-index: 2000;
+        }
+        .modal-content {
+            background: white; padding: 20px; border-radius: 12px;
+            width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .form-row { display: flex; gap: 8px; width: 100%; }
+        .form-input { flex: 1; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar" style="display: flex; align-items: center; padding: 0 16px; height: 56px; background: #fff; border-bottom: 1px solid #ddd;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="index.html" style="text-decoration: none; color: #186879; display: flex; align-items: center;">
+                <span class="material-icons">arrow_back</span>
+            </a>
+            <div class="logo" style="font-weight: 800; color: #186879; font-size: 1.1rem;">Repertórios</div>
+        </div>
+    </div>
+
+    <div class="config-content" style="padding: 20px;">
+        <div class="card" style="margin-bottom: 20px;">
+            <div class="form-row">
+                <input type="text" id="rep-input" class="form-input" placeholder="Nome do novo repertório...">
+                <button onclick="App.save()" class="btn-picker" style="display: flex; align-items: center; gap: 4px;">
+                    <span class="material-icons">add</span> Criar
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="font-size: 0.75rem; color: #666; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Meus Repertórios</h3>
+            <div id="repertorios-list"></div>
+        </div>
+    </div>
+
+    <div id="edit-modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 15px; color: #186879;">Editar Nome</h3>
+            <input type="text" id="modal-input" class="form-input" style="width: 100%; margin-bottom: 15px; box-sizing: border-box;">
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button onclick="App.closeModal()" class="tool-btn">Cancelar</button>
+                <button onclick="App.confirmEdit()" class="btn-picker" style="padding: 8px 20px;">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src='js/pouchdb.min.js'></script>
+    <script src='js/pouchdb.find.min.js'></script>  
+    <script src="js/database.js"></script>
+
+    <script>
+        const App = {
+            editingDoc: null,
+
+            async init() {
+                if (typeof DBManager !== 'undefined') await DBManager.init();
+                await this.loadList();
+            },
+
+            async loadList() {
+                const listEl = document.getElementById('repertorios-list');
+                try {
+                    const result = await db.find({ selector: { type: 'repertorio' } });
+                    listEl.innerHTML = '';
+
+                    if (result.docs.length === 0) {
+                        listEl.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">Nenhum repertório criado.</p>';
+                        return;
+                    }
+
+                    const sortedDocs = result.docs.sort((a, b) => a.nome.localeCompare(b.nome));
+
+                    sortedDocs.forEach(doc => {
+                        const div = document.createElement('div');
+                        div.className = 'folder-card';
+                        
+                        // Lógica: Botão de lista ativo apenas se tiver músicas
+                        const temMusicas = doc.musicas && doc.musicas.length > 0;
+                        const btnRelacao = temMusicas ? `
+                            <button onclick="window.location.href='musicasRepertorio.html?id=${doc._id}'" 
+                                    class="btn-icon" title="Ver relação de músicas" 
+                                    style="background: rgba(24, 104, 121, 0.1); border-radius: 8px;">
+                                <span class="material-icons" style="color: #186879;">receipt_long</span>
+                            </button>
+                        ` : '';
+
+                        div.innerHTML = `
+                            <div class="folder-info-wrapper" style="flex: 1;">
+                                <span class="material-icons" style="color:#186879">queue_music</span>
+                                <div>
+                                    <b style="color: #186879; display: block;">${doc.nome}</b>
+                                    <small style="color: #999; font-size: 0.7rem;">${doc.musicas ? doc.musicas.length : 0} música(s)</small>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                ${btnRelacao}
+                                <button onclick="App.openEdit('${doc._id}', '${doc.nome}')" class="btn-icon">
+                                    <span class="material-icons">edit</span>
+                                </button>
+                                <button onclick="App.delete('${doc._id}')" class="btn-icon delete">
+                                    <span class="material-icons">delete</span>
+                                </button>
+                            </div>
+                        `;
+                        listEl.appendChild(div);
+                    });
+                } catch (e) { 
+                    console.error("Erro ao carregar lista:", e); 
+                }
+            },
+
+            async save() {
+                const input = document.getElementById('rep-input');
+                const nome = input.value.trim();
+                if (!nome) return;
+                
+                try {
+                    await db.put({
+                        _id: 'rep_' + Date.now(),
+                        type: 'repertorio',
+                        nome: nome,
+                        musicas: []
+                    });
+                    
+                    input.value = '';
+                    this.loadList();
+                } catch (e) {
+                    console.error("Erro ao salvar:", e);
+                }
+            },
+
+            openEdit(id, nome) {
+                this.editingDoc = id;
+                document.getElementById('modal-input').value = nome;
+                document.getElementById('edit-modal').style.display = 'flex';
+                document.getElementById('modal-input').focus();
+            },
+
+            closeModal() {
+                document.getElementById('edit-modal').style.display = 'none';
+                this.editingDoc = null;
+            },
+
+            async confirmEdit() {
+                const novoNome = document.getElementById('modal-input').value.trim();
+                if (novoNome && this.editingDoc) {
+                    try {
+                        const doc = await db.get(this.editingDoc);
+                        doc.nome = novoNome;
+                        await db.put(doc);
+                        this.closeModal();
+                        this.loadList();
+                    } catch (e) {
+                        console.error("Erro ao editar:", e);
+                    }
+                }
+            },
+
+            async delete(id) {
+                if (confirm('Excluir este repertório? Todas as associações de músicas nesta lista serão perdidas.')) {
+                    try {
+                        const doc = await db.get(id);
+                        await db.remove(doc);
+                        this.loadList();
+                    } catch (e) {
+                        console.error("Erro ao deletar:", e);
+                    }
+                }
+            }
+        };
+
+        window.onload = () => App.init();
+    </script>
+</body>
+</html>
