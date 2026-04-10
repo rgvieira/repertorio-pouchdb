@@ -1,7 +1,17 @@
 /**
  * Gerenciamento do banco de dados PouchDB
  */
+// A "Vacina" contra erro de navegador
+window.isElectron = (typeof window !== 'undefined' && window.process && window.process.type === 'renderer');
 
+if (!window.isElectron) {
+    console.warn("Ambiente Web detectado. Recursos de sistema de arquivos desativados.");
+    // Cria um 'require' falso para não dar erro de 'function not found'
+    window.require = window.require || function(module) {
+        console.warn(`O módulo ${module} não está disponível no navegador.`);
+        return {}; 
+    };
+}
 // Definimos a variável, mas não a inicializamos imediatamente.
 // Precisamos garantir que o plugin 'find' seja registrado ANTES de 'new PouchDB'.
 let db = null;
