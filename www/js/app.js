@@ -18,8 +18,15 @@ const App = {
 
         try {
             // Busca os documentos do tipo repertorio
-            const res = await db.find({ selector: { type: 'repertorio' } });
-            
+// Procure esta linha no app.js e substitua:
+const res = await db.find({ 
+    selector: { 
+        $or: [
+            { type: 'repertorio' },
+            { tipo: 'repertorio' }
+        ]
+    } 
+});
             // Ordena A-Z
             const sorted = res.docs.sort((a, b) => 
                 a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' })
@@ -42,15 +49,26 @@ const App = {
     },
 
     // Salva o path no array de musicas do documento escolhido
-    async adicionarMusicaAoRep(repId) {
+async adicionarMusicaAoRep(repId) {
         try {
             const repDoc = await db.get(repId);
             
+            // Garante que o array existe
             if (!repDoc.musicas) repDoc.musicas = [];
             
-            // Verifica se já existe para não duplicar
-            if (!repDoc.musicas.includes(this.pathMusicaSelecionada)) {
+            // Normaliza o path para comparação (remove barras duplicadas extras)
+            const pathNormalizado = this.pathMusicaSelecionada.replace(/\\\\/g, '\\');
+
+            // Verifica se já existe
+            const jaExiste = repDoc.musicas.some(m => {
+                const mNormal = (typeof m === 'string' ? m : (m.path || "")).replace(/\\\\/g, '\\');
+                return mNormal === pathNormalizado;
+            });
+
+            if (!jaExiste) {
+                // Adiciona o path (usamos o original selecionado)
                 repDoc.musicas.push(this.pathMusicaSelecionada);
+                
                 await db.put(repDoc);
                 alert("Música adicionada ao repertório!");
             } else {
@@ -59,7 +77,7 @@ const App = {
             
             document.getElementById('modal-favoritos').style.display = 'none';
         } catch (e) {
-            alert("Erro ao salvar.");
+            alert("Erro ao salvar no banco de dados.");
             console.error(e);
         }
     }
@@ -130,64 +148,72 @@ async function carregarMusicas() {
         });
     }
 
-    renderizarTabela(musicas);
+    renderizarMusicas(musicas);
 }
 
-function renderizarTabela(musicas) {
-    const tbody = document.getElementById('lista-musicas');
+/**
+ * js/app.js - Parte da Renderização
+ */
+// No app.js, substitua a função renderizarMusicas:
+function renderizarMusicas(docs) {
+    const tbody = document.getElementById('corpo-tabela');
     if (!tbody) return;
     tbody.innerHTML = '';
 
-    if (musicas.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Nenhuma música encontrada.</td></tr>';
-        return;
-    }
-
-    musicas.forEach(m => {
+    docs.forEach(doc => {
         const tr = document.createElement('tr');
-        tr.style.borderBottom = "1px solid var(--outline)";
-        
-        const pathOriginal = m.fullPath || ""; 
-        const pathSeguro = pathOriginal ? pathOriginal.replace(/\\/g, '\\\\') : '';
-        const termo = encodeURIComponent(`${m.titulo} ${m.artista || ''}`);
+//console.log("Renderizando música:", doc);        
+        // Agora tenta pegar nome ou titulo, o que estiver preenchido
+        const nomeExibicao = doc.nome  || " ";
+        const pastaExibicao = doc.pasta || "Raiz";
+        const pathSeguro = doc._id.replace(/\\/g, '\\\\');
 
- // Dentro do loop musicas.forEach(m => { ... })
-tr.innerHTML = `
-    <td>${m.genero}</td>
-    <td>${m.artista}</td>
-    <td class="titulo-musica">${m.titulo}</td>
-    <td style="padding:8px 4px; text-align:center; display: flex; gap: 4px; justify-content: center;">
-        
-        ${pathOriginal ? `
-            <button class="btn-icon" onclick="visualizarArquivo('${pathSeguro}', '${encodeURIComponent(m.titulo)}')" title="Partitura">
-                <span class="material-icons" style="color: var(--primary);">visibility</span>
+        tr.innerHTML = `
+            <td><span class="badge-genero">${pastaExibicao}</span></td>
+            <td><strong>${nomeExibicao}</strong></td>
+            <td>
+                <div class="acoes-container">
+    <button class="btn-icon" onclick="visualizarArquivo('${pathSeguro}', '${nomeExibicao}')">
+                <span class="material-icons">visibility</span>
             </button>
-            <button class="btn-icon" onclick="App.abrirModalFavoritos('${pathSeguro}')" title="Adicionar ao Repertório">
-                <span class="material-icons" style="color: #fbc02d;">star_border</span>
-            </button>
-        ` : `
-            <span class="material-icons" style="color:#ccc; font-size:18px;" title="Arquivo não localizado">visibility_off</span>
-        `}
-        
-        <button class="btn-icon" onclick="abrirExterno('https://www.google.com/search?q=letra+${termo}')" title="Letra">
-            <span class="material-icons" style="color: #566163;">lyrics</span>
-        </button>
 
-        <button class="btn-icon" onclick="abrirExterno('https://www.youtube.com/results?search_query=${termo}')" title="Vídeo">
-            <span class="material-icons" style="color: #d32f2f;">play_circle</span>
-        </button>
-    </td>
-`;
+                    <button class="btn-icon" onclick="abrirLetra('${nomeExibicao}')" title="Ver Letra">
+                        <span class="material-icons">description</span>
+                    </button>
+                    <button class="btn-icon" onclick="abrirVideo('${nomeExibicao}')" title="Ver Vídeo">
+                        <span class="material-icons">play_circle</span>
+                    </button>                    
+                    <button class="btn-icon" onclick="App.abrirModalFavoritos('${pathSeguro}')" title="Adicionar ao Repertório">
+                        <span class="material-icons" style="color: #FFD700">star</span>
+                    </button>
+                </div>
+            </td>
+        `;
         tbody.appendChild(tr);
     });
 }
-
-function visualizarArquivo(path, titulo) {
-    if (!path) {
-        alert("Caminho do arquivo não encontrado.");
-        return;
+ 
+function abrirLetra(nomeMusica) {
+    const url = `https://www.google.com/search?q=letra+musica+${encodeURIComponent(nomeMusica)}`;
+    if (window.electronAPI) {
+        window.electronAPI.abrirLink(url);
+    } else {
+        window.open(url, '_blank');
     }
-    window.location.href = `viewer.html?file=${encodeURIComponent(path)}&title=${titulo}`;
+}
+
+function abrirVideo(nomeMusica) {
+    const url = `https://www.google.com/search?q=video+youtube+${encodeURIComponent(nomeMusica)}`;
+    if (window.electronAPI) {
+        window.electronAPI.abrirLink(url);
+    } else {
+        window.open(url, '_blank');
+    }
+}
+function visualizarArquivo(path, titulo) {
+    if (!path) return;
+    // Use encodeURIComponent no título também para evitar erro com espaços e acentos
+    window.location.href = `viewer.html?file=${encodeURIComponent(path)}&title=${encodeURIComponent(titulo)}`;
 }
 
 function abrirExterno(url) {

@@ -52,14 +52,14 @@ const App = {
             if (!repDoc.musicas.includes(this.pathMusicaSelecionada)) {
                 repDoc.musicas.push(this.pathMusicaSelecionada);
                 await db.put(repDoc);
-                showToast("Música adicionada ao repertório!");
+                alert("Música adicionada ao repertório!");
             } else {
-                showToast("Esta música já está nesta lista.");
+                alert("Esta música já está nesta lista.");
             }
             
             document.getElementById('modal-favoritos').style.display = 'none';
         } catch (e) {
-            showToast("Erro ao salvar.");
+            alert("Erro ao salvar.");
             console.error(e);
         }
     }
@@ -130,101 +130,37 @@ async function carregarMusicas() {
         });
     }
 
-    renderizarTabela(musicas);
+    renderizarMusicas(musicas);
 }
 
-function renderizarTabela(musicas) {
-    const tbody = document.getElementById('lista-musicas'); 
+/**
+ * js/app.js - Parte da Renderização
+ */
+function renderizarMusicas(docs) {
+    const tbody = document.querySelector('#tabela-musicas tbody') || document.getElementById('corpo-tabela');
     if (!tbody) return;
     tbody.innerHTML = '';
 
-    musicas.forEach(m => {
+    docs.forEach(doc => {
         const tr = document.createElement('tr');
-        tr.style.borderBottom = "1px solid #eee";
         
-        // Ajuste de caminhos para o Windows (troca \ por /)
-        const pathSeguro = m._id.replace(/\\/g, '/');
-        const termoBusca = encodeURIComponent(`${m.titulo} ${m.pasta}`);
+        // FORÇA O USO DE NOME E PASTA, mas mantém fallback para não quebrar
+        const exibicaoNome = doc.nome || doc.titulo || "Sem Nome";
+        const exibicaoPasta = doc.pasta || doc.genero || "Raiz";
         
+        const pathSeguro = doc._id.replace(/\\/g, '\\\\');
+        const termo = encodeURIComponent(exibicaoNome);
+
         tr.innerHTML = `
-            <td style="padding: 10px 8px; width: 100px;">
-                <span class="badge-genero" style="background:#e1f5fe; color:#01579b; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold; display:inline-block; max-width:90px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                    ${m.pasta || 'Geral'}
-                </span>
-            </td>
-
-            <td style="padding: 10px 8px;">
-                <div class="music-title" style="font-weight: 600; color: #333; white-space: normal; word-break: break-word; font-size: 0.9rem;">
-                    ${m.titulo}
-                </div>
-            </td>
-
-            <td style="padding: 10px 8px; width: 100px; text-align: right;">
-                <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
-                    
-                    <button class="btn-icon" onclick="visualizarArquivo('${pathSeguro}', '${m.titulo}')" title="Ver PDF" style="background:none; border:none; cursor:pointer; padding:0;">
-                        <span class="material-icons" style="color: var(--primary); font-size: 20px;">visibility</span>
-                    </button>
-
-                    <button class="btn-icon" onclick="App.abrirModalFavoritos('${pathSeguro}')" title="Adicionar" style="background:none; border:none; cursor:pointer; padding:0;">
-                        <span class="material-icons" style="color: #fbc02d; font-size: 20px;">star_border</span>
-                    </button>
-
-                    <button class="btn-icon" onclick="abrirExterno('https://www.youtube.com/results?search_query=${termoBusca}')" title="YouTube" style="background:none; border:none; cursor:pointer; padding:0;">
-                        <span class="material-icons" style="color: #d32f2f; font-size: 20px;">play_circle</span>
-                    </button>
-
-                </div>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-}function renderizarTabela(musicas) {
-    const tbody = document.getElementById('lista-musicas'); 
-    if (!tbody) return;
-    tbody.innerHTML = '';
-
-    musicas.forEach(m => {
-        const tr = document.createElement('tr');
-        tr.style.borderBottom = "1px solid #eee";
-        
-        // Ajusta o path para não quebrar no Windows (troca \ por /)
-        const pathSeguro = m._id.replace(/\\/g, '/');
-        const termoBusca = encodeURIComponent(`${m.titulo} ${m.pasta}`);
-        
-        tr.innerHTML = `
-            <td style="padding: 10px 8px; width: 100px;">
-                <span class="badge-genero" style="background:#e1f5fe; color:#01579b; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold; display:block; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                    ${m.pasta || 'Raiz'}
-                </span>
-            </td>
-
-            <td style="padding: 10px 8px;">
-                <div class="music-title" style="font-weight: 600; color: #333; font-size: 0.9rem;">
-                    ${m.titulo}
-                </div>
-            </td>
-
-            <td style="padding: 10px 8px; width: 140px; text-align: right;">
-                <div style="display: flex; gap: 4px; justify-content: flex-end; align-items: center;">
-                    
-                    <button class="btn-icon" onclick="visualizarArquivo('${pathSeguro}', '${m.titulo}')" title="Ver PDF">
-                        <span class="material-icons" style="color: #186879; font-size: 20px;">visibility</span>
-                    </button>
-
-                    <button class="btn-icon" onclick="App.abrirModalFavoritos('${pathSeguro}')" title="Adicionar à Lista">
-                        <span class="material-icons" style="color: #fbc02d; font-size: 20px;">star_border</span>
-                    </button>
-
-                    <button class="btn-icon" onclick="abrirExterno('https://www.google.com/search?q=letra+${termoBusca}')" title="Letra">
-                        <span class="material-icons" style="color: #566163; font-size: 20px;">lyrics</span>
-                    </button>
-
-                    <button class="btn-icon" onclick="abrirExterno('https://www.youtube.com/results?search_query=${termoBusca}')" title="YouTube">
-                        <span class="material-icons" style="color: #d32f2f; font-size: 20px;">play_circle</span>
-                    </button>
-
-                </div>
+            <td><span class="badge-genero">${exibicaoPasta}</span></td>
+            <td><strong>${exibicaoNome}</strong></td>
+            <td class="acoes-cell">
+                <button class="btn-icon" onclick="visualizarArquivo('${pathSeguro}', '${exibicaoNome}')">
+                    <span class="material-icons" style="color: #186879;">visibility</span>
+                </button>
+                <button class="btn-icon" onclick="App.abrirModalFavoritos('${pathSeguro}')">
+                    <span class="material-icons" style="color: #fbc02d;">star_border</span>
+                </button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -233,7 +169,7 @@ function renderizarTabela(musicas) {
 
 function visualizarArquivo(path, titulo) {
     if (!path) {
-        showToast("Caminho do arquivo não encontrado.");
+        alert("Caminho do arquivo não encontrado.");
         return;
     }
     window.location.href = `viewer.html?file=${encodeURIComponent(path)}&title=${titulo}`;

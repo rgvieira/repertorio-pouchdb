@@ -1,13 +1,11 @@
 const { contextBridge, ipcRenderer } = require('electron');
-const fs = require('fs');
-const path = require('path');
 
-// Expõe o Node para o seu Scanner de forma segura e direta
 contextBridge.exposeInMainWorld('electronAPI', {
-    fs: fs,
-    path: path,
-    readdir: (path) => fs.readdirSync(path, { withFileTypes: true }),
-    dirname: (p) => path.dirname(p)
+    salvarPartitura: (dados) => ipcRenderer.send('salvar-pdf-direto', dados),
+    imprimirDireto: (dados) => ipcRenderer.send('chamar-impressora', dados),
+    // NOVAS FUNÇÕES PARA O SCANNER
+    lerDiretorio: (caminho) => ipcRenderer.invoke('ler-diretorio', caminho),
+    obterStatus: (caminho) => ipcRenderer.invoke('obter-status', caminho),
+    abrirDialogoPasta: () => ipcRenderer.invoke('abrir-dialogo-pasta'),
+    abrirLink: (url) => ipcRenderer.send('abrir-link-externo', url)
 });
-
-console.log("Preload carregado com sucesso!");

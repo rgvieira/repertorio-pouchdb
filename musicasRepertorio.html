@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Músicas do Repertório</title>
+<style>
+    .top-bar { 
+        height: 56px; 
+        background: #fff; 
+        display: flex; 
+        align-items: center; 
+        padding: 0 16px; 
+        border-bottom: 1px solid #ddd; 
+        position: sticky; 
+        top: 0; 
+        z-index: 100;
+    }
+    .back-area { display: flex; align-items: center; cursor: pointer; color: #186879; min-width: 0; }
+    .logo-title { 
+        margin-left: 8px; 
+        font-weight: 700; 
+        font-size: 1.1rem; 
+        color: #186879;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .music-list { 
+        padding: 0; /* Remove padding lateral para ganhar espaço no mobile */
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    
+    th { 
+        text-align: left; 
+        padding: 12px 8px; 
+        border-bottom: 2px solid #eee; 
+        font-size: 0.75rem; 
+        color: #666; 
+        text-transform: uppercase;
+    }
+
+    td { padding: 12px 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
+    
+    .btn-icon { background: none; border: none; cursor: pointer; padding: 8px; display: inline-flex; align-items: center; }
+
+    /* RESPONSIVIDADE ESPECÍFICA */
+    
+    /* Celulares Médios/Pequenos */
+    @media (max-width: 600px) {
+        /* Esconde Gênero e Artista para priorizar o Título */
+        th:nth-child(1), td:nth-child(1),
+        th:nth-child(2), td:nth-child(2) {
+            display: none;
+        }
+        
+        /* Ajusta as larguras das colunas restantes */
+        th:nth-child(3) { width: 70%; } /* Título */
+        th:nth-child(4) { width: 30%; } /* Ações */
+
+        .logo-title { font-size: 1rem; }
+    }
+
+@media (max-width: 600px) {
+    .show-mobile {
+        display: block !important;
+        font-size: 0.7rem;
+    }
+}
+
+    /* Evita que o título da música quebre a linha e empurre a tabela */
+    .truncar-texto {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+    }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="back-area" onclick="window.location.replace('repertorio.html')">
+        <span class="material-icons">arrow_back</span>
+        <span id="titulo-repertorio" class="logo-title">Carregando...</span>
+    </div>
+</div>
+
+<div class="music-list">
+    <table>
+        <thead>
+            <tr>
+                <th>Gênero</th>
+                <th>Artista</th>
+                <th>Título</th>
+                <th style="text-align:center">Ações</th>
+            </tr>
+        </thead>
+        <tbody id="lista-musicas"></tbody>
+    </table>
+</div>
+
+<script src="js/pouchdb.min.js"></script>
+<script src="js/pouchdb.find.min.js"></script>
+<script src="js/database.js"></script>
+<script>
+    // Tornamos as funções globais para o onclick do HTML funcionar
+    async function removerDaLista(musicaId) {
+        if(!confirm("Remover esta música do repertório?")) return;
+        
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const repId = urlParams.get('id');
+            
+            const repDoc = await db.get(repId);
+            // Filtra o array removendo o ID da música
+            repDoc.musicas = repDoc.musicas.filter(id => id !== musicaId);
+            
+            await db.put(repDoc);
+            Page.carregarDados(repId); // Recarrega a lista sem dar refresh na página toda
+        } catch (e) {
+            console.error("Erro ao remover:", e);
+        }
+    }
+
+    function visualizarArquivo(path, titulo) {
+        window.location.href = `viewer.html?file=${encodeURIComponent(path)}&title=${titulo}`;
+    }
+
+    const Page = {
+        async init() {
+            if (typeof DBManager !== 'undefined') await DBManager.init();
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const repId = urlParams.get('id');
+
+            if (!repId) {
+                window.location.href = 'repertorio.html';
+                return;
+            }
+
+            this.carregarDados(repId);
+        },
+
+        async carregarDados(id) {
+            try {
+                const repDoc = await db.get(id);
+                document.getElementById('titulo-repertorio').textContent = repDoc.nome;
+
+                const tbody = document.getElementById('lista-musicas');
+                tbody.innerHTML = '';
+
+                if (!repDoc.musicas || repDoc.musicas.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#999;">Este repertório está vazio.</td></tr>';
+                    return;
+                }
+
+                // Buscamos os detalhes de cada música
+                for (const mId of repDoc.musicas) {
+                    try {
+                        const m = await db.get(mId);
+                        this.renderLinha(m);
+                    } catch (err) {
+                        console.warn("Música ignorada (deletada do banco):", mId);
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        },
+
+        renderLinha(m) {
+    const tbody = document.getElementById('lista-musicas');
+    const tr = document.createElement('tr');
+    
+    const pathSeguro = m.fullPath.replace(/\\/g, '\\\\');
+
+    tr.innerHTML = `
+        <td style="font-size: 0.8rem; color:#666;">${m.genero || '---'}</td>
+        <td style="font-size: 0.8rem; color:#666;">${m.artista || '---'}</td>
+        <td>
+            <b class="truncar-texto" title="${m.titulo}">${m.titulo}</b>
+            <small style="display: none; color: #888;" class="show-mobile">${m.artista || ''}</small>
+        </td>
+        <td style="text-align:center;">
+            <div style="display: flex; gap: 4px; justify-content: center;">
+                <button class="btn-icon" onclick="visualizarArquivo('${pathSeguro}', '${encodeURIComponent(m.titulo)}')" title="Ver PDF">
+                    <span class="material-icons" style="color: #186879; font-size: 22px;">visibility</span>
+                </button>
+                <button class="btn-icon" onclick="removerDaLista('${m._id}')" title="Remover">
+                    <span class="material-icons" style="color: #d32f2f; font-size: 22px;">playlist_remove</span>
+                </button>
+            </div>
+        </td>
+    `;
+    tbody.appendChild(tr);
+}
+    };
+
+    window.onload = () => Page.init();
+</script>
+</body>
+</html>

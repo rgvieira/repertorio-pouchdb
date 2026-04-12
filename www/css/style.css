@@ -152,6 +152,38 @@ p.subtitle {
 }
 
 /* --- LISTA DE MÚSICAS (INDEX) --- */
+/* Container para alinhar Ver PDF, Vídeo e Letra lado a lado */
+/* No final do style.css */
+.acoes-container {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.btn-icon .material-icons {
+    font-size: 22px;
+    color: var(--primary-dark, #186879); /* Mantém sua cor original */
+}
+
+/* Cor específica para a estrela de favoritos */
+.btn-icon .material-icons[style*="color: #FFD700"] {
+    color: #FFD700 !important;
+}
+/* Remove qualquer padding extra que desalinhe a tabela */
+.music-list td:last-child {
+    width: 140px; /* Largura fixa para a coluna de ações não pular */
+}
 .music-list table {
     width: 100%;
     border-collapse: collapse;

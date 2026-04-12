@@ -110,100 +110,125 @@
 <script src="js/pouchdb.find.min.js"></script>
 <script src="js/database.js"></script>
 <script>
-    // Tornamos as funções globais para o onclick do HTML funcionar
-    async function removerDaLista(musicaId) {
-        if(!confirm("Remover esta música do repertório?")) return;
+
+    // Funções Globais
+async function removerDaLista(musicaId) {
+    if(!confirm("Remover esta música do repertório?")) return;
+    
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const repId = urlParams.get('id');
+        const database = window.db || db;
         
+        const repDoc = await database.get(repId);
+        
+        // Normalização para garantir que o ID seja removido independente das barras
+        const idParaRemover = musicaId.replace(/\\\\/g, '\\');
+        repDoc.musicas = repDoc.musicas.filter(id => {
+            const idAtual = id.replace(/\\\\/g, '\\');
+            return idAtual !== idParaRemover;
+        });
+        
+        await database.put(repDoc);
+        Page.carregarDados(repId); 
+    } catch (e) {
+        console.error("Erro ao remover:", e);
+        alert("Erro ao remover música.");
+    }
+}
+
+function visualizarArquivo(path, titulo) {
+    // Se vier com barras duplas do onclick, o encode resolve, mas vamos garantir
+    const pathLimpo = path.replace(/\\\\/g, '\\');
+    window.location.href = `viewer.html?file=${encodeURIComponent(pathLimpo)}&title=${titulo}`;
+}
+
+const Page = {
+    async init() {
         try {
-            const urlParams = new URLSearchParams(window.location.search);
-            const repId = urlParams.get('id');
-            
-            const repDoc = await db.get(repId);
-            // Filtra o array removendo o ID da música
-            repDoc.musicas = repDoc.musicas.filter(id => id !== musicaId);
-            
-            await db.put(repDoc);
-            Page.carregarDados(repId); // Recarrega a lista sem dar refresh na página toda
-        } catch (e) {
-            console.error("Erro ao remover:", e);
-        }
-    }
-
-    function visualizarArquivo(path, titulo) {
-        window.location.href = `viewer.html?file=${encodeURIComponent(path)}&title=${titulo}`;
-    }
-
-    const Page = {
-        async init() {
             if (typeof DBManager !== 'undefined') await DBManager.init();
             
             const urlParams = new URLSearchParams(window.location.search);
             const repId = urlParams.get('id');
 
             if (!repId) {
-                window.location.href = 'repertorio.html';
+                window.location.replace('repertorio.html');
                 return;
             }
 
-            this.carregarDados(repId);
-        },
+            // Aguarda um pouco o banco estabilizar no Electron
+            setTimeout(() => this.carregarDados(repId), 150);
+        } catch (e) {
+            console.error("Erro no init:", e);
+        }
+    },
 
-        async carregarDados(id) {
-            try {
-                const repDoc = await db.get(id);
-                document.getElementById('titulo-repertorio').textContent = repDoc.nome;
+    async carregarDados(id) {
+        const database = window.db || db;
+        try {
+            const repDoc = await database.get(id);
+            document.getElementById('titulo-repertorio').textContent = repDoc.nome || "Sem nome";
 
-                const tbody = document.getElementById('lista-musicas');
-                tbody.innerHTML = '';
+            const tbody = document.getElementById('lista-musicas');
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Carregando músicas...</td></tr>';
 
-                if (!repDoc.musicas || repDoc.musicas.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#999;">Este repertório está vazio.</td></tr>';
-                    return;
-                }
-
-                // Buscamos os detalhes de cada música
-                for (const mId of repDoc.musicas) {
-                    try {
-                        const m = await db.get(mId);
-                        this.renderLinha(m);
-                    } catch (err) {
-                        console.warn("Música ignorada (deletada do banco):", mId);
-                    }
-                }
-            } catch (e) {
-                console.error(e);
+            if (!repDoc.musicas || repDoc.musicas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#999;">Este repertório está vazio.</td></tr>';
+                return;
             }
-        },
 
-        renderLinha(m) {
-    const tbody = document.getElementById('lista-musicas');
-    const tr = document.createElement('tr');
-    
-    const pathSeguro = m.fullPath.replace(/\\/g, '\\\\');
+            tbody.innerHTML = ''; // Limpa para renderizar
 
-    tr.innerHTML = `
-        <td style="font-size: 0.8rem; color:#666;">${m.genero || '---'}</td>
-        <td style="font-size: 0.8rem; color:#666;">${m.artista || '---'}</td>
-        <td>
-            <b class="truncar-texto" title="${m.titulo}">${m.titulo}</b>
-            <small style="display: none; color: #888;" class="show-mobile">${m.artista || ''}</small>
-        </td>
-        <td style="text-align:center;">
-            <div style="display: flex; gap: 4px; justify-content: center;">
-                <button class="btn-icon" onclick="visualizarArquivo('${pathSeguro}', '${encodeURIComponent(m.titulo)}')" title="Ver PDF">
-                    <span class="material-icons" style="color: #186879; font-size: 22px;">visibility</span>
-                </button>
-                <button class="btn-icon" onclick="removerDaLista('${m._id}')" title="Remover">
-                    <span class="material-icons" style="color: #d32f2f; font-size: 22px;">playlist_remove</span>
-                </button>
-            </div>
-        </td>
-    `;
-    tbody.appendChild(tr);
-}
-    };
+            // Itera sobre os IDs (paths) salvos no repertório
+            for (const mId of repDoc.musicas) {
+                try {
+                    const m = await database.get(mId);
+                    this.renderLinha(m);
+                } catch (err) {
+                    // Se a música não existe mais no banco principal, mostra uma linha de erro ou ignora
+                    console.warn("Música não encontrada no banco principal:", mId);
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar dados do repertório:", e);
+        }
+    },
 
-    window.onload = () => Page.init();
+    renderLinha(m) {
+        const tbody = document.getElementById('lista-musicas');
+        const tr = document.createElement('tr');
+        
+        // No seu banco, se o _id é o path, usamos ele. 
+        // Se houver um campo nome, usamos, senão tentamos extrair do path.
+        const pathOriginal = m._id; 
+        const nomeMusica = m.nome || m.titulo || pathOriginal.split(/[\\/]/).pop();
+        const pathSeguro = pathOriginal.replace(/\\/g, '\\\\');
+
+        tr.innerHTML = `
+            <td style="font-size: 0.8rem; color:#666;">${m.genero || '---'}</td>
+            <td style="font-size: 0.8rem; color:#666;">${m.artista || '---'}</td>
+            <td>
+                <b class="truncar-texto" title="${nomeMusica}">${nomeMusica}</b>
+                <small style="display: none; color: #888;" class="show-mobile">${m.artista || ''}</small>
+            </td>
+            <td style="text-align:center;">
+                <div style="display: flex; gap: 4px; justify-content: center;">
+                    <button class="btn-icon" onclick="visualizarArquivo('${pathSeguro}', '${encodeURIComponent(nomeMusica)}')" title="Ver PDF">
+                        <span class="material-icons" style="color: #186879; font-size: 22px;">visibility</span>
+                    </button>
+                    <button class="btn-icon" onclick="removerDaLista('${pathSeguro}')" title="Remover">
+                        <span class="material-icons" style="color: #d32f2f; font-size: 22px;">playlist_remove</span>
+                    </button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    }
+};
+
+window.onload = () => Page.init();
+
+
 </script>
 </body>
 </html>

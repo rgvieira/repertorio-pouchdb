@@ -10,7 +10,7 @@ class PDFViewer {
   }
 
   async init() {
-console.log('init')    
+
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
     if (!id) {
@@ -22,21 +22,21 @@ console.log('init')
       // Usar a instância global ou garantir o nome correto do banco
       const manager = new PouchDBManager('repertorio');
       const doc = await manager.read(id);
-console.log(doc)      
+     
 console.log(doc.fullPath)      
       if (!doc || !doc.fullPath) {
         this.showError('Arquivo não encontrado');
         return;
       }
 
-      document.getElementById('pdf-title').textContent = doc.titulo || doc.name;
+     document.getElementById('pdf-title').textContent = doc.nome;
       document.getElementById('pdf-path').textContent = doc.fullPath;
       document.getElementById('pdf-header').style.display = 'block';
       document.getElementById('pdf-loading').style.display = 'none';
       document.getElementById('pdf-error').style.display = 'none';
       document.getElementById('pdf-canvas').style.display = 'block';
       document.getElementById('pdf-controls').classList.remove('hidden');
-console.log('em viewer.js', doc)
+
       this.loadPDF(doc.fullPath);
     } catch (e) {
       this.showError('Erro ao carregar: ' + e.message);

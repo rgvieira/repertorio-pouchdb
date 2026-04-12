@@ -11,8 +11,26 @@
         window.nodeRequire = (typeof require !== 'undefined') ? require : (window.require ? window.require : null);
         if (typeof module === 'object') { window.electronModule = module; window.module = undefined; }
     </script>
+        <style>
+            #loader-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255,255,255,0.8); z-index: 9999;
+    display: none; align-items: center; justify-content: center; flex-direction: column;
+}
+.spinner {
+    width: 50px; height: 50px; border: 5px solid #f3f3f3;
+    border-top: 5px solid #186879; border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        </style>
 </head>
 <body>
+
+    <div id="loader-overlay">
+    <div class="spinner"></div>
+    <p style="color: #186879; font-weight: bold; margin-top: 10px;">Escaneando arquivos...</p>
+</div>
 
 <div class="top-bar" style="display: flex; align-items: center; padding: 0 16px; height: 56px; background: #fff; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 1000;">
     <a href="index.html" style="text-decoration: none; color: #186879; display: flex; align-items: center; margin-right: 12px;">
@@ -52,103 +70,141 @@
 <script src="js/scanner.js"></script>
 
 <script>
-    class ConfigApp {
-        constructor() {
-            this.foldersListEl = document.getElementById('folders-list');
-            this.rootInputEl = document.getElementById('root-folder-input');
-            this.selectBtnEl = document.getElementById('select-folder-btn');
-            this.clearBtnEl = document.getElementById('btn-clear');
+ class ConfigApp {
+    constructor() {
+        this.foldersListEl = document.getElementById('folders-list');
+        this.selectBtnEl = document.getElementById('select-folder-btn');
+        this.clearBtnEl = document.getElementById('btn-clear');
+        this.loader = document.getElementById('loader-overlay');
+        
+        // Melhor detecção para Electron via Ponte
+        this.isElectron = !!(window.electronAPI);
+
+        this.init();
+    }
+
+    async init() {
+        try {
+            // Garante que o DBManager iniciou antes de listar
+            if (typeof DBManager !== 'undefined') {
+                await DBManager.init();
+            } else {
+                console.error("DBManager não definido!");
+            }
             
-            this.isElectron = (typeof process !== 'undefined' && !!(process.versions && process.versions.electron));
+            await this.loadFoldersList();
 
-            if (!this.isElectron) {
-                document.getElementById('btn-label').innerText = "Salvar";
-                this.rootInputEl.readOnly = false;
-                this.rootInputEl.placeholder = "Digite o caminho manualmente...";
+            if (this.selectBtnEl) {
+                this.selectBtnEl.onclick = () => this.selectFolder();
             }
-
-            this.init();
-        }
-
-        async init() {
-            try {
-                if (typeof DBManager !== 'undefined') await DBManager.init();
-                await this.loadFoldersList();
-
-                if (this.selectBtnEl) {
-                    this.selectBtnEl.onclick = () => {
-                        if (this.isElectron) this.selectFolder();
-                        else this.manualSave();
-                    };
-                }
-                if (this.clearBtnEl) this.clearBtnEl.onclick = () => this.clearAll();
-            } catch (err) { console.error(err); }
-        }
-
-        async manualSave() {
-            const path = this.rootInputEl.value.trim();
-            if (!path) return showToast("Digite o caminho!");
-            if (await DBManager.addFolder(path)) {
-                this.rootInputEl.value = '';
-                await this.loadFoldersList();
+            if (this.clearBtnEl) {
+                this.clearBtnEl.onclick = () => this.clearAll();
             }
+        } catch (err) { 
+            console.error("Erro no Init:", err); 
         }
+    }
 
-        async loadFoldersList() {
-            if (!this.foldersListEl) return;
-            try {
-                const folders = await DBManager.listFolders();
-                this.foldersListEl.innerHTML = folders.length ? '' : 'Nenhuma pasta ativa';
-                for (const folder of folders) {
-                    const div = document.createElement('div');
-                    div.className = 'folder-card';
-                    div.style = "display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee;";
-                    div.innerHTML = `
-                        <div style="min-width: 0; flex: 1;">
-                            <b>${folder.path.split(/[\\/]/).pop() || 'Pasta'}</b>
-                            <div style="font-size: 0.7rem; color: #888;">${folder.path}</div>
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <span class="material-icons" style="color: #186879; cursor: pointer;" onclick="ConfigApp.instance.refreshFolder('${folder._id}', '${folder.path}')">refresh</span>
-                            <span class="material-icons" style="color: #f44336; cursor: pointer;" onclick="ConfigApp.instance.deleteFolder('${folder._id}')">delete</span>
-                        </div>
-                    `;
-                    this.foldersListEl.appendChild(div);
-                }
-            } catch (err) { console.error(err); }
+    showLoader(show) {
+        this.loader.style.display = show ? 'flex' : 'none';
+    }
+
+    async loadFoldersList() {
+        if (!this.foldersListEl) return;
+        try {
+            const folders = await DBManager.listFolders();
+            console.log("Pastas carregadas:", folders); // Debug
+            
+            this.foldersListEl.innerHTML = folders.length ? '' : '<p style="padding:10px;">Nenhuma pasta ativa</p>';
+            
+            folders.forEach(folder => {
+                const div = document.createElement('div');
+                div.className = 'folder-card';
+                div.style = "display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: #fff; margin-bottom: 5px; border-radius: 8px;";
+                
+                const pathSeguro = folder.path.replace(/\\/g, '\\\\');
+
+                div.innerHTML = `
+                    <div class="folder-info" style="display:flex; align-items:center; gap:10px; overflow:hidden;">
+                        <span class="material-icons" style="color:#666">folder</span>
+                        <span class="folder-path" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.9rem;">${folder.path}</span>
+                    </div>
+                    <div class="folder-actions" style="display:flex; gap:15px; margin-left:10px;">
+                        <span class="material-icons" style="color: #186879; cursor: pointer;" 
+                              onclick="ConfigApp.instance.handleRefresh('${folder._id}', '${pathSeguro}')">refresh</span>
+                        <span class="material-icons" style="color: #f44336; cursor: pointer;" 
+                              onclick="ConfigApp.instance.handleDelete('${folder._id}')">delete</span>
+                    </div>
+                `;
+                this.foldersListEl.appendChild(div);
+            });
+        } catch (err) { 
+            console.error("Erro ao listar pastas:", err); 
+            this.foldersListEl.innerHTML = "Erro ao carregar pastas.";
         }
+    }
 
-        async selectFolder() {
+    async selectFolder() {
+        try {
             const path = await Scanner.abrirPicker();
-            if (path && await DBManager.addFolder(path)) {
+            if (path) {
+                this.showLoader(true);
+                // Adiciona ao banco
+                const added = await DBManager.addFolder(path);
+                if (added) {
+                    // Escaneia
+                    await Scanner.escanearPasta(path);
+                    await this.loadFoldersList();
+                }
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            this.showLoader(false);
+        }
+    }
+
+    async handleRefresh(id, path) {
+        if (confirm('Rescanear esta pasta?')) {
+            this.showLoader(true);
+            try {
                 await Scanner.escanearPasta(path);
-                await this.loadFoldersList();
-            }
-        }
-
-        async refreshFolder(id, path) {
-            if (confirm('Rescanear esta pasta?')) {
-                await Scanner.escanearPasta(path);
-                await this.loadFoldersList();
-            }
-        }
-
-        async deleteFolder(id) {
-            if (confirm('Remover esta pasta?')) {
-                await DBManager.deleteFolder(id);
-                await this.loadFoldersList();
-            }
-        }
-
-        async clearAll() {
-            if (confirm('LIMPAR TUDO?')) {
-                await DBManager.limparBanco();
+                alert("Sincronização concluída!");
+            } catch (err) {
+                console.error(err);
+            } finally {
+                this.showLoader(false);
                 await this.loadFoldersList();
             }
         }
     }
 
+    async handleDelete(id) {
+        if (confirm('Remover esta pasta? Os arquivos continuarão no disco, mas sairão do app.')) {
+            await DBManager.deleteFolder(id);
+            await this.loadFoldersList();
+        }
+    }
+
+    async clearAll() {
+        if (confirm('ISSO APAGARÁ TODO O SEU BANCO DE DADOS. Tem certeza?')) {
+            this.showLoader(true);
+            try {
+                await DBManager.limparBanco();
+                await this.loadFoldersList();
+            } finally {
+                this.showLoader(false);
+            }
+        }
+    }
+}
+
+// Inicializa a instância
+window.onload = () => {
     ConfigApp.instance = new ConfigApp();
+};
+
+   
 </script>
 </body>
 </html>

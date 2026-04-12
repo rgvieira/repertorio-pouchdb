@@ -43,14 +43,13 @@ const DBManager = {
             }
 
             // 3. Criação de índices para otimizar as buscas
-            if (typeof db.createIndex === 'function') {
-                await db.createIndex({
-                    index: { fields: ['tipo', 'genero', 'artista', 'titulo'] }
-                });
-                console.log("Banco de dados PouchDB e índices inicializados com sucesso.");
-            } else {
-                console.warn("Aviso: createIndex não disponível. O plugin 'pouchdb.find' não foi carregado corretamente.");
-            }
+if (typeof db.createIndex === 'function') {
+    await db.createIndex({
+        // Troquei 'genero', 'artista' e 'titulo' pelos campos REAIS do scanner
+        index: { fields: ['tipo', 'pasta', 'nome'] }
+    });
+    console.log("Índices atualizados para: tipo, pasta, nome");
+}
         } catch (err) {
             console.error("Erro crítico ao inicializar PouchDB:", err);
         }
@@ -134,13 +133,13 @@ const DBManager = {
             console.error("Erro ao limpar músicas por caminho:", err);
         }
     },
-
+ 
     // ATENÇÃO: Use sempre 'async', 'sync' não existe no JS para declarar funções
  async inserirMusica(musica) {
     const doc = {
         _id: musica._id, 
         pasta: musica.pasta || 'Raiz',
-        titulo: musica.titulo || 'Sem Título',
+        nome: musica.nome || 'Sem Título', // Adicionado para bater com o scanner
         tipo: 'musica'
     };
 
@@ -161,10 +160,11 @@ const DBManager = {
 
             if (filtro) {
                 const f = filtro.toLowerCase();
-                musicas = musicas.filter(m => 
-                    (m.titulo && m.titulo.toLowerCase().includes(f)) || 
-                    (m.artista && m.artista.toLowerCase().includes(f))
-                );
+musicas = musicas.filter(m => 
+    // Procura no campo 'nome' (que é o que o scanner gera) e na 'pasta'
+    (m.nome && m.nome.toLowerCase().includes(f)) || 
+    (m.pasta && m.pasta.toLowerCase().includes(f))
+);
             }
             return musicas;
         } catch (err) {

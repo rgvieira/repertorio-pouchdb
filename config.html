@@ -23,13 +23,13 @@
 
 <div class="config-content" style="padding: 16px; max-width: 800px; margin: 0 auto;">
     <div id="desktop-section" class="card">
-        <h2>Gerenciar Pastas</h2>
+        <h2>Pastas</h2>
         <p>Sincronize pastas para alimentar sua biblioteca.</p>
         
         <div class="form-row" style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <input type="text" id="root-folder-input" class="form-input" style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px;" placeholder="Caminho da pasta...">
+            <!--<input type="text" id="root-folder-input" class="form-input" style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px;" placeholder="Caminho da pasta...">-->
             <button id="select-folder-btn" class="btn-picker" style="display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: #186879; color: #fff; border: none; border-radius: 8px; cursor: pointer;">
-<!-- <span class="material-icons">folder_open</span> -->
+ <span class="material-icons">folder_open</span> 
 
                 <span id="btn-label">Nova Pasta</span>
             </button>
@@ -87,7 +87,7 @@
 
         async manualSave() {
             const path = this.rootInputEl.value.trim();
-            if (!path) return alert("Digite o caminho!");
+            if (!path) return showToast("Digite o caminho!");
             if (await DBManager.addFolder(path)) {
                 this.rootInputEl.value = '';
                 await this.loadFoldersList();

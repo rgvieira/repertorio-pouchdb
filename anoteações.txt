@@ -6,7 +6,7 @@ npm run dev
 Aplique todas as mudanças visuais do protótipo atual diretamente no código-fonte. Gere o arquivo style.css completo e atualize as classes no index.html. Prepare o pacote de download com essas atualizações implementadas.
 
 npm start
-
+npm run dev
 
 
 git add .

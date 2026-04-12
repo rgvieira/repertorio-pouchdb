@@ -2,165 +2,64 @@
 <html lang="pt-br">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <title>Repertórios</title>
-    <link rel="stylesheet" href="css/style.css">
-
-    <script>
-        window.nodeRequire = (typeof require !== 'undefined') ? require : (window.require ? window.require : null);
-        if (typeof module === 'object') {
-            window.electronModule = module;
-            window.module = undefined; 
+    <title>Gerenciar Repertórios</title>
+    <style>
+        :root { --primary: #186879; --bg: #f5f7f8; }
+        body { font-family: 'Manrope', sans-serif; background: var(--bg); margin: 0; padding-top: 70px; }
+        
+        .header { 
+            position: fixed; top: 0; width: 100%; height: 60px; 
+            background: white; display: flex; align-items: center; 
+            padding: 0 20px; border-bottom: 1px solid #ddd; z-index: 1000; 
         }
-    </script>
-<style>
-    /* Reduz o espaçamento do card para ganhar espaço vertical */
-    .folder-card {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 8px 10px; /* Reduzido de 12px */
-        background: rgba(0,0,0,0.03);
-        border-radius: 8px;
-        margin-bottom: 6px;
-    }
 
-    .folder-info-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 8px; /* Reduzido de 12px */
-        overflow: hidden;
-        flex: 1;
-    }
+        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        
+        /* O INPUT - Agora forçado a aparecer */
+        .input-box { 
+            background: white; padding: 15px; border-radius: 12px; 
+            display: flex; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        input { 
+            flex: 1; padding: 12px; border: 1px solid #ccc; 
+            border-radius: 8px; font-size: 16px; 
+        }
 
-    /* Ícones menores na lista */
-    .folder-info-wrapper .material-icons {
-        font-size: 20px; /* Reduzido de 24px */
-    }
+        button.main-btn { 
+            background: var(--primary); color: white; border: none; 
+            padding: 0 20px; border-radius: 8px; cursor: pointer; font-weight: bold;
+        }
 
-    /* Nome do repertório com fonte menor e controle de estouro */
-    .folder-info-wrapper b {
-        color: #186879;
-        display: block;
-        font-size: 0.85rem; /* Fonte menor */
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 140px; /* Impede que nomes longos joguem os botões para fora */
-    }
-
-    /* Botões de ação mais compactos */
-    .btn-icon {
-        background: none; border: none; cursor: pointer; color: #186879;
-        padding: 6px; /* Reduzido de 8px */
-        border-radius: 50%; 
-        display: flex; 
-        transition: background 0.2s;
-        align-items: center; justify-content: center;
-    }
-
-    .btn-icon .material-icons {
-        font-size: 18px !important; /* Ícones menores para os botões */
-    }
-
-    .btn-icon:hover { background: rgba(0,0,0,0.05); }
-    .btn-icon.delete { color: #d32f2f; }
-
-    /* Estilo para telas muito pequenas */
-    @media (max-width: 360px) {
-        .folder-info-wrapper b { max-width: 100px; }
-        .folder-card { padding: 6px 8px; }
-    }
-
-    #edit-modal {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.5); display: none; align-items: center;
-        justify-content: center; z-index: 2000;
-    }
-    .modal-content {
-        background: white; padding: 20px; border-radius: 12px;
-        width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    }
-    .form-row { display: flex; gap: 8px; width: 100%; }
-    .form-input { flex: 1; }
-
-    /* Tooltip Customizado - Otimizado para Mobile */
-.tooltip-item, .btn-icon {
-    position: relative;
-}
-
-.tooltip-item::after, .btn-icon::after {
-    content: attr(data-tooltip); /* Unificando para usar data-tooltip */
-    position: absolute;
-    bottom: 110%; /* Sobe um pouco mais para não colar no ícone */
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(51, 51, 51, 0.9);
-    color: #fff;
-    padding: 4px 8px;
-    border-radius: 4px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-    font-size: 11px; /* Fonte menor para o balão */
-    z-index: 100;
-}
-
-/* Mostra apenas em telas que aceitam hover (computador) */
-@media (hover: hover) {
-    .tooltip-item:hover::after, .btn-icon:hover::after {
-        opacity: 1;
-    }
-}
-
-/* No celular, o tooltip costuma atrapalhar, então podemos desativar 
-   ou reduzir o tempo de exibição para um toque longo */
-@media (max-width: 480px) {
-    .tooltip-item::after, .btn-icon::after {
-        display: none; /* Esconde no mobile para priorizar a área de toque */
-    }
-}
-
-</style>
+        .folder-card { 
+            background: white; padding: 12px; border-radius: 10px; 
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 8px; border: 1px solid #eee;
+        }
+        
+        .btn-icon { background: none; border: none; color: var(--primary); cursor: pointer; }
+        .btn-icon.delete { color: #d32f2f; }
+    </style>
 </head>
 <body>
 
-    <div class="top-bar" style="display: flex; align-items: center; padding: 0 16px; height: 56px; background: #fff; border-bottom: 1px solid #ddd;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <a href="index.html" style="text-decoration: none; color: #186879; display: flex; align-items: center;">
-                <span class="material-icons">arrow_back</span>
-            </a>
-            <div class="logo" style="font-weight: 800; color: #186879; font-size: 1.1rem;">Repertórios</div>
-        </div>
+    <div class="header">
+        <a href="index.html" style="color: var(--primary); margin-right: 15px;"><span class="material-icons">arrow_back</span></a>
+        <b style="color: var(--primary)">MEUS REPERTÓRIOS</b>
     </div>
 
-    <div class="config-content" style="padding: 20px;">
-        <div class="card" style="margin-bottom: 20px;">
-            <div class="form-row">
-                <input type="text" id="rep-input" class="form-input" placeholder="Nome do novo repertório...">
-                <button onclick="App.save()" class="btn-picker" style="display: flex; align-items: center; gap: 4px;">
-                    <span class="material-icons">add</span> Criar
-                </button>
-            </div>
+    <div class="container">
+        <div class="input-box">
+            <input type="text" id="rep-input" placeholder="Nome do repertório...">
+            <button class="main-btn" onclick="App.save()">CRIAR</button>
         </div>
 
-        <div class="card">
-            <h3 style="font-size: 0.75rem; color: #666; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Meus Repertórios</h3>
-            <div id="repertorios-list"></div>
-        </div>
-    </div>
-
-    <div id="edit-modal">
-        <div class="modal-content">
-            <h3 style="margin-bottom: 15px; color: #186879;">Editar Nome</h3>
-            <input type="text" id="modal-input" class="form-input" style="width: 100%; margin-bottom: 15px; box-sizing: border-box;">
-            <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                <button onclick="App.closeModal()" class="tool-btn">Cancelar</button>
-                <button onclick="App.confirmEdit()" class="btn-picker" style="padding: 8px 20px;">Salvar</button>
-            </div>
+        <div id="repertorios-list">
+            <p style="text-align:center; color:#999;">Carregando banco de dados...</p>
         </div>
     </div>
 
@@ -170,127 +69,105 @@
 
     <script>
         const App = {
-            editingDoc: null,
-
-            async init() {
-                if (typeof DBManager !== 'undefined') await DBManager.init();
-                await this.loadList();
+            // Tenta pegar o banco de qualquer lugar possível
+            get db() {
+                return window.db || (typeof db !== 'undefined' ? db : null);
             },
 
-            async loadList() {
-                const listEl = document.getElementById('repertorios-list');
-                try {
-                    const result = await db.find({ selector: { type: 'repertorio' } });
-                    listEl.innerHTML = '';
+            async init() {
+                console.log("Tentando conectar ao banco...");
+                
+                // 1. Espera o DBManager (do seu database.js) terminar o init
+                if (typeof DBManager !== 'undefined') {
+                    await DBManager.init();
+                }
 
-                    if (result.docs.length === 0) {
-                        listEl.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">Nenhum repertório criado.</p>';
+                // 2. Loop de espera (Até 5 segundos) para o banco aparecer
+                let tentativas = 0;
+                while (!this.db && tentativas < 50) {
+                    await new Promise(r => setTimeout(r, 100));
+                    tentativas++;
+                }
+
+                if (this.db) {
+                    console.log("✅ Banco conectado!");
+                    this.render();
+                } else {
+                    document.getElementById('repertorios-list').innerHTML = 
+                        "<b style='color:red'>Erro crítico: O banco de dados não iniciou.</b>";
+                }
+            },
+
+            async render() {
+                const list = document.getElementById('repertorios-list');
+                try {
+                    // Busca documentos onde tipo == 'repertorio'
+                    const res = await this.db.find({ selector: { tipo: 'repertorio' } });
+                    
+                    if (res.docs.length === 0) {
+                        list.innerHTML = "<p style='text-align:center; color:#999;'>Nenhum repertório criado.</p>";
                         return;
                     }
 
-                    const sortedDocs = result.docs.sort((a, b) => a.nome.localeCompare(b.nome));
-
-                    sortedDocs.forEach(doc => {
-                        const div = document.createElement('div');
-                        div.className = 'folder-card';
-                        
-// ... dentro do sortedDocs.forEach(doc => { ... })
-
-// Lógica do botão de relação com data-tooltip
-const temMusicas = doc.musicas && doc.musicas.length > 0;
-const btnRelacao = temMusicas ? `
-    <button onclick="window.location.href='musicasRepertorio.html?id=${doc._id}'" 
-            class="btn-icon" data-tooltip="Ver músicas" 
-            style="background: rgba(24, 104, 121, 0.1); border-radius: 8px;">
-        <span class="material-icons" style="color: #186879;">receipt_long</span>
-    </button>
-` : '';
-
-div.innerHTML = `
-    <div class="folder-info-wrapper">
-        <span class="material-icons" style="color:#186879">queue_music</span>
-        <div>
-            <b>${doc.nome}</b>
-            <small style="color: #999; font-size: 0.65rem;">${doc.musicas ? doc.musicas.length : 0} partitura(s)</small>
-        </div>
-    </div>
-    <div style="display: flex; gap: 4px; align-items: center;">
-        ${btnRelacao}
-        <button onclick="App.openEdit('${doc._id}', '${doc.nome}')" class="btn-icon" data-tooltip="Editar nome">
-            <span class="material-icons">edit</span>
-        </button>
-        <button onclick="App.delete('${doc._id}')" class="btn-icon delete" data-tooltip="Excluir lista">
-            <span class="material-icons">delete</span>
-        </button>
-    </div>
-`;
-                        listEl.appendChild(div);
-                    });
-                } catch (e) { 
-                    console.error("Erro ao carregar lista:", e); 
+list.innerHTML = res.docs
+    .sort((a, b) => a.nome.localeCompare(b.nome))
+    .map(doc => {
+        const qtd = doc.musicas ? doc.musicas.length : 0;
+        return `
+            <div class="folder-card" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="material-icons" style="color: var(--primary)">queue_music</i>
+                    <div>
+                        <b style="display: block; color: var(--primary)">${doc.nome}</b>
+                        <small style="color: #666">${qtd} incluído(s)</small>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-icon" onclick="window.location.href='musicasRepertorio.html?id=${doc._id}'" title="Ver Músicas">
+                        <i class="material-icons">receipt_long</i>
+                    </button>
+                    <button class="btn-icon delete" onclick="App.delete('${doc._id}')" title="Excluir">
+                        <i class="material-icons">delete</i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+                } catch (e) {
+                    console.error(e);
                 }
             },
 
             async save() {
-                const input = document.getElementById('rep-input');
-                const nome = input.value.trim();
-                if (!nome) return;
-                
+                const val = document.getElementById('rep-input').value.trim();
+                if (!val) return alert("Digite um nome!");
+                if (!this.db) return alert("Banco ainda não carregado!");
+
                 try {
-                    await db.put({
-                        _id: 'rep_' + Date.now(),
-                        type: 'repertorio',
-                        nome: nome,
-                        musicas: []
-                    });
-                    
-                    input.value = '';
-                    this.loadList();
+// No repertorio.html, dentro da função save():
+await this.db.put({
+    _id: 'rep_' + Date.now(),
+    type: 'repertorio', // Mudei de 'tipo' para 'type'
+    nome: val,
+    musicas: []
+});
+                    document.getElementById('rep-input').value = '';
+                    this.render();
                 } catch (e) {
-                    console.error("Erro ao salvar:", e);
-                }
-            },
-
-            openEdit(id, nome) {
-                this.editingDoc = id;
-                document.getElementById('modal-input').value = nome;
-                document.getElementById('edit-modal').style.display = 'flex';
-                document.getElementById('modal-input').focus();
-            },
-
-            closeModal() {
-                document.getElementById('edit-modal').style.display = 'none';
-                this.editingDoc = null;
-            },
-
-            async confirmEdit() {
-                const novoNome = document.getElementById('modal-input').value.trim();
-                if (novoNome && this.editingDoc) {
-                    try {
-                        const doc = await db.get(this.editingDoc);
-                        doc.nome = novoNome;
-                        await db.put(doc);
-                        this.closeModal();
-                        this.loadList();
-                    } catch (e) {
-                        console.error("Erro ao editar:", e);
-                    }
+                    alert("Erro ao salvar!");
                 }
             },
 
             async delete(id) {
-                if (confirm('Excluir este repertório? Todas as associações de músicas nesta lista serão perdidas.')) {
-                    try {
-                        const doc = await db.get(id);
-                        await db.remove(doc);
-                        this.loadList();
-                    } catch (e) {
-                        console.error("Erro ao deletar:", e);
-                    }
+                if (confirm("Excluir?")) {
+                    const doc = await this.db.get(id);
+                    await this.db.remove(doc);
+                    this.render();
                 }
             }
         };
 
+        // Inicia
         window.onload = () => App.init();
     </script>
 </body>

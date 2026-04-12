@@ -191,14 +191,27 @@
         if (!container.contains(e.target)) document.getElementById('fab-menu').classList.remove('open');
     });
 
-    async function init() {
-        document.getElementById('display-title').innerText = params.get('title') || 'Música';
-        const file = params.get('file');
-        if (file) {
-            pdfDoc = await pdfjsLib.getDocument(decodeURIComponent(file)).promise;
+async function init() {
+    const params = new URLSearchParams(window.location.search);
+    
+    // Pega o título da URL
+    const titulo = params.get('title');
+    document.getElementById('display-title').innerText = (titulo && titulo !== 'undefined') ? titulo : 'Música';
+
+    const file = params.get('file');
+    if (file && file !== 'undefined') {
+        try {
+            const loadingTask = pdfjsLib.getDocument(decodeURIComponent(file));
+            pdfDoc = await loadingTask.promise;
             render();
+        } catch (err) {
+            console.error("Erro ao carregar PDF:", err);
+            alert("Não foi possível abrir o arquivo.");
         }
+    } else {
+        alert("Caminho do arquivo inválido.");
     }
+}
 
     async function render() {
         if (!pdfDoc) return;
@@ -324,15 +337,41 @@
         if (n > 0 && n <= pdfDoc.numPages) { pageNum = n; render(); }
     }
 
-    function imprimir() {
+ function imprimir() {
+    try {
+        const canvasPdf = document.getElementById('pdf-canvas');
+        const canvasDesenho = document.getElementById('draw-canvas');
+        const displayTitle = document.getElementById('display-title'); // Onde está o nome da música
+
+        if (!canvasPdf || !canvasDesenho) return;
+
         const merge = document.createElement('canvas');
-        merge.width = pdfCanvas.width; merge.height = pdfCanvas.height;
+        merge.width = canvasPdf.width;
+        merge.height = canvasPdf.height;
         const ctx = merge.getContext('2d');
-        ctx.drawImage(pdfCanvas, 0, 0); ctx.drawImage(drawCanvas, 0, 0);
-        const win = window.open('', '_blank');
-        win.document.write(`<html><body style="margin:0;display:flex;justify-content:center;"><img src="${merge.toDataURL('image/png')}" style="width:100%;" onload="window.print();"></body></html>`);
-        win.document.close();
+
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, merge.width, merge.height);
+        ctx.drawImage(canvasPdf, 0, 0);
+        ctx.drawImage(canvasDesenho, 0, 0);
+
+        const imgData = merge.toDataURL('image/png');
+        const nomeMusica = (displayTitle ? displayTitle.innerText : 'Partitura').trim();
+
+        if (window.electronAPI && window.electronAPI.imprimirDireto) {
+            // ENVIAMOS DATA E TITLE
+            window.electronAPI.imprimirDireto({ 
+                data: imgData, 
+                title: nomeMusica 
+            });
+        }
+    } catch (err) {
+        console.error(err);
     }
+}
+
+
+
 
     function limpar() {
         if(confirm("Limpar esta página?")) {
