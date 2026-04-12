@@ -136,32 +136,20 @@ const DBManager = {
     },
 
     // ATENÇÃO: Use sempre 'async', 'sync' não existe no JS para declarar funções
-    async inserirMusica(musica) {
-        console.log("DBManager -> Recebendo música para inserir:", musica.titulo);
-        const doc = {
-            _id: musica.caminho, // O caminho é a chave primária única
-            genero: musica.genero || 'Desconhecido',
-            artista: musica.artista || 'Artista Desconhecido',
-            titulo: musica.titulo || 'Sem Título',
-            fullPath: musica.caminho,
-            favorito: 0,
-            tipo: 'musica'
-        };
+ async inserirMusica(musica) {
+    const doc = {
+        _id: musica._id, 
+        pasta: musica.pasta || 'Raiz',
+        titulo: musica.titulo || 'Sem Título',
+        tipo: 'musica'
+    };
 
-        try {
-            // Tenta inserir. Se já existir, pegamos o _rev para atualizar ou ignorar
-            await db.put(doc);
-        } catch (err) {
-            if (err.name === 'conflict') {
-                // Se houver conflito, opcionalmente você pode atualizar o registro existente
-                // const existing = await db.get(musica.caminho);
-                // doc._rev = existing._rev;
-                // await db.put(doc);
-            } else {
-                throw err;
-            }
-        }
-    },
+    try {
+        await db.put(doc);
+    } catch (err) {
+        if (err.name !== 'conflict') throw err;
+    }
+},
 
     async listarMusicas(filtro = "", genero = "") {
         try {
@@ -185,20 +173,58 @@ const DBManager = {
         }
     },
 
-    async limparBanco() {
-        try {
-            const result = await db.find({ selector: { tipo: 'musica' } });
-            if (result.docs.length > 0) {
-                const deletions = result.docs.map(doc => ({ ...doc, _deleted: true }));
-                await db.bulkDocs(deletions);
-                return true;
-            }
-        } catch (err) {
-            console.error("Erro ao limpar banco:", err);
+async limparBanco() {
+    try {
+        console.log("🧹 Iniciando limpeza total do PouchDB...");
+        
+        // Pega todos os documentos do banco (allDocs)
+        // Isso ignora os seletores e traz TUDO: músicas, pastas e repertórios
+        const result = await db.allDocs({ include_docs: true });
+        
+        if (result.rows.length === 0) {
+            if (typeof showToast !== 'undefined') showToast("O banco já está vazio.");
+            return true;
         }
+
+        // Filtra para não tentar deletar documentos de design (índices)
+        const docsParaDeletar = result.rows
+            .filter(row => !row.id.startsWith('_design/'))
+            .map(row => {
+                return {
+                    _id: row.id,
+                    _rev: row.doc._rev,
+                    _deleted: true
+                };
+            });
+
+        if (docsParaDeletar.length > 0) {
+            await db.bulkDocs(docsParaDeletar);
+            console.log(`✅ ${docsParaDeletar.length} itens removidos.`);
+            if (typeof showToast !== 'undefined') {
+                showToast("Biblioteca e configurações limpas!", "success");
+            } else {
+                alert("Tudo foi limpo!");
+            }
+        }
+        
+        return true;
+    } catch (err) {
+        console.error("❌ Erro fatal ao limpar banco:", err);
         return false;
-    },
+    }
+},
 };
 
+window.showToast = function(msg, tipo = 'info') {
+    let toast = document.getElementById('app-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'app-toast';
+        document.body.appendChild(toast);
+    }
+    toast.className = `toast-visible ${tipo}`;
+    toast.innerText = msg;
+    setTimeout(() => { toast.className = ''; }, 3000);
+};
 // Expor globalmente para garantir visibilidade entre scripts
 window.DBManager = DBManager;
