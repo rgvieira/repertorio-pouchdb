@@ -1,236 +1,253 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="utf-8">
-
-    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover, user-scalable=no">
-    <link rel="icon" type="image/png" href="img/logo.png">
-
-    <link rel="apple-touch-icon" href="img/logo.png">
-
-    <meta name="theme-color" content="#186879">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8"/>
+    <meta content="initial-scale=1, width=device-width, viewport-fit=cover" name="viewport"/>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-    <meta name="description" content="Gerenciador de repertório e visualizador de partituras/PDFs.">
-    <meta name="author" content="Seu Nome">
-
-    <meta name="theme-color" content="#186879">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">    
-    <title>Repertório Principal</title>
+    <title>Biblioteca</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Ajuste do FAB Menu para aparecer sobre os elementos */
- /* Local: Adicione ou substitua no seu <style> */
+:root { 
+    --primary: #186879; 
+    --bg-modal: rgba(0,0,0,0.7); 
+}
+
+body { 
+    font-family: 'Manrope', sans-serif; 
+    margin: 0; 
+    background: #f9f9f9; 
+    overflow-x: hidden; 
+}
+
+/* HEADER & TOP BAR */
+.top-bar { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 0 16px; 
+    height: 56px; 
+    background: #fff; 
+    border-bottom: 1px solid #ddd; 
+    position: sticky; 
+    top: 0; 
+    z-index: 1000;
+}
+
+.logo { display: flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 800; }
+
+/* FAB MINIMALISTA (PROPORCIONAL AO ÍCONE) */
+/* FAB MINIMALISTA - CORRIGIDO */
+.fab-container { 
+    position: relative; 
+    width: 36px; 
+    height: 36px; 
+}
+
+.fab-trigger {
+    background: var(--primary); 
+    color: white; 
+    border: none; 
+    border-radius: 50%; 
+    width: 36px; 
+    height: 36px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    cursor: pointer; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    padding: 0; /* Garante que não haja espaço interno extra */
+}
+
 .fab-menu {
-    right: 0;
-    top: 50px; /* Ajustado para não sobrepor o botão trigger */
-    width: 200px; /* Um pouco mais largo para facilitar o toque */
+    display: none; 
+    position: absolute; 
+    right: 0; 
+    top: 42px; 
+    background: white; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+    border: 1px solid #eee; 
+    width: 36px; /* Largura exata do trigger */
+    min-width: 36px; /* Trava a largura */
+    overflow: hidden; 
+    z-index: 1001;
+    padding: 0; /* Remove padding que empurra o conteúdo */
 }
 
-/* Garante que os ícones do menu sejam fáceis de clicar em qualquer celular */
-.tooltip-item {
-    min-height: 48px; 
+.fab-menu a {
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    width: 100%; /* Ocupa a largura total da janela de 36px */
+    height: 40px; /* Altura do clique */
+    text-decoration: none; 
+    border-bottom: 1px solid #f5f5f5;
+    margin: 0;
 }
-        .fab-menu.open { display: block; }
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            text-decoration: none;
-            color: #333;
-            gap: 10px;
-        }
-        .menu-item:hover { background: #f5f5f5; }
-        .fab-container { position: relative; }
 
-        /* Local: Adicione no final da sua tag <style> que já existe no head */
+.fab-menu a:last-child { border-bottom: none; }
+.fab-menu .material-icons { 
+    font-size: 20px; 
+    margin: 0; /* Centralização absoluta */
+}
 
-.music-list {
+/* TABELA COM LARGURA FIXA (IMPEDE O LAYOUT DE MUDAR) */
+.music-list { width: 100%; overflow-x: auto; padding: 10px 0; }
+
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    table-layout: fixed; /* O segredo: as colunas não variam conforme o texto */
+}
+
+/* Definição Rígida de Colunas */
+/* Ajuste as larguras das colunas para abrir espaço para os 4 ícones */
+th:nth-child(1), td:nth-child(1) { width: 70px; }   /* Gênero */
+th:nth-child(2), td:nth-child(2) { width: 25%; }    /* Artista */
+th:nth-child(3), td:nth-child(3) { width: auto; }   /* Título */
+th:nth-child(4), td:nth-child(4) { 
+    width: 130px; /* Aumentado para caber os 4 ícones com folga */
+    text-align: center; 
+}
+
+/* Garante que o container dos ícones não quebre linha */
+.acoes-container {
+    display: flex;
+    justify-content: center;
+    gap: 4px; /* Espaço entre os ícones */
     width: 100%;
-    overflow-x: auto; /* Permite scroll horizontal na tabela se necessário em telas minúsculas */
-    -webkit-overflow-scrolling: touch;
 }
 
-table {
-    min-width: 450px; /* Garante que os dados não fiquem encavalados */
+.btn-icon .material-icons { 
+    font-size: 18px !important; /* Tamanho padronizado para caber lado a lado */
 }
 
-/* Esconde o Gênero em telas muito pequenas para dar espaço ao Título */
+th { text-align: left; padding: 12px 8px; font-size: 0.8rem; color: #666; border-bottom: 2px solid #eee; }
+
+td { 
+    padding: 10px 8px; 
+    font-size: 0.85rem; 
+    border-bottom: 1px solid #eee; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; /* Coloca "..." se o nome for grande */
+}
+
+/* RESPONSIVIDADE MOBILE */
 @media (max-width: 480px) {
-    th:nth-child(1), td:nth-child(1) {
-        display: none; 
-    }
-    table {
-        min-width: 100%; /* Em telas pequenas, ocupa apenas o que tem */
-    }
+    th:nth-child(1), td:nth-child(1) { display: none; } /* Esconde Gênero */
+    th:nth-child(2), td:nth-child(2) { width: 35%; }
 }
 
-/* Ajuste do Título para não quebrar a linha e sim colocar "..." */
-#lista-musicas td {
-    max-width: 150px; /* Limite para o texto não empurrar a tabela */
+/* MODAL E OUTROS */
+#modal-favoritos {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--bg-modal); display: none; align-items: center; 
+    justify-content: center; z-index: 10000;
+}
+
+.modal-fav-content {
+    background: white; width: 95%; max-width: 400px; border-radius: 12px;
+    padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* TOOLTIP */
+[data-tooltip]:hover::after {
+    content: attr(data-tooltip); 
+    position: absolute; 
+    right: 45px;
+    background: #333; 
+    color: #fff; 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+    font-size: 11px; 
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 12px 8px;
+    z-index: 1002;
 }
-
     </style>
 </head>
 <body>
-    <div class="top-bar" style="display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 56px; background: #fff; border-bottom: 1px solid #ddd; position: relative; overflow: visible;">
-    
-    <div class="logo" style="display: flex; align-items: center; gap: 8px; color: #186879; font-weight: 800;">
-        <span class="material-icons">music_note</span>
-        <span>Repertório</span>
-    </div>
-    
-    <div class="fab-container" style="position: relative; z-index: 9999;">
-        <button class="fab-trigger" onclick="toggleFabMenu()" style="background: #186879; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-            <span class="material-icons">add</span>
-        </button>
 
-        <div class="fab-menu" id="fab-menu" style="display: none; position: absolute; right: 0; top: 45px; background: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 1px solid #eee; overflow: visible; min-width: 60px;">
-            
-            <a href="config.html" class="tooltip-item" data-tooltip="Configurações" style="display: flex; align-items: center; justify-content: center; padding: 15px; text-decoration: none; border-bottom: 1px solid #f5f5f5; position: relative;">
-                <span class="material-icons" style="color: #186879; font-size: 24px;">settings</span>
-            </a>
-            
-            <a href="repertorio.html" class="tooltip-item" data-tooltip="Gerenciar Listas" style="display: flex; align-items: center; justify-content: center; padding: 15px; text-decoration: none; border-bottom: 1px solid #f5f5f5; position: relative;">
-                <span class="material-icons" style="color: #fbc02d; font-size: 24px;">star</span>
-            </a>
-<a href="repertorio.html" class="tooltip-item" data-tooltip="Meus Repertórios" style="display: flex; align-items: center; justify-content: center; padding: 15px; text-decoration: none; border-bottom: 1px solid #f5f5f5; position: relative;">
-    <span class="material-icons" style="color: #fbc02d; font-size: 24px;">format_list_bulleted</span>
-</a>
+    <div class="top-bar">
+        <div class="logo">
+            <span class="material-icons">music_note</span>
+            <span>Biblioteca</span>
         </div>
-    </div>
-</div>
-
-<main style="max-width: 900px; margin: 0 auto; width: 100%;">
-    <div class="search-filter-container">
-        <div class="search-wrapper">
-            <span class="material-icons search-icon">search</span>
-            <input class="search-input" id="busca" placeholder="Buscar música ou artista..." type="text"/>
-        </div>
-        <select class="genero-select" id="genero-select">
-            <option value="">Todos os Gêneros</option>
-        </select>
-    </div>
-
-    <div class="music-list" id="tabela-container">
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="text-align: left; border-bottom: 2px solid var(--outline); color: var(--on-surface-variant); font-size: 0.8rem;">
-                    <th style="padding: 8px;">Gênero</th>
-                    <th style="padding: 8px;">Artista</th>
-                    <th style="padding: 8px;">Título</th>
-                    <th style="padding: 8px; text-align: center;">Ações</th>
-                </tr>
-            </thead>
-            <tbody id="lista-musicas">
-                </tbody>
-        </table>
-    </div>
-</main>
-
-<nav class="bottom-nav">
-    <a class="nav-item active" href="#"><span class="material-icons">library_music</span><span>Biblioteca</span></a>
-    <a class="nav-item" href="#"><span class="material-icons">search</span><span>Busca</span></a>
-    <a class="nav-item" href="#"><span class="material-icons">person</span><span>Perfil</span></a>
-</nav>
-
-<script src="js/pouchdb.min.js"></script>
-<script src="js/pouchdb.find.min.js"></script>
-<script src="js/database.js"></script>
-<script src="js/scanner.js"></script>
-<script src="js/app.js"></script>
-
-<script>
-    // Função do FAB Menu
-function toggleFabMenu() {
-    const menu = document.getElementById('fab-menu');
-    // Alterna entre block e none
-    if (menu.style.display === 'none' || menu.style.display === '') {
-        menu.style.display = 'block';
-    } else {
-        menu.style.display = 'none';
-    }
-}
-
-// Fecha o menu se o usuário clicar em qualquer lugar fora dele
-document.addEventListener('click', function(event) {
-    const container = document.querySelector('.fab-container');
-    const menu = document.getElementById('fab-menu');
-    if (container && !container.contains(event.target)) {
-        menu.style.display = 'none';
-    }
-});
-
-    window.onerror = function(msg) { if (msg.includes('hasService')) return true; };
-    
-    // Inicialização segura
-    setTimeout(() => {
-        if (typeof onDeviceReady === 'function' && !window.app_initialized) onDeviceReady();
-    }, 1200);
-</script>
-
-<style>
-    #modal-favoritos {
-        position: fixed; 
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.7); 
-        display: none; /* Começa escondido */
-        align-items: center; 
-        justify-content: center; 
-        z-index: 10000;
-    }
-    .modal-fav-content {
-        background: white; 
-        width: 90%; 
-        max-width: 400px; 
-        border-radius: 12px;
-        padding: 20px; 
-        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    }
-    .lista-reps-modal {
-        max-height: 300px; 
-        overflow-y: auto; 
-        margin: 15px 0;
-        border: 1px solid #eee;
-        border-radius: 8px;
-    }
-    .item-rep-modal {
-        padding: 15px; 
-        border-bottom: 1px solid #eee; 
-        cursor: pointer;
-        display: flex; 
-        align-items: center; 
-        gap: 12px; 
-        transition: background 0.2s;
-    }
-    .item-rep-modal:hover { 
-        background: #f0f7f8; 
-    }
-    .item-rep-modal b {
-        color: #333;
-        font-size: 0.95rem;
-    }
-</style>
-
-<div id="modal-favoritos">
-    <div class="modal-fav-content">
-        <h3 style="color: #186879; margin-top: 0;">Adicionar ao Repertório</h3>
-        <p style="font-size: 0.8rem; color: #666;">Escolha uma lista para salvar esta música:</p>
         
-        <div id="lista-reps-modal" class="lista-reps-modal">
-            </div>
-
-        <button onclick="document.getElementById('modal-favoritos').style.display='none'" 
-                style="width: 100%; padding: 12px; border: none; background: #ececec; border-radius: 8px; cursor: pointer; font-weight: bold; color: #555;">
-            CANCELAR
-        </button>
+<div class="fab-container">
+    <button class="fab-trigger" onclick="toggleFabMenu()">
+        <span class="material-icons">add</span>
+    </button>
+    <div class="fab-menu" id="fab-menu">
+        <a href="config.html" title="Config">
+            <span class="material-icons" style="color: var(--primary);">settings</span>
+        </a>
+        <a href="repertorio.html" title="Repertórios">
+            <span class="material-icons" style="color: #fbc02d;">format_list_bulleted</span>
+        </a>
     </div>
 </div>
+    </div>
+
+    <main style="max-width: 900px; margin: 0 auto; padding: 16px;">
+        <div class="search-filter-container" style="display: flex; gap: 10px; margin-bottom: 16px;">
+            <input class="search-input" id="busca" placeholder="Buscar música..." type="text" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+            <select id="genero-select" style="padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                <option value="">Todos os Gêneros</option>
+            </select>
+        </div>
+
+        <div class="music-list">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gênero</th>
+                        <th>Artista</th>
+                        <th>Título</th>
+                        <th style="text-align: center;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-musicas">
+                    </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="modal-favoritos">
+        <div class="modal-fav-content">
+            <h3 style="color: var(--primary); margin: 0 0 10px 0;">Adicionar ao Repertório</h3>
+            <div id="lista-reps-modal" class="lista-reps-modal"></div>
+            <button onclick="fecharModal()" style="width: 100%; padding: 12px; border: none; background: #eee; border-radius: 8px; font-weight: bold; cursor: pointer;">CANCELAR</button>
+        </div>
+    </div>
+
+    <script src="js/pouchdb.min.js"></script>
+    <script src="js/pouchdb.find.min.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/app.js"></script>
+
+    <script>
+        function toggleFabMenu() {
+            const menu = document.getElementById('fab-menu');
+            const isVisible = menu.style.display === 'block';
+            menu.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                setTimeout(() => {
+                    document.addEventListener('click', function close(e) {
+                        if (!menu.contains(e.target) && !e.target.closest('.fab-trigger')) {
+                            menu.style.display = 'none';
+                            document.removeEventListener('click', close);
+                        }
+                    });
+                }, 10);
+            }
+        }
+
+        function fecharModal() {
+            document.getElementById('modal-favoritos').style.display = 'none';
+        }
+    </script>
 </body>
 </html>

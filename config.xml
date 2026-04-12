@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.seuprojeto.repertorio" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.seuprojeto.repertorio" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
     <name>Repertorio</name>
     <description>Banco de partituras PouchDB</description>
     <author email="contato@exemplo.com">Seu Nome</author>
@@ -7,6 +7,21 @@
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
+    
+    <!-- Configurações para Android moderno (API 33+) -->
+    <preference name="android-minSdkVersion" value="24" />
+    <preference name="android-targetSdkVersion" value="33" />
+    <preference name="AndroidXEnabled" value="true" />
+    <preference name="GradlePluginGoogleServicesEnabled" value="false" />
+    
+    <!-- Permite ler arquivos externos no Android 11+ -->
+    <preference name="android-requestLegacyExternalStorage" value="true" />
+    
+    <!-- Permissões explícitas para leitura de arquivos -->
+    <config-file target="AndroidManifest.xml" parent="/*">
+        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    </config-file>
+
     <window height="768" width="1024" />
     <preference name="AllowInlineMediaPlayback" value="true" />
     <preference name="ElectronNodeIntegration" value="true" />

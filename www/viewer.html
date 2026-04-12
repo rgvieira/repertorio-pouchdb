@@ -9,69 +9,57 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; background: #333; overflow: hidden; }
         
-/* Local: No bloco <style>, substitua as classes correspondentes */
+        /* HEADER & TOP BAR */
+        .top-bar { 
+            height: 56px; 
+            background: #fff; 
+            display: flex; 
+            align-items: center; 
+            padding: 0 12px; 
+            z-index: 100; 
+            border-bottom: 1px solid #ccc;
+            gap: 8px;
+        }
 
-.top-bar { 
-    height: 56px; 
-    background: #fff; 
-    display: flex; 
-    align-items: center; 
-    padding: 0 12px; /* Reduzido para dar espaço */
-    z-index: 100; 
-    border-bottom: 1px solid #ccc;
-    gap: 8px;
-}
+        .music-title {
+            font-weight: 700; 
+            color: #186879;
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            flex: 1; 
+            min-width: 0; 
+            font-size: 0.9rem;
+        }
 
-.music-title {
-    font-weight: 700; 
-    color: #186879;
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-    flex: 1; /* Ocupa o espaço que sobrar */
-    min-width: 0; 
-    font-size: 0.9rem;
-}
+        .header-actions { 
+            display: flex; 
+            align-items: center; 
+            gap: 2px; 
+            flex-shrink: 0; 
+        }
 
-.header-actions { 
-    display: flex; 
-    align-items: center; 
-    gap: 2px; /* Compactado para mobile */
-    flex-shrink: 0; /* Impede que os botões sumam */
-}
-
-/* Esconde o texto dos controles de página em telas muito pequenas */
-@media (max-width: 380px) {
-    #page-info { font-size: 0.65rem; }
-    .nav-controls { gap: 0; }
-}
-
-/* Local: No bloco <style> */
-.pdf-container { 
-    flex: 1; 
-    overflow: auto; 
-    background: #525659; 
-    display: flex; 
-    justify-content: center; 
-    align-items: flex-start; /* Alinha o PDF no topo para facilitar o scroll */
-    position: relative; 
-    padding: 10px 0;
-}
+        /* PDF CONTAINER */
+        .pdf-container { 
+            flex: 1; 
+            overflow: auto; 
+            background: #525659; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; 
+            position: relative; 
+            padding: 10px 0;
+        }
 
         #pdf-canvas { background: white; display: block; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        #draw-canvas { position: absolute; left: 50%; transform: translateX(-50%); cursor: crosshair; }
+        #draw-canvas { position: absolute; left: 50%; transform: translateX(-50%); cursor: crosshair; touch-action: none; }
 
-
-
-        /* Paginação menor e compacta */
+        /* CONTROLES */
         .nav-controls { display: flex; align-items: center; gap: 2px; color: #186879; font-size: 0.75rem; }
-        .nav-controls .tool-btn { padding: 4px; }
-        .nav-controls .material-icons { font-size: 18px; }
-
         .tool-btn { border: none; background: none; padding: 8px; cursor: pointer; border-radius: 8px; color: #186879; display: flex; align-items: center; }
-        .tool-btn.active { background: rgba(24, 104, 121, 0.15); font-weight: bold; }
+        .tool-btn.active { background: rgba(24, 104, 121, 0.15); font-weight: bold; border: 1px solid rgba(24, 104, 121, 0.2); }
         
-        /* FAB */
+        /* FAB PADRONIZADO */
         .fab-container { position: relative; margin-left: 4px; }
         .fab-trigger {
             width: 38px; height: 38px; border-radius: 50%;
@@ -81,19 +69,34 @@
         }
 
         .fab-menu {
-            position: absolute; top: 45px; right: 0;
-            background: white; border: 1px solid #ccc;
-            border-radius: 8px; display: none; flex-direction: column;
-            padding: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); min-width: 160px; z-index: 200;
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 44px; 
+            z-index: 200;
         }
         .fab-menu.open { display: flex; }
-        .fab-menu .tool-btn { width: 100%; justify-content: flex-start; gap: 10px; font-size: 0.9rem; }
+        .fab-menu .tool-btn { width: 36px; height: 36px; justify-content: center; margin-bottom: 4px; padding: 0; }
+        .fab-menu .tool-btn .material-icons { font-size: 20px; }
 
         #text-input-container {
             position: absolute; display: none; z-index: 1000; background: white;
             padding: 5px; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
         #text-input-container input { border: 1px solid #186879; padding: 5px; outline: none; }
+
+        @media (max-width: 380px) {
+            #page-info { font-size: 0.65rem; }
+            .nav-controls .tool-btn { padding: 2px; }
+        }
     </style>
 </head>
 <body>
@@ -110,19 +113,19 @@
         </div>
 
         <button class="tool-btn" onclick="imprimir()" title="Imprimir"><span class="material-icons">print</span></button> 
-        
+
         <div class="fab-container">
             <button class="fab-trigger" onclick="toggleFab()"><span class="material-icons">add</span></button>
             <div class="fab-menu" id="fab-menu">
-                <button class="tool-btn active" id="btn-pen" onclick="setTool('pen')"><span class="material-icons">edit</span> Lápis</button>
-                <button class="tool-btn" id="btn-highlight" onclick="setTool('highlight')"><span class="material-icons">highlight</span> Marca-texto</button>
-                <button class="tool-btn" id="btn-eraser" onclick="setTool('eraser')"><span class="material-icons">auto_fix_normal</span> Borracha</button>
-                <button class="tool-btn" id="btn-arrow" onclick="setTool('arrow')"><span class="material-icons">trending_flat</span> Seta</button>
-                <button class="tool-btn" id="btn-rect" onclick="setTool('rect')"><span class="material-icons">rectangle</span> Retângulo</button>
-                <button class="tool-btn" id="btn-text" onclick="setTool('text')"><span class="material-icons">text_fields</span> Texto</button>
-                <hr style="margin: 4px 0; border: 0; border-top: 1px solid #eee;">
-                <button class="tool-btn" onclick="document.getElementById('cor').click()"><span class="material-icons">color_lens</span> Cor</button>
-                <button class="tool-btn" onclick="limpar()" style="color: #d32f2f;"><span class="material-icons">delete_sweep</span> Limpar Página</button>
+                <button class="tool-btn active" id="btn-pen" onclick="setTool('pen')"><span class="material-icons">edit</span></button>
+                <button class="tool-btn" id="btn-highlight" onclick="setTool('highlight')"><span class="material-icons">highlight</span></button>
+                <button class="tool-btn" id="btn-eraser" onclick="setTool('eraser')"><span class="material-icons">auto_fix_normal</span></button>
+                <button class="tool-btn" id="btn-arrow" onclick="setTool('arrow')"><span class="material-icons">trending_flat</span></button>
+                <button class="tool-btn" id="btn-rect" onclick="setTool('rect')"><span class="material-icons">rectangle</span></button>
+                <button class="tool-btn" id="btn-text" onclick="setTool('text')"><span class="material-icons">text_fields</span></button>
+                <hr style="width: 80%; margin: 4px 0; border: 0; border-top: 1px solid #eee;">
+                <button class="tool-btn" onclick="document.getElementById('cor').click()"><span class="material-icons">color_lens</span></button>
+                <button class="tool-btn" onclick="limpar()" style="color: #d32f2f;"><span class="material-icons">delete_sweep</span></button>
             </div>
         </div>
     </div>
@@ -155,6 +158,39 @@
     const fileKey = params.get('file') || 'doc_default';
     let annotations = JSON.parse(localStorage.getItem('annot_' + fileKey)) || [];
 
+    // --- FUNÇÕES DE TOQUE CORRIGIDAS ---
+    function handleTouch(e) {
+        const touch = (e.type === 'touchend' || e.type === 'touchcancel') ? e.changedTouches[0] : e.touches[0];
+        if (!touch) return;
+
+        const mouseEvent = new MouseEvent(
+            e.type === 'touchstart' ? 'mousedown' : e.type === 'touchmove' ? 'mousemove' : 'mouseup', 
+            { clientX: touch.clientX, clientY: touch.clientY, bubbles: true, cancelable: true }
+        );
+        drawCanvas.dispatchEvent(mouseEvent);
+    }
+
+    drawCanvas.addEventListener("touchstart", (e) => { e.preventDefault(); handleTouch(e); }, {passive: false});
+    drawCanvas.addEventListener("touchmove", (e) => { e.preventDefault(); handleTouch(e); }, {passive: false});
+    drawCanvas.addEventListener("touchend", (e) => { e.preventDefault(); handleTouch(e); }, {passive: false});
+
+    function toggleFab() { 
+        document.getElementById('fab-menu').classList.toggle('open'); 
+    }
+
+    function setTool(t) {
+        tool = t;
+        document.querySelectorAll('#fab-menu .tool-btn').forEach(b => b.classList.remove('active'));
+        const selectedBtn = document.getElementById('btn-' + t);
+        if (selectedBtn) selectedBtn.classList.add('active');
+        redesenharCamadaDesenho();
+    }
+
+    document.addEventListener('click', (e) => {
+        const container = document.querySelector('.fab-container');
+        if (!container.contains(e.target)) document.getElementById('fab-menu').classList.remove('open');
+    });
+
     async function init() {
         document.getElementById('display-title').innerText = params.get('title') || 'Música';
         const file = params.get('file');
@@ -163,75 +199,30 @@
             render();
         }
     }
-// Local: No final do bloco <script>, antes do init()
 
-function handleTouch(e) {
-    const touch = e.touches[0];
-    const mouseEvent = new MouseEvent(
-        e.type === 'touchstart' ? 'mousedown' : e.type === 'touchmove' ? 'mousemove' : 'mouseup', 
-        { clientX: touch.clientX, clientY: touch.clientY }
-    );
-    drawCanvas.dispatchEvent(mouseEvent);
-}
-
-drawCanvas.addEventListener("touchstart", (e) => { e.preventDefault(); handleTouch(e); }, {passive: false});
-drawCanvas.addEventListener("touchmove", (e) => { e.preventDefault(); handleTouch(e); }, {passive: false});
-drawCanvas.addEventListener("touchend", (e) => { handleTouch(e); }, {passive: false});
-
-    function toggleFab() { document.getElementById('fab-menu').classList.toggle('open'); }
-
-    function setTool(t) {
-        tool = t;
-        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-        if(document.getElementById('btn-' + t)) document.getElementById('btn-' + t).classList.add('active');
-        toggleFab();
-    }
-
- // Local: Dentro da função async function render()
-async function render() {
-    if (!pdfDoc) return;
-    
-    try {
+    async function render() {
+        if (!pdfDoc) return;
         const page = await pdfDoc.getPage(pageNum);
         const container = document.getElementById('pdf-container');
-        
-        // 1. Cálculo da escala responsiva
-        const availableWidth = container.clientWidth - 20; 
-        const viewportOrig = page.getViewport({ scale: 1.0 });
-        const scale = availableWidth / viewportOrig.width;
+        const scale = (container.clientWidth - 20) / page.getViewport({ scale: 1.0 }).width;
         const viewport = page.getViewport({ scale: scale });
 
-        // 2. Ajuste dos tamanhos dos Canvas
         pdfCanvas.width = drawCanvas.width = viewport.width;
         pdfCanvas.height = drawCanvas.height = viewport.height;
         
-        // 3. O PULO DO GATO: Renderizar o conteúdo do PDF de fato
-        const renderContext = {
-            canvasContext: pdfCanvas.getContext('2d'),
-            viewport: viewport
-        };
-        
-        // Aguarda a renderização terminar antes de desenhar as anotações
-        await page.render(renderContext).promise;
-
-        // 4. Atualiza informações de página e redesenha os seus riscos/anotações
+        await page.render({ canvasContext: pdfCanvas.getContext('2d'), viewport: viewport }).promise;
         document.getElementById('page-info').innerText = pageNum + '/' + pdfDoc.numPages;
         redesenharCamadaDesenho();
-        
-    } catch (error) {
-        console.error("Erro ao renderizar página:", error);
     }
-}
 
-// ADICIONE ISTO: Faz o PDF reajustar se o usuário girar o celular
-window.onresize = () => {
-    clearTimeout(window.resizer);
-    window.resizer = setTimeout(render, 200);
-};
+    window.onresize = () => {
+        clearTimeout(window.resizer);
+        window.resizer = setTimeout(render, 200);
+    };
+
     function redesenharCamadaDesenho() {
         drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
         const all = annotations.concat(tempAnnotation ? [tempAnnotation] : []);
-        
         all.forEach(a => {
             if (a.page !== pageNum) return;
             drawCtx.beginPath();
@@ -253,9 +244,9 @@ window.onresize = () => {
                 const angle = Math.atan2(a.h, a.w);
                 drawCtx.moveTo(a.x, a.y);
                 drawCtx.lineTo(a.x + a.w, a.y + a.h);
-                drawCtx.lineTo(a.x + a.w - headlen * Math.cos(angle - Math.PI / 6), a.y + a.h - headlen * Math.sin(angle - Math.PI / 6));
+                drawCtx.lineTo(a.x + a.w - headlen * Math.cos(angle - Math.PI/6), a.y + a.h - headlen * Math.sin(angle - Math.PI/6));
                 drawCtx.moveTo(a.x + a.w, a.y + a.h);
-                drawCtx.lineTo(a.x + a.w - headlen * Math.cos(angle + Math.PI / 6), a.y + a.h - headlen * Math.sin(angle + Math.PI / 6));
+                drawCtx.lineTo(a.x + a.w - headlen * Math.cos(angle + Math.PI/6), a.y + a.h - headlen * Math.sin(angle + Math.PI/6));
                 drawCtx.stroke();
             } else if (a.type === 'text') {
                 drawCtx.globalAlpha = 1.0;
@@ -271,32 +262,24 @@ window.onresize = () => {
         const mouseY = e.clientY - r.top;
 
         if (tool === 'eraser') {
-            const sensibilidade = 25;
+            const sens = 25;
             annotations = annotations.filter(a => {
                 if(a.page !== pageNum) return true;
-                if(a.pts) {
-                    return !a.pts.some(p => Math.sqrt(Math.pow(p.x - mouseX, 2) + Math.pow(p.y - mouseY, 2)) < sensibilidade);
-                }
-                const distOrigem = Math.sqrt(Math.pow(a.x - mouseX, 2) + Math.pow(a.y - mouseY, 2));
-                const distFim = a.w ? Math.sqrt(Math.pow((a.x + a.w) - mouseX, 2) + Math.pow((a.y + a.h) - mouseY, 2)) : 999;
-                return distOrigem > sensibilidade && distFim > sensibilidade;
+                if(a.pts) return !a.pts.some(p => Math.hypot(p.x - mouseX, p.y - mouseY) < sens);
+                return Math.hypot(a.x - mouseX, a.y - mouseY) > sens;
             });
             localStorage.setItem('annot_' + fileKey, JSON.stringify(annotations));
             redesenharCamadaDesenho();
             return;
         }
 
-        startX = mouseX;
-        startY = mouseY;
-
+        startX = mouseX; startY = mouseY;
         if (tool === 'text') {
             const container = document.getElementById('text-input-container');
-            const input = document.getElementById('floating-text-input');
             container.style.left = e.clientX + "px";
             container.style.top = e.clientY + "px";
             container.style.display = "block";
-            input.value = "";
-            setTimeout(() => input.focus(), 50);
+            setTimeout(() => document.getElementById('floating-text-input').focus(), 50);
             return;
         }
 
@@ -305,15 +288,6 @@ window.onresize = () => {
         tempAnnotation = (tool === 'pen' || tool === 'highlight') 
             ? { type: tool, color: color, pts: [{ x: startX, y: startY }], page: pageNum }
             : { type: tool, color: color, x: startX, y: startY, w: 0, h: 0, page: pageNum };
-    };
-
-    document.getElementById('floating-text-input').onkeydown = (e) => {
-        if (e.key === 'Enter' && e.target.value) {
-            annotations.push({ type: 'text', color: document.getElementById('cor').value, x: startX, y: startY, txt: e.target.value, page: pageNum });
-            localStorage.setItem('annot_' + fileKey, JSON.stringify(annotations));
-            redesenharCamadaDesenho();
-            document.getElementById('text-input-container').style.display = "none";
-        }
     };
 
     drawCanvas.onmousemove = (e) => {
@@ -331,8 +305,17 @@ window.onresize = () => {
             annotations.push(tempAnnotation);
             localStorage.setItem('annot_' + fileKey, JSON.stringify(annotations));
         }
-        drawing = false;
-        tempAnnotation = null;
+        drawing = false; tempAnnotation = null;
+        redesenharCamadaDesenho();
+    };
+
+    document.getElementById('floating-text-input').onkeydown = (e) => {
+        if (e.key === 'Enter' && e.target.value) {
+            annotations.push({ type: 'text', color: document.getElementById('cor').value, x: startX, y: startY, txt: e.target.value, page: pageNum });
+            localStorage.setItem('annot_' + fileKey, JSON.stringify(annotations));
+            redesenharCamadaDesenho();
+            document.getElementById('text-input-container').style.display = "none";
+        }
     };
 
     function mudarPagina(d) {
@@ -345,8 +328,7 @@ window.onresize = () => {
         const merge = document.createElement('canvas');
         merge.width = pdfCanvas.width; merge.height = pdfCanvas.height;
         const ctx = merge.getContext('2d');
-        ctx.drawImage(pdfCanvas, 0, 0);
-        ctx.drawImage(drawCanvas, 0, 0);
+        ctx.drawImage(pdfCanvas, 0, 0); ctx.drawImage(drawCanvas, 0, 0);
         const win = window.open('', '_blank');
         win.document.write(`<html><body style="margin:0;display:flex;justify-content:center;"><img src="${merge.toDataURL('image/png')}" style="width:100%;" onload="window.print();"></body></html>`);
         win.document.close();

@@ -10,7 +10,23 @@ npm start
 
 
 git add .
-
-git commit -m "9-04-2026 10: 20 pm"
-
+git commit -m "9-04-2026 x10xxx: 26 pm"
 git push
+
+cordova platform remove android
+cordova platform add android@12
+cordova build android
+# para assinado, mas com build.json configurado
+cordova build android --release
+
+# para o android, aab
+cordova build android --release -- --packageType=bundle
+
+#Gera chave de assinatura em d:\keystore
+keytool -genkey -v -keystore d:\keystore\minha-chave.jks -alias meu-alias -keyalg RSA -keysize 2048 -validity 10000
+
+#var a chave pas chave@@@@
+keytool -list -v -keystore d:\keystore\minha-chave.jks p
+
+# gerar com assinatura correta e build.json configurado
+cordova build android --release -- --keystore="d:\keystore\minha-chave.jks" --alias=meu-alias --packageType=bundle

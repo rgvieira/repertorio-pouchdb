@@ -5,7 +5,7 @@
     <meta content="initial-scale=1, width=device-width, viewport-fit=cover" name="viewport"/>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-    <title>Repertório Principal</title>
+    <title>Biblioteca</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
         /* Ajuste do FAB Menu para aparecer sobre os elementos */
@@ -53,14 +53,69 @@ table {
         min-width: 100%; /* Em telas pequenas, ocupa apenas o que tem */
     }
 }
-
-/* Ajuste do Título para não quebrar a linha e sim colocar "..." */
+.btn-icon {
+  position: relative;
+}
+/* Diminui a fonte geral da tabela e o espaçamento das células */
 #lista-musicas td {
-    max-width: 150px; /* Limite para o texto não empurrar a tabela */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 12px 8px;
+    padding: 8px 4px; /* Reduzido de 12px para 8px vertical e 4px horizontal */
+    font-size: 0.75rem; /* Fonte menor */
+}
+
+/* Ajuste específico para o Título (que tem peso 600 no JS) */
+#lista-musicas td:nth-child(3) {
+    font-size: 0.85rem; 
+    max-width: 120px; /* Reduzi um pouco mais para caber melhor */
+}
+
+/* Reduz o tamanho dos botões de ação e dos ícones dentro deles */
+.btn-icon {
+    padding: 4px; /* Área de toque menor, mas ainda acessível */
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+}
+
+.btn-icon .material-icons {
+    font-size: 18px !important; /* Ícones menores (padrão é 24px) */
+}
+
+/* Ajuste para telas muito pequenas (Mobile) */
+@media (max-width: 400px) {
+    #lista-musicas td {
+        padding: 6px 2px;
+    }
+    
+    /* Se o nome do artista for muito grande, também coloca reticências */
+    #lista-musicas td:nth-child(2) {
+        max-width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+/* Tooltip customizado */
+.tooltip-item::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%; /* aparece acima do ícone */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 5px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  font-size: 13px;
+  z-index: 10;
+}
+
+.tooltip-item:hover::after {
+  opacity: 1;
 }
 
     </style>
@@ -70,7 +125,7 @@ table {
     
     <div class="logo" style="display: flex; align-items: center; gap: 8px; color: #186879; font-weight: 800;">
         <span class="material-icons">music_note</span>
-        <span>Repertório</span>
+        <span>Biblioteca</span>
     </div>
     
     <div class="fab-container" style="position: relative; z-index: 9999;">
@@ -80,15 +135,12 @@ table {
 
         <div class="fab-menu" id="fab-menu" style="display: none; position: absolute; right: 0; top: 45px; background: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 1px solid #eee; overflow: visible; min-width: 60px;">
             
-            <a href="config.html" class="tooltip-item" data-tooltip="Configurações" style="display: flex; align-items: center; justify-content: center; padding: 15px; text-decoration: none; border-bottom: 1px solid #f5f5f5; position: relative;">
-                <span class="material-icons" style="color: #186879; font-size: 24px;">settings</span>
-            </a>
-            
-            <a href="repertorio.html" class="tooltip-item" data-tooltip="Gerenciar Listas" style="display: flex; align-items: center; justify-content: center; padding: 15px; text-decoration: none; border-bottom: 1px solid #f5f5f5; position: relative;">
-                <span class="material-icons" style="color: #fbc02d; font-size: 24px;">star</span>
-            </a>
-<a href="repertorio.html" class="tooltip-item" data-tooltip="Meus Repertórios" style="display: flex; align-items: center; justify-content: center; padding: 15px; text-decoration: none; border-bottom: 1px solid #f5f5f5; position: relative;">
-    <span class="material-icons" style="color: #fbc02d; font-size: 24px;">format_list_bulleted</span>
+<a href="config.html" class="tooltip-item" data-tooltip="Configurações" style="display: flex; align-items: center; justify-content: center; padding: 15px; text-decoration: none; border-bottom: 1px solid #f5f5f5;">
+  <span class="material-icons" style="color: #186879; font-size: 24px;">settings</span>
+</a>
+
+<a href="repertorio.html" class="tooltip-item" data-tooltip="Meus Repertórios" style="display: flex; align-items: center; justify-content: center; padding: 15px; text-decoration: none; border-bottom: 1px solid #f5f5f5;">
+  <span class="material-icons" style="color: #fbc02d; font-size: 24px;">format_list_bulleted</span>
 </a>
         </div>
     </div>
@@ -133,35 +185,6 @@ table {
 <script src="js/scanner.js"></script>
 <script src="js/app.js"></script>
 
-<script>
-    // Função do FAB Menu
-function toggleFabMenu() {
-    const menu = document.getElementById('fab-menu');
-    // Alterna entre block e none
-    if (menu.style.display === 'none' || menu.style.display === '') {
-        menu.style.display = 'block';
-    } else {
-        menu.style.display = 'none';
-    }
-}
-
-// Fecha o menu se o usuário clicar em qualquer lugar fora dele
-document.addEventListener('click', function(event) {
-    const container = document.querySelector('.fab-container');
-    const menu = document.getElementById('fab-menu');
-    if (container && !container.contains(event.target)) {
-        menu.style.display = 'none';
-    }
-});
-
-    window.onerror = function(msg) { if (msg.includes('hasService')) return true; };
-    
-    // Inicialização segura
-    setTimeout(() => {
-        if (typeof onDeviceReady === 'function' && !window.app_initialized) onDeviceReady();
-    }, 1200);
-</script>
-
 <style>
     #modal-favoritos {
         position: fixed; 
@@ -204,6 +227,30 @@ document.addEventListener('click', function(event) {
         font-size: 0.95rem;
     }
 </style>
+<script>
+    function toggleFabMenu() {
+        const menu = document.getElementById('fab-menu');
+        if (menu.style.display === 'none' || menu.style.display === '') {
+            menu.style.display = 'block';
+            // Adiciona um listener para fechar ao clicar fora
+            setTimeout(() => {
+                document.addEventListener('click', closeMenuOutside);
+            }, 1);
+        } else {
+            menu.style.display = 'none';
+        }
+    }
+
+    function closeMenuOutside(event) {
+        const menu = document.getElementById('fab-menu');
+        const trigger = document.querySelector('.fab-trigger');
+        
+        if (!menu.contains(event.target) && !trigger.contains(event.target)) {
+            menu.style.display = 'none';
+            document.removeEventListener('click', closeMenuOutside);
+        }
+    }
+</script>
 
 <div id="modal-favoritos">
     <div class="modal-fav-content">

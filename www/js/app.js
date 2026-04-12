@@ -151,32 +151,33 @@ function renderizarTabela(musicas) {
         const pathSeguro = pathOriginal ? pathOriginal.replace(/\\/g, '\\\\') : '';
         const termo = encodeURIComponent(`${m.titulo} ${m.artista || ''}`);
 
-        tr.innerHTML = `
-<td style="font-size: 0.8rem;">${m.genero}</td>
-    <td style="font-size: 0.8rem;">${m.artista}</td>
-    <td style="font-weight: 600;">${m.titulo}</td>
-            <td style="padding:12px; text-align:center; display: flex; gap: 8px; justify-content: center;">
-                
-                ${pathOriginal ? `
-                    <button class="btn-icon" onclick="visualizarArquivo('${pathSeguro}', '${encodeURIComponent(m.titulo)}')" title="Ver PDF">
-                        <span class="material-icons" style="color: var(--primary);">visibility</span>
-                    </button>
-                    <button class="btn-icon" onclick="App.abrirModalFavoritos('${pathSeguro}')" title="Adicionar ao Repertório">
-                        <span class="material-icons" style="color: #fbc02d;">star_border</span>
-                    </button>
-                ` : `
-                    <span class="material-icons" style="color:#ccc" title="Arquivo não localizado">visibility_off</span>
-                `}
-                
-                <button class="btn-icon" onclick="abrirExterno('https://www.google.com/search?q=letra+${termo}')" title="Letra">
-                    <span class="material-icons" style="color: #566163;">lyrics</span>
-                </button>
+ // Dentro do loop musicas.forEach(m => { ... })
+tr.innerHTML = `
+    <td>${m.genero}</td>
+    <td>${m.artista}</td>
+    <td class="titulo-musica">${m.titulo}</td>
+    <td style="padding:8px 4px; text-align:center; display: flex; gap: 4px; justify-content: center;">
+        
+        ${pathOriginal ? `
+            <button class="btn-icon" onclick="visualizarArquivo('${pathSeguro}', '${encodeURIComponent(m.titulo)}')" title="Partitura">
+                <span class="material-icons" style="color: var(--primary);">visibility</span>
+            </button>
+            <button class="btn-icon" onclick="App.abrirModalFavoritos('${pathSeguro}')" title="Adicionar ao Repertório">
+                <span class="material-icons" style="color: #fbc02d;">star_border</span>
+            </button>
+        ` : `
+            <span class="material-icons" style="color:#ccc; font-size:18px;" title="Arquivo não localizado">visibility_off</span>
+        `}
+        
+        <button class="btn-icon" onclick="abrirExterno('https://www.google.com/search?q=letra+${termo}')" title="Letra">
+            <span class="material-icons" style="color: #566163;">lyrics</span>
+        </button>
 
-                <button class="btn-icon" onclick="abrirExterno('https://www.youtube.com/results?search_query=${termo}')" title="Vídeo">
-                    <span class="material-icons" style="color: #d32f2f;">play_circle</span>
-                </button>
-            </td>
-        `;
+        <button class="btn-icon" onclick="abrirExterno('https://www.youtube.com/results?search_query=${termo}')" title="Vídeo">
+            <span class="material-icons" style="color: #d32f2f;">play_circle</span>
+        </button>
+    </td>
+`;
         tbody.appendChild(tr);
     });
 }

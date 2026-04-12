@@ -1,0 +1,11 @@
+{
+    "android": {
+        "release": {
+            "keystore": "d:/keystore/minha-chave.jks",
+            "storePassword": "chave@@@@",
+            "alias": "meu-alias",
+            "password": "chave@@@@",
+            "keystoreType": ""
+        }
+    }
+}

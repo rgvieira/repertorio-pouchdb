@@ -15,42 +15,116 @@
             window.module = undefined; 
         }
     </script>
-    <style>
-        .folder-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px;
-            background: rgba(0,0,0,0.03);
-            border-radius: 8px;
-            margin-bottom: 8px;
-        }
-        .folder-info-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            overflow: hidden;
-        }
-        .btn-icon {
-            background: none; border: none; cursor: pointer; color: #186879;
-            padding: 8px; border-radius: 50%; display: flex; transition: background 0.2s;
-            align-items: center; justify-content: center;
-        }
-        .btn-icon:hover { background: rgba(0,0,0,0.05); }
-        .btn-icon.delete { color: #d32f2f; }
+<style>
+    /* Reduz o espaçamento do card para ganhar espaço vertical */
+    .folder-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px; /* Reduzido de 12px */
+        background: rgba(0,0,0,0.03);
+        border-radius: 8px;
+        margin-bottom: 6px;
+    }
 
-        #edit-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); display: none; align-items: center;
-            justify-content: center; z-index: 2000;
-        }
-        .modal-content {
-            background: white; padding: 20px; border-radius: 12px;
-            width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        .form-row { display: flex; gap: 8px; width: 100%; }
-        .form-input { flex: 1; }
-    </style>
+    .folder-info-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px; /* Reduzido de 12px */
+        overflow: hidden;
+        flex: 1;
+    }
+
+    /* Ícones menores na lista */
+    .folder-info-wrapper .material-icons {
+        font-size: 20px; /* Reduzido de 24px */
+    }
+
+    /* Nome do repertório com fonte menor e controle de estouro */
+    .folder-info-wrapper b {
+        color: #186879;
+        display: block;
+        font-size: 0.85rem; /* Fonte menor */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px; /* Impede que nomes longos joguem os botões para fora */
+    }
+
+    /* Botões de ação mais compactos */
+    .btn-icon {
+        background: none; border: none; cursor: pointer; color: #186879;
+        padding: 6px; /* Reduzido de 8px */
+        border-radius: 50%; 
+        display: flex; 
+        transition: background 0.2s;
+        align-items: center; justify-content: center;
+    }
+
+    .btn-icon .material-icons {
+        font-size: 18px !important; /* Ícones menores para os botões */
+    }
+
+    .btn-icon:hover { background: rgba(0,0,0,0.05); }
+    .btn-icon.delete { color: #d32f2f; }
+
+    /* Estilo para telas muito pequenas */
+    @media (max-width: 360px) {
+        .folder-info-wrapper b { max-width: 100px; }
+        .folder-card { padding: 6px 8px; }
+    }
+
+    #edit-modal {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); display: none; align-items: center;
+        justify-content: center; z-index: 2000;
+    }
+    .modal-content {
+        background: white; padding: 20px; border-radius: 12px;
+        width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .form-row { display: flex; gap: 8px; width: 100%; }
+    .form-input { flex: 1; }
+
+    /* Tooltip Customizado - Otimizado para Mobile */
+.tooltip-item, .btn-icon {
+    position: relative;
+}
+
+.tooltip-item::after, .btn-icon::after {
+    content: attr(data-tooltip); /* Unificando para usar data-tooltip */
+    position: absolute;
+    bottom: 110%; /* Sobe um pouco mais para não colar no ícone */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(51, 51, 51, 0.9);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    font-size: 11px; /* Fonte menor para o balão */
+    z-index: 100;
+}
+
+/* Mostra apenas em telas que aceitam hover (computador) */
+@media (hover: hover) {
+    .tooltip-item:hover::after, .btn-icon:hover::after {
+        opacity: 1;
+    }
+}
+
+/* No celular, o tooltip costuma atrapalhar, então podemos desativar 
+   ou reduzir o tempo de exibição para um toque longo */
+@media (max-width: 480px) {
+    .tooltip-item::after, .btn-icon::after {
+        display: none; /* Esconde no mobile para priorizar a área de toque */
+    }
+}
+
+</style>
 </head>
 <body>
 
@@ -120,34 +194,36 @@
                         const div = document.createElement('div');
                         div.className = 'folder-card';
                         
-                        // Lógica: Botão de lista ativo apenas se tiver músicas
-                        const temMusicas = doc.musicas && doc.musicas.length > 0;
-                        const btnRelacao = temMusicas ? `
-                            <button onclick="window.location.href='musicasRepertorio.html?id=${doc._id}'" 
-                                    class="btn-icon" title="Ver relação de músicas" 
-                                    style="background: rgba(24, 104, 121, 0.1); border-radius: 8px;">
-                                <span class="material-icons" style="color: #186879;">receipt_long</span>
-                            </button>
-                        ` : '';
+// ... dentro do sortedDocs.forEach(doc => { ... })
 
-                        div.innerHTML = `
-                            <div class="folder-info-wrapper" style="flex: 1;">
-                                <span class="material-icons" style="color:#186879">queue_music</span>
-                                <div>
-                                    <b style="color: #186879; display: block;">${doc.nome}</b>
-                                    <small style="color: #999; font-size: 0.7rem;">${doc.musicas ? doc.musicas.length : 0} música(s)</small>
-                                </div>
-                            </div>
-                            <div style="display: flex; gap: 6px; align-items: center;">
-                                ${btnRelacao}
-                                <button onclick="App.openEdit('${doc._id}', '${doc.nome}')" class="btn-icon">
-                                    <span class="material-icons">edit</span>
-                                </button>
-                                <button onclick="App.delete('${doc._id}')" class="btn-icon delete">
-                                    <span class="material-icons">delete</span>
-                                </button>
-                            </div>
-                        `;
+// Lógica do botão de relação com data-tooltip
+const temMusicas = doc.musicas && doc.musicas.length > 0;
+const btnRelacao = temMusicas ? `
+    <button onclick="window.location.href='musicasRepertorio.html?id=${doc._id}'" 
+            class="btn-icon" data-tooltip="Ver músicas" 
+            style="background: rgba(24, 104, 121, 0.1); border-radius: 8px;">
+        <span class="material-icons" style="color: #186879;">receipt_long</span>
+    </button>
+` : '';
+
+div.innerHTML = `
+    <div class="folder-info-wrapper">
+        <span class="material-icons" style="color:#186879">queue_music</span>
+        <div>
+            <b>${doc.nome}</b>
+            <small style="color: #999; font-size: 0.65rem;">${doc.musicas ? doc.musicas.length : 0} partitura(s)</small>
+        </div>
+    </div>
+    <div style="display: flex; gap: 4px; align-items: center;">
+        ${btnRelacao}
+        <button onclick="App.openEdit('${doc._id}', '${doc.nome}')" class="btn-icon" data-tooltip="Editar nome">
+            <span class="material-icons">edit</span>
+        </button>
+        <button onclick="App.delete('${doc._id}')" class="btn-icon delete" data-tooltip="Excluir lista">
+            <span class="material-icons">delete</span>
+        </button>
+    </div>
+`;
                         listEl.appendChild(div);
                     });
                 } catch (e) { 
