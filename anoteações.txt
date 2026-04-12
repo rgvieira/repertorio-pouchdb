@@ -10,7 +10,7 @@ npm run dev
 
 
 git add .
-git commit -m "11-04-2026 10: 26 pm"
+git commit -m "12-04-2026 10: 26 pm"
 git push
 
 cordova platform remove android
@@ -29,4 +29,48 @@ keytool -genkey -v -keystore d:\keystore\minha-chave.jks -alias meu-alias -keyal
 keytool -list -v -keystore d:\keystore\minha-chave.jks p
 
 # gerar com assinatura correta e build.json configurado
+# AAB
 cordova build android --release -- --keystore="d:\keystore\minha-chave.jks" --alias=meu-alias --packageType=bundle
+# APK
+cordova build android --release -- --keystore="d:\keystore\minha-chave.jks" --alias=meu-alias  --packageType=apk
+cordova build android --release -- --keystore="d:\keystore\minha-chave.jks" --alias=meu-alias --packageType=apk
+
+
+# cria app no dir  
+D:\workspace\repertorio-pouchdb\platforms\android\app\build\outputs\bundle\release\app-release.aab
+PS D:\workspace\repertorio-pouchdb>
+
+# limpar e recomecar pelo gradle
+# Mata o Java de novo por garantia
+Stop-Process -Name "java" -Force -ErrorAction SilentlyContinue
+
+# Limpa o projeto via Gradle (isso limpa a CordovaLib também)
+./platforms/android/gradlew clean -p platforms/android
+
+# Tenta o build ignorando o Lint
+./platforms/android/gradlew assembleRelease -p platforms/android -x lint
+
+
+# PARA GERAR APK - VERSÃO MAIS RÁPIDA
+# 1. Garante que as alterações do HTML/JS entrem no projeto Android
+cordova prepare android
+
+# 2. Mata processos travados do Java
+Stop-Process -Name "java" -Force -ErrorAction SilentlyContinue
+
+# 3. Limpa a pasta de build antiga (Obrigatório para atualizar o horário)
+Remove-Item -Recurse -Force "platforms/android/app/build"
+
+# 4. Gera o APK de Debug (Aparecerá na pasta outputs/apk/debug)
+./platforms/android/gradlew assembleDebug -p platforms/android
+
+
+# gEARA apk versão mais lenta
+# 1. Sincroniza os arquivos www 
+cordova prepare android
+
+# 2. Limpa o cache do Gradle
+./platforms/android/gradlew clean -p platforms/android
+
+# 3. Gera o APK de Release (Aparecerá na pasta outputs/apk/release)
+./platforms/android/gradlew assembleRelease -p platforms/android

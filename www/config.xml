@@ -2,13 +2,24 @@
 <widget id="com.seuprojeto.repertorio" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Repertorio</name>
     <description>Banco de partituras PouchDB</description>
-    <author email="contato@exemplo.com">Seu Nome</author>
+    <author email="rgvieira63@yahoo.com.br">Roberto</author>
+    
     <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
+    
     <window height="768" width="1024" />
+
+    <platform name="android">
+        <preference name="AndroidPackageType" value="apk" />
+        <preference name="AndroidPostProcessBundle" value="false" />
+    </platform>
+
+    <platform name="electron">
+        <preference name="ElectronNodeIntegration" value="false" />
+        <preference name="ElectronContextIsolation" value="true" />
+    </platform>
+    
     <preference name="AllowInlineMediaPlayback" value="true" />
-    <preference name="ElectronNodeIntegration" value="true" />
-    <preference name="ElectronContextIsolation" value="false" />
 </widget>

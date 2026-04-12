@@ -8,28 +8,32 @@
     <title>Configurações</title>
     <link rel="stylesheet" href="css/style.css">
     <script>
+        // Compatibilidade Electron/Node
         window.nodeRequire = (typeof require !== 'undefined') ? require : (window.require ? window.require : null);
         if (typeof module === 'object') { window.electronModule = module; window.module = undefined; }
     </script>
-        <style>
-            #loader-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(255,255,255,0.8); z-index: 9999;
-    display: none; align-items: center; justify-content: center; flex-direction: column;
-}
-.spinner {
-    width: 50px; height: 50px; border: 5px solid #f3f3f3;
-    border-top: 5px solid #186879; border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        </style>
+    <style>
+        #loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.8); z-index: 9999;
+            display: none; align-items: center; justify-content: center; flex-direction: column;
+        }
+        .spinner {
+            width: 50px; height: 50px; border: 5px solid #f3f3f3;
+            border-top: 5px solid #186879; border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Ajuste para não quebrar o layout no Android com Notch */
+        body { padding-top: env(safe-area-inset-top); }
+    </style>
 </head>
 <body>
 
-    <div id="loader-overlay">
+<div id="loader-overlay">
     <div class="spinner"></div>
-    <p style="color: #186879; font-weight: bold; margin-top: 10px;">Escaneando arquivos...</p>
+    <p style="color: #186879; font-weight: bold; margin-top: 10px;">Processando...</p>
 </div>
 
 <div class="top-bar" style="display: flex; align-items: center; padding: 0 16px; height: 56px; background: #fff; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 1000;">
@@ -41,98 +45,129 @@
 
 <div class="config-content" style="padding: 16px; max-width: 800px; margin: 0 auto;">
     <div id="desktop-section" class="card">
-        <h2>Pastas</h2>
-        <p>Sincronize pastas para alimentar sua biblioteca.</p>
+        <h2>Biblioteca</h2>
+        <p>Selecione  para sincronizar.</p>
         
-        <div class="form-row" style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <!--<input type="text" id="root-folder-input" class="form-input" style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px;" placeholder="Caminho da pasta...">-->
-            <button id="select-folder-btn" class="btn-picker" style="display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: #186879; color: #fff; border: none; border-radius: 8px; cursor: pointer;">
- <span class="material-icons">folder_open</span> 
-
-                <span id="btn-label">Nova Pasta</span>
-            </button>
-        </div>
+  <div class="form-row" style="margin-bottom: 20px;">
+    <label for="html5-picker" style="display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: #186879; color: #fff; border: none; border-radius: 8px; cursor: pointer; width: 100%; justify-content: center;">
+        <span class="material-icons">folder_open</span> 
+        <span id="btn-label">Selecionar Pasta de Partituras</span>
+        <input type="file" id="html5-picker" webkitdirectory directory multiple style="display:none">
+    </label>
+</div>
 
         <div style="margin-top: 24px;">
-            <h3 style="font-size: 0.8rem; color: #666; text-transform: uppercase;">Pastas Ativas</h3>
+            
             <div id="folders-list"></div>
         </div>
     </div>
 
-    <button id="btn-clear" class="btn-danger" style="margin-top: 20px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+    <button id="btn-clear" class="btn-danger" style="margin-top: 40px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: #f44336; color: white; border: none; border-radius: 8px;">
         <span class="material-icons">delete_forever</span> Limpar Banco de Dados
     </button>
 </div>
 
-<script src='js/pouchdb.min.js'></script>
-<script src='js/pouchdb.find.min.js'></script>  
+<script src="cordova.js"></script>
+<script src="js/pouchdb.min.js"></script>
+<script src="js/pouchdb.find.min.js"></script>
 <script src="js/database.js"></script>
 <script src="js/scanner.js"></script>
 
 <script>
- class ConfigApp {
+
+
+class ConfigApp {
     constructor() {
         this.foldersListEl = document.getElementById('folders-list');
         this.selectBtnEl = document.getElementById('select-folder-btn');
         this.clearBtnEl = document.getElementById('btn-clear');
         this.loader = document.getElementById('loader-overlay');
         
-        // Melhor detecção para Electron via Ponte
-        this.isElectron = !!(window.electronAPI);
-
         this.init();
     }
 
-    async init() {
-        try {
-            // Garante que o DBManager iniciou antes de listar
-            if (typeof DBManager !== 'undefined') {
-                await DBManager.init();
-            } else {
-                console.error("DBManager não definido!");
-            }
-            
-            await this.loadFoldersList();
-
-            if (this.selectBtnEl) {
-                this.selectBtnEl.onclick = () => this.selectFolder();
-            }
-            if (this.clearBtnEl) {
-                this.clearBtnEl.onclick = () => this.clearAll();
-            }
-        } catch (err) { 
-            console.error("Erro no Init:", err); 
+   async init() {
+    try {
+        console.log("DEBUG: ConfigApp Init iniciado.");
+        
+        // 1. Inicializa o Banco de Dados
+        if (typeof DBManager !== 'undefined') {
+            await DBManager.init();
         }
-    }
 
-    showLoader(show) {
-        this.loader.style.display = show ? 'flex' : 'none';
+        // 2. Carrega a lista de pastas já salvas
+        await this.loadFoldersList();
+
+        // 3. SELETOR DE PASTA (NOVO MÉTODO HTML5)
+        // Pegamos o input escondido que colocamos no HTML
+        const realPicker = document.getElementById('html5-picker');
+        
+        if (realPicker) {
+            realPicker.addEventListener('change', async (e) => {
+                console.log("DEBUG: Mudança detectada no seletor de arquivos.");
+                const files = e.target.files;
+                
+                if (files && files.length > 0) {
+                    // No Android 12, pegamos o nome da pasta raiz do primeiro arquivo
+                    const nomePasta = files[0].webkitRelativePath.split('/')[0] || "Pasta Selecionada";
+                    console.log("DEBUG: Pasta selecionada:", nomePasta);
+
+                    this.showLoader(true);
+                    try {
+                        const added = await DBManager.addFolder(nomePasta);
+                        if (added) {
+                            // Se o Scanner.js estiver pronto, enviamos os arquivos direto
+                            if (typeof Scanner !== 'undefined') {
+                                await Scanner.escanearArquivosDireto(files);
+                            }
+                            await this.loadFoldersList();
+                        }
+                    } catch (err) {
+                        console.error("Erro ao processar pasta:", err);
+                        alert("Erro ao processar arquivos.");
+                    } finally {
+                        this.showLoader(false);
+                        // Limpa o input para permitir selecionar a mesma pasta de novo se precisar
+                        realPicker.value = '';
+                    }
+                }
+            });
+        }
+
+        // 4. Botão de Limpar Banco
+        if (this.clearBtnEl) {
+            this.clearBtnEl.addEventListener('click', () => this.clearAll());
+        }
+
+    } catch (err) { 
+        console.error("Erro no Init:", err); 
     }
+}
 
     async loadFoldersList() {
         if (!this.foldersListEl) return;
         try {
             const folders = await DBManager.listFolders();
-            console.log("Pastas carregadas:", folders); // Debug
-            
-            this.foldersListEl.innerHTML = folders.length ? '' : '<p style="padding:10px;">Nenhuma pasta ativa</p>';
+            this.foldersListEl.innerHTML = folders.length ? '' : '<p style="padding:10px; color:#999; text-align:center;">Nenhuma pasta ativa</p>';
             
             folders.forEach(folder => {
                 const div = document.createElement('div');
                 div.className = 'folder-card';
-                div.style = "display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: #fff; margin-bottom: 5px; border-radius: 8px;";
+                div.style = "display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: #fff; margin-bottom: 8px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);";
                 
-                const pathSeguro = folder.path.replace(/\\/g, '\\\\');
+                const pathExibicao = folder.path;
+                // Escapa barras invertidas para o Windows no Desktop
+                const pathParaScript = folder.path.replace(/\\/g, '\\\\');
 
                 div.innerHTML = `
-                    <div class="folder-info" style="display:flex; align-items:center; gap:10px; overflow:hidden;">
-                        <span class="material-icons" style="color:#666">folder</span>
-                        <span class="folder-path" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.9rem;">${folder.path}</span>
+                    <div class="folder-info" style="display:flex; align-items:center; gap:10px; overflow:hidden; flex:1;">
+                        <span class="material-icons" style="color:#186879">folder</span>
+                        <span class="folder-path" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.85rem; color: #333;">${pathExibicao}</span>
                     </div>
-                    <div class="folder-actions" style="display:flex; gap:15px; margin-left:10px;">
-                        <span class="material-icons" style="color: #186879; cursor: pointer;" 
-                              onclick="ConfigApp.instance.handleRefresh('${folder._id}', '${pathSeguro}')">refresh</span>
-                        <span class="material-icons" style="color: #f44336; cursor: pointer;" 
+                    <div class="folder-actions" style="display:flex; gap:12px; margin-left:10px;">
+                        <span class="material-icons" style="color: #186879; cursor: pointer; font-size: 20px;" 
+                              onclick="ConfigApp.instance.handleRefresh('${folder._id}', '${pathParaScript}')">refresh</span>
+                        <span class="material-icons" style="color: #f44336; cursor: pointer; font-size: 20px;" 
                               onclick="ConfigApp.instance.handleDelete('${folder._id}')">delete</span>
                     </div>
                 `;
@@ -140,25 +175,29 @@
             });
         } catch (err) { 
             console.error("Erro ao listar pastas:", err); 
-            this.foldersListEl.innerHTML = "Erro ao carregar pastas.";
         }
     }
 
     async selectFolder() {
+        console.log("DEBUG: Entrou em selectFolder");
         try {
+            // Chama o Scanner (que tem a trava de segurança que te mandei)
             const path = await Scanner.abrirPicker();
+            
             if (path) {
+                console.log("DEBUG: Pasta selecionada:", path);
                 this.showLoader(true);
-                // Adiciona ao banco
                 const added = await DBManager.addFolder(path);
                 if (added) {
-                    // Escaneia
                     await Scanner.escanearPasta(path);
                     await this.loadFoldersList();
                 }
+            } else {
+                console.log("DEBUG: Picker fechado sem seleção.");
             }
         } catch (err) {
-            console.error(err);
+            console.error("DEBUG: Erro no Picker:", err);
+            alert("Erro ao selecionar pasta: " + err);
         } finally {
             this.showLoader(false);
         }
@@ -171,7 +210,7 @@
                 await Scanner.escanearPasta(path);
                 alert("Sincronização concluída!");
             } catch (err) {
-                console.error(err);
+                alert("Erro ao escanear: " + err.message);
             } finally {
                 this.showLoader(false);
                 await this.loadFoldersList();
@@ -180,18 +219,21 @@
     }
 
     async handleDelete(id) {
-        if (confirm('Remover esta pasta? Os arquivos continuarão no disco, mas sairão do app.')) {
+        if (confirm('Remover esta pasta da biblioteca?')) {
             await DBManager.deleteFolder(id);
             await this.loadFoldersList();
         }
     }
 
     async clearAll() {
-        if (confirm('ISSO APAGARÁ TODO O SEU BANCO DE DADOS. Tem certeza?')) {
+        if (confirm('ATENÇÃO: Isso apagará todos os dados salvos no App. Continuar?')) {
             this.showLoader(true);
             try {
                 await DBManager.limparBanco();
                 await this.loadFoldersList();
+                alert("Banco de dados limpo com sucesso.");
+            } catch(e) {
+                alert("Erro ao limpar: " + e.message);
             } finally {
                 this.showLoader(false);
             }
@@ -199,12 +241,19 @@
     }
 }
 
-// Inicializa a instância
-window.onload = () => {
-    ConfigApp.instance = new ConfigApp();
+// INICIALIZAÇÃO SEGURA
+const startApp = () => {
+    console.log("DEBUG: DOM/Cordova pronto. Criando instância do ConfigApp.");
+    if (!ConfigApp.instance) {
+        ConfigApp.instance = new ConfigApp();
+    }
 };
 
-   
+if (window.cordova) {
+    document.addEventListener('deviceready', startApp, false);
+} else {
+    window.onload = startApp;
+}
 </script>
 </body>
 </html>

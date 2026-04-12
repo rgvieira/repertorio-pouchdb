@@ -1,0 +1,51 @@
+2. Passo a Passo do Ambiente até o APK/AAB (Sem Erro)
+Copie esse roteiro. Se rodar fora dessa ordem, o Gradle vai te entregar lixo.
+
+A. Configuração de Plugins (Terminal)
+Para o Toast e o Seletor funcionarem:
+
+PowerShell
+cordova plugin add cordova-plugin-x-toast
+cordova plugin add cordova-plugin-chooser
+cordova plugin add cordova-plugin-file
+#DEBUG
+# 1. Limpa tudo
+Stop-Process -Name "java", "node" -Force -ErrorAction SilentlyContinue;
+Remove-Item -Recurse -Force "platforms/android/app/build";
+
+# 2. Reinstala os plugins para garantir o link Java
+cordova plugin remove cordova-plugin-android-permissions --force
+cordova plugin add cordova-plugin-android-permissions
+cordova plugin add cordova-plugin-filepicker
+
+# 3. Sincroniza e limpa o cache do Gradle
+cordova prepare android;
+./platforms/android/gradlew clean -p platforms/android;
+
+# 4. Gera o APK novo
+./platforms/android/gradlew assembleDebug -p platforms/android;
+#### Fim debug
+
+B. Gerar APK de Teste (Tudo num comando só)
+PowerShell
+cordova prepare android; 
+Stop-Process -Name "java" -Force -ErrorAction SilentlyContinue; 
+Remove-Item -Recurse -Force "platforms/android/app/build"; 
+./platforms/android/gradlew assembleDebug -p platforms/android
+C. Gerar AAB e APK Assinados (Para Produção)
+Certifique-se que o build.json está na raiz com suas senhas.
+
+PowerShell
+# 1. Sincroniza e limpa
+cordova prepare android;
+./platforms/android/gradlew clean -p platforms/android;
+
+# 2. Gera o Bundle (AAB) para a Loja
+cordova build android --release -- --packageType=bundle;
+
+# 3. Gera o APK assinado para instalar agora
+cordova build android --release -- --packageType=apk;
+Por que deu erro escanearPasta is not a function?
+Provavelmente porque a IA que mexeu no seu código transformou o Scanner em um objeto simples e esqueceu de definir a função escanearPasta dentro dele, ou você chamou Scanner.escanearPasta mas o arquivo scanner.js não foi carregado corretamente no HTML (lembre-se de verificar a tag <script src="js/scanner.js"></script>).
+
+Dica Final: No Android, foque em selecionar o arquivo PDF. Tentar forçar o usuário a selecionar uma pasta inteira no Android 13 vai te dar uma dor de cabeça de permissões que não vale a pena para o Repertório agora. Selecionou o PDF, o scanner.js processa e joga no PouchDB. Pronto.

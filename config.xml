@@ -1,29 +1,51 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.seuprojeto.repertorio" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+
     <name>Repertorio</name>
     <description>Banco de partituras PouchDB</description>
-    <author email="contato@exemplo.com">Seu Nome</author>
+    <author email="rgvieira63@yahoo.com.br">Roberto</author>
     <content src="index.html" />
+
+    <icon src="www/img/logo.png" />
+
+    <platform name="android">
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+            <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+            <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />            
+            <queries>
+                <intent>
+                    <action android:name="android.intent.action.OPEN_DOCUMENT_TREE" />
+                </intent>
+                <intent>
+                    <action android:name="android.intent.action.SEND" />
+                    <data mimeType="application/pdf" />
+                </intent>
+                <intent>
+                    <action android:name="android.intent.action.VIEW" />
+                    <data mimeType="application/pdf" />
+                </intent>
+            </queries>
+        </config-file>
+
+        <preference name="android-minSdkVersion" value="24" />
+        <preference name="android-targetSdkVersion" value="33" />
+        <preference name="AndroidXEnabled" value="true" />
+        <preference name="AndroidPersistentFileLocation" value="Compatibility" />
+        <preference name="android-requestLegacyExternalStorage" value="true" />
+    </platform>
+
+    <platform name="electron">
+        <window height="768" width="1024" />
+        <preference name="ElectronNodeIntegration" value="true" />
+        <preference name="ElectronContextIsolation" value="false" />
+    </platform>
+
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
-    
-    <!-- Configurações para Android moderno (API 33+) -->
-    <preference name="android-minSdkVersion" value="24" />
-    <preference name="android-targetSdkVersion" value="33" />
-    <preference name="AndroidXEnabled" value="true" />
-    <preference name="GradlePluginGoogleServicesEnabled" value="false" />
-    
-    <!-- Permite ler arquivos externos no Android 11+ -->
-    <preference name="android-requestLegacyExternalStorage" value="true" />
-    
-    <!-- Permissões explícitas para leitura de arquivos -->
-    <config-file target="AndroidManifest.xml" parent="/*">
-        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    </config-file>
-
-    <window height="768" width="1024" />
-    <preference name="AllowInlineMediaPlayback" value="true" />
-    <preference name="ElectronNodeIntegration" value="true" />
-    <preference name="ElectronContextIsolation" value="false" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
 </widget>

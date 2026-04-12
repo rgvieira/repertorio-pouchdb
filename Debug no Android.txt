@@ -1,0 +1,60 @@
+Como você já instalou o app com sucesso e o computador reconhece o dispositivo (`adb devices` deu OK), o caminho agora é abrir as "entranhas" do código pelo Chrome. 
+
+Aqui está o roteiro definitivo para você debugar o seu **Repertório PouchDB**:
+
+### 1. No Computador (Preparação do Navegador)
+1.  Abra o **Google Chrome**.
+2.  Na barra de endereços, digite: `chrome://inspect/#devices` e aperte Enter.
+3.  Certifique-se de que a caixa **"Discover USB devices"** esteja marcada.
+
+### 2. No Celular (O toque final)
+1.  Conecte o celular ao PC via cabo USB (preferencialmente o cabo original).
+2.  Abra o app **Repertório** que você acabou de instalar.
+3.  Mantenha a tela do celular acesa.
+
+---
+
+### 3. A Janela de Debug
+1.  No Chrome (no PC), você deverá ver o nome do seu celular (ex: `b6fd1f9e`) e, logo abaixo dele, o título do seu app: **"Repertorio"** ou o endereço **"index.html"**.
+2.  Clique no link azul **"inspect"**.
+    * *Se abrir uma janela branca ou vazia, feche o app no celular e abra-o novamente com a janela do Chrome já aberta.*
+
+### 4. Analisando o Código (Aba Console)
+Uma nova janela vai abrir com a tela do seu celular espelhada à esquerda e as ferramentas de desenvolvedor à direita.
+1.  Clique na aba **Console** (no topo da janela de inspeção).
+2.  Aqui você verá todos os erros em **vermelho**.
+3.  Vá no celular, clique em "Escanear Pasta" e olhe para o Console no PC.
+
+---
+
+### O que procurar no Console (Checklist de Erros):
+
+| Se você vir este erro: | Significa que... |
+| :--- | :--- |
+| `Uncaught ReferenceError: Scanner is not defined` | O arquivo `js/scanner.js` não foi carregado. Verifique se o caminho no HTML está correto. |
+| `DEBUG: Timeout! Plugins não carregaram...` | O Cordova não inicializou os plugins. Tente reiniciar o app. |
+| `Permission denied` ou `Security Error` | O Android 12+ barrou o acesso. Precisamos revisar as permissões no `scanner.js`. |
+| `pouchdb is not defined` | O arquivo `pouchdb.min.js` está faltando ou com caminho errado. |
+
+---
+
+### Dica: Teste Manual pelo Console
+Você pode "conversar" com o seu app. Digite no Console do Chrome (lá no PC) e dê Enter:
+
+```javascript
+// Para saber se o objeto Scanner existe:
+console.log(Scanner);
+
+// Para testar o banco de dados:
+db.info().then(info => console.log("Banco OK:", info));
+```
+
+### Se o app não aparecer no Chrome:
+* **Troque o cabo USB:** Teste com outro cabo de dados.
+* **Revise o Celular:** Vá em *Opções do Desenvolvedor* e veja se a opção **"Depuração USB"** ainda está ativa (alguns celulares desativam sozinhos ao desconectar).
+* **Reinicie o ADB:** No seu terminal do PC, digite:
+    `adb kill-server`
+    `adb start-server`
+    `adb devices`
+
+**O app apareceu na lista do Chrome agora?** Se sim, clica em "inspect" e me diz qual é a primeira mensagem de erro que aparece no Console!
