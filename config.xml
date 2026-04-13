@@ -1,7 +1,21 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.seuprojeto.repertorio" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<widget id="com.seuprojeto.repertorio" version="1.0.0"
+    xmlns="http://www.w3.org/ns/widgets"
+    xmlns:cdv="http://cordova.apache.org/ns/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+<hook src="hooks/after_prepare/add_tools_namespace_to_manifest.js" type="after_prepare" />
+
+        <!-- ADICIONA ISTO AGORA -->
+    <feature name="FolderPicker">
+        <param name="android-package" value="br.seuapp.plugins.FolderPickerPlugin"/>
+    </feature>
+
+    <hook src="hooks/after_prepare/add_tools_namespace_to_manifest.js" type="after_prepare" />
 
     <name>Repertorio</name>
+
     <description>Banco de partituras PouchDB</description>
     <author email="rgvieira63@yahoo.com.br">Roberto</author>
     <content src="index.html" />
@@ -10,11 +24,15 @@
 
     <platform name="android">
         <config-file target="AndroidManifest.xml" parent="/*">
+            <!-- Permissões de acesso a arquivos -->
             <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            
             <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
             <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-            <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />            
+            <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+
+            <!-- Intents necessários para SAF e PDFs -->
             <queries>
                 <intent>
                     <action android:name="android.intent.action.OPEN_DOCUMENT_TREE" />
@@ -30,6 +48,7 @@
             </queries>
         </config-file>
 
+        <!-- Preferências da plataforma Android -->
         <preference name="android-minSdkVersion" value="24" />
         <preference name="android-targetSdkVersion" value="33" />
         <preference name="AndroidXEnabled" value="true" />
@@ -43,6 +62,7 @@
         <preference name="ElectronContextIsolation" value="false" />
     </platform>
 
+    <!-- Acessos permitidos -->
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />

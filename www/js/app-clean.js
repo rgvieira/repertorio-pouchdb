@@ -270,12 +270,15 @@ window.ConfigApp = {
 
 // Init
 document.addEventListener("DOMContentLoaded", async () => {
-  window.app = new RepertorioApp();
-  window.app.init();
-window.ConfigApp = window.ConfigApp || ConfigApp;
-  window.ConfigApp.loadPastas = function() { loadPastas(); };
+  if (!window.app) {
+    window.app = new RepertorioApp();
+    await window.app.init();
+  }
+
+  // Fix: Ensure ConfigApp is available and prevent ReferenceError on loadPastas
+  window.ConfigApp = window.ConfigApp || {};
+  
   if (document.getElementById("selecionar-pasta")) {
     document.getElementById("selecionar-pasta").addEventListener("click", ConfigApp.adicionarPasta);
   }
-// ConfigApp.loadPastas();
 });

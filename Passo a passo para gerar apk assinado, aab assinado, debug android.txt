@@ -1,0 +1,324 @@
+Vou criar um passo a passo completo e bem documentado para:
+
+1. Gerar **APK assinado (release)**
+2. Gerar **AAB assinado** (para Google Play)
+3. Gerar **APK debug** e transferir para o Android via USB
+
+Como você já tem `build.json` com as configurações de preload/main build config, vou usar ele nas assinaturas.
+
+***
+
+# Passo a passo completo: gerar APK e AAB assinados no Cordova Android
+
+## Pré-requisos
+
+1. **Android SDK** instalado e configurado:
+   - `ANDROID_HOME=C:\Users\rgvie\AppData\Local\Android\Sdk`
+   - Build Tools 34.0.0 instalado (já confirmado)
+
+2. **Java JDK** instalado (recomendado JDK 17 ou 11):
+   ```powershell
+   java -version
+   ```
+
+3. **Cordova**:
+   ```powershell
+   npx cordova -v
+   ```
+
+4. **Arquivo `build.json`** já existente na raiz do projeto com as chaves de assinatura (você mencionou que já tem).
+
+5. **Dispositivo Android** conectado via USB com **depuração USB ativada** (para instalar APK debug).
+
+***
+
+## 1. Criar ou confirmar o keystore para assinatura release
+
+Se você ainda **não tem keystore**, crie um:
+
+```powershell
+cd D:\workspace\repertorio-pouchdb
+
+keytool -genkey -v `
+  -keystore repertorio-release.keystore `
+  -alias repertorio-key `
+  -keyalg RSA `
+  -keysize 2048 `
+  -validity 10000 `
+  -storepass sua_senha_akeystore `
+  -keypass sua_senha_chave `
+  -dname "CN=Roberto, OU=Dev, O=SeuProjeto, L=Serra, ST=ES, C=BR"
+```
+
+Substitua:
+- `repertorio-release.keystore` pelo nome desejado
+- `repertorio-key` pelo alias desejado
+- senhas e informações do `dname` conforme seu caso
+
+**Guarde bem:**
+- Caminho do keystore
+- Alias
+- Senha do keystore
+- Senha da chave
+
+Posicione o arquivo `.keystore` na raiz do projeto, por exemplo:
+
+```text
+D:\workspace\repertorio-pouchdb\repertorio-release.keystore
+```
+
+***
+
+## 2. Configurar `build.json` para release e debug
+
+Na raiz do projeto (`D:\workspace\repertorio-pouchdb\build.json`), o arquivo deve conter algo como:
+
+```json
+{
+  "android": {
+    "debug": {
+      "keystore": "repertorio-release.keystore",
+      "storePassword": "sua_senha_akeystore",
+      "alias": "repertorio-key",
+      "password": "sua_senha_chave",
+      "_keystorePasswordEnv": "ANDROID_KEYSTORE_PASSWORD",
+      "_keyPasswordEnv": "ANDROID_KEY_PASSWORD"
+    },
+    "release": {
+      "keystore": "repertorio-release.keystore",
+      "storePassword": "sua_senha_akeystore",
+      "alias": "repertorio-key",
+      "password": "sua_senha_chave"
+    }
+  }
+}
+```
+
+Se você já tem um `build.json` com `preload/main build config`, adapte mantendo as seções `debug` e `release`.
+
+> **Importante:**  
+> - Não versione o `build.json` com senhas no Git (adicione ao `.gitignore`).
+> - Para maior segurança, use variáveis de ambiente em vez de senhas no arquivo.
+
+***
+
+## 3. Gerar APK debug assinado
+
+### 3.1. Construir APK debug
+
+```powershell
+cd D:\workspace\repertorio-pouchdb
+
+npx cordova clean
+npx cordova build android --debug --buildConfig=build.json
+```
+
+O APK debug será gerado em:
+
+```text
+platforms\android\app\build\outputs\apk\debug\app-debug.apk
+```
+
+Se você passar `--debug` e configuração de assinatura, o Cordova vai assinar com a chave definida em `debug` do `build.json`.
+
+Algumas versões do Cordova Android geram `*-debug.apk` já assinado se configurado.
+
+Se quiser garantir assinatura manual depois, pode gerar sem assinatura e assinar com `apksigner`, mas normalmente o Cordova já faz isso.
+
+***
+
+## 4. Instalar APK debug no dispositivo Android via USB
+
+### 4.1. Ativar depuração USB no Android
+
+No celular:
+
+1. Acesse **Ajustes** → **Sobre o dispositivo**
+2. Toque 7 vezes em **Número da versão** para ativar **Opções de desenvolvedor**
+3. Volte: **Ajustes** → **Sistema** → **Opções de desenvolvedor**
+4. Ative **Depuração USB**
+
+### 4.2. Conectar o celular ao PC
+
+- Conecte via USB
+- No celular, aparecendo a pergunta, **permita** a depuração USB para esse PC
+
+### 4.3. Verificar se o ADB vê o dispositivo
+
+```powershell
+adb devices
+```
+
+Deve aparecer algo como:
+
+```text
+List of devices attached
+ABC12345    device
+```
+
+Se aparecer `unauthorized`, aceite no celular.
+
+***
+
+### 4.4. Instalar o APK debug no dispositivo
+
+```powershell
+adb install -r "platforms\android\app\build\outputs\apk\debug\app-debug.apk"
+```
+
+- `-r` instala substituindo se já existir.
+
+Após instalar, o app deve aparecer na lista de aplicativos do celular com o nome definido no `config.xml` (`<name>Repertorio</name>`).
+
+***
+
+## 5. Gerar APK release assinado (APK tradicional)
+
+### 5.1. Construir APK release
+
+```powershell
+cd D:\workspace\repertorio-pouchdb
+
+npx cordova clean
+npx cordova build android --release --buildConfig=build.json
+```
+
+O APK release assinado será gerado em:
+
+```text
+platforms\android\app\build\outputs\apk\release\app-release.apk
+```
+
+(Às vezes o nome pode ser `app-release-unsigned.apk` e o Cordova assina automaticamente, gerando `app-release.apk` já assinado.)
+
+### 5.2. Confirmar assinatura (opcional)
+
+```powershell
+cd "D:\workspace\repertorio-pouchdb\platforms\android\app\build\outputs\apk\release"
+
+apksigner verify --verbose app-release.apk
+```
+
+Se estiver assinado corretamente, não mostrará erros.
+
+***
+
+## 6. Gerar AAB assinado (Android App Bundle) para Google Play
+
+### 6.1. Verificar se o Cordova suporta `--bundle`
+
+Versões modernas do Cordova Android suportam gerar AAB via `--bundle`.
+
+```powershell
+cd D:\workspace\repertorio-pouchdb
+
+npx cordova build android --release --bundle --buildConfig=build.json
+```
+
+O AAB assinado será gerado em:
+
+```text
+platforms\android\app\build\outputs\bundle\release\app-release.aab
+```
+
+Se o comando `--bundle` não for reconhecido, pode ser necessário:
+- Atualizar o Cordova Android platform:
+
+  ```powershell
+  npx cordova platform rm android
+  npx cordova platform add android@latest
+  ```
+
+- Ou usar `gradle` diretamente (veja item 6.3).
+
+***
+
+### 6.2. Confirmar assinatura do AAB
+
+```powershell
+cd "D:\workspace\repertorio-pouchdb\platforms\android\app\build\outputs\bundle\release"
+
+apksigner verify --verbose app-release.aab
+```
+
+Se voltar sem erro, o AAB está assinado corretamente.
+
+***
+
+### 6.3. Alternativa: gerar AAB via Gradle diretamente
+
+Se o Cordova não gerar AAB automaticamente:
+
+```powershell
+cd D:\workspace\repertorio-pouchdb\platforms\android
+
+.\gradlew.bat clean
+.\gradlew.bat bundleRelease
+```
+
+Isso gera:
+
+```text
+app\build\outputs\bundle\release\app-release.aab
+```
+
+Se precisar assinar manualmente, configure o `build.gradle` com as informações do keystore ou use `apksigner` para assinar.
+
+Geralmente, se o `build.json` está configurado, o Cordova já prepara o Gradle para assinar automaticamente o bundle.
+
+***
+
+## 7. Resumo dos outputs gerados
+
+Depois de rodar os comandos, você terá:
+
+- **APK debug** (para testes):
+
+  ```text
+  platforms\android\app\build\outputs\apk\debug\app-debug.apk
+  ```
+
+- **APK release assinado** (sideloading, lojas alternativas):
+
+  ```text
+  platforms\android\app\build\outputs\apk\release\app-release.apk
+  ```
+
+- **AAB release assinado** (para Google Play):
+
+  ```text
+  platforms\android\app\build\outputs\bundle\release\app-release.aab
+  ```
+
+***
+
+## 8. Transferir APK para Android via USB (se不想 instalar pelo ADB)
+
+Se preferir transferir o arquivo manualmente:
+
+1. Conecte o celular via USB
+2. Escolha **Transferência de arquivos / MTP**
+3. No PC, copie o APK para o celular:
+
+   ```text
+   platforms\android\app\build\outputs\apk\debug\app-debug.apk
+   ```
+
+   para, por exemplo:
+
+   ```text
+   Downloads\app-debug.apk
+   ```
+
+4. No celular, use um gerenciador de arquivos, vá em `Downloads`, toque no APK e instale.
+   - No primeiro caso, o Android pedirá permissão para instalar apps de fontes desconhecidas.
+
+***
+
+Se quiser, posso gerar um script `.ps1` (PowerShell) que:
+- Gera APK debug
+- Gera APK release
+- Gera AAB
+- Instala o debug no dispositivo via USB
+
+comando único para tudo. Deseja esse script?

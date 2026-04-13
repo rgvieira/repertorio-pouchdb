@@ -1,0 +1,116 @@
+﻿> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugBuildConfig
+> Task :CordovaLib:preBuild UP-TO-DATE
+> Task :CordovaLib:preDebugBuild UP-TO-DATE
+> Task :app:javaPreCompileDebug
+> Task :app:generateDebugResValues
+> Task :CordovaLib:generateDebugResValues
+> Task :CordovaLib:writeDebugAarMetadata
+> Task :CordovaLib:generateDebugResources
+> Task :app:checkDebugAarMetadata
+> Task :CordovaLib:packageDebugResources
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+> Task :app:packageDebugResources
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :CordovaLib:extractDeepLinksDebug
+> Task :app:parseDebugLocalResources
+> Task :CordovaLib:processDebugManifest
+> Task :CordovaLib:compileDebugLibraryResources
+> Task :app:mergeDebugResources
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :CordovaLib:javaPreCompileDebug
+> Task :app:processDebugManifestForPackage
+> Task :CordovaLib:parseDebugLocalResources
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :CordovaLib:mergeDebugShaders
+> Task :CordovaLib:compileDebugShaders NO-SOURCE
+> Task :CordovaLib:generateDebugAssets UP-TO-DATE
+> Task :CordovaLib:packageDebugAssets
+> Task :CordovaLib:generateDebugRFile
+> Task :app:mergeDebugAssets
+> Task :app:processDebugResources
+
+> Task :CordovaLib:compileDebugJavaWithJavac
+gradlew.bat : Note: Some input files use or override a deprecated API.
+No linha:4 caractere:1
++ & "D:\workspace\repertorio-pouchdb\platforms\android\tools\gradlew.ba ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Note: Some inpu...deprecated API.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:processDebugJavaRes NO-SOURCE
+> Task :CordovaLib:bundleLibCompileToJarDebug
+> Task :app:compressDebugAssets
+> Task :CordovaLib:processDebugJavaRes
+
+> Task :app:compileDebugJavaWithJavac
+D:\workspace\repertorio-pouchdb\platforms\android\app\src\main\java\br\seuapp\plugins\FolderPickerPlugin.java:39: 
+error: unmappable character (0xE3) for encoding UTF-8
+            callbackContext.error("N∩┐╜o ∩┐╜ poss∩┐╜vel abrir o seletor de pasta: " + e.getMessage());
+                                    ^
+D:\workspace\repertorio-pouchdb\platforms\android\app\src\main\java\br\seuapp\plugins\FolderPickerPlugin.java:39: 
+error: unmappable character (0xE9) for encoding UTF-8
+            callbackContext.error("N∩┐╜o ∩┐╜ poss∩┐╜vel abrir o seletor de pasta: " + e.getMessage());
+                                       ^
+D:\workspace\repertorio-pouchdb\platforms\android\app\src\main\java\br\seuapp\plugins\FolderPickerPlugin.java:39: 
+error: unmappable character (0xED) for encoding UTF-8
+            callbackContext.error("N∩┐╜o ∩┐╜ poss∩┐╜vel abrir o seletor de pasta: " + e.getMessage());
+                                             ^
+D:\workspace\repertorio-pouchdb\platforms\android\app\src\main\java\br\seuapp\plugins\FolderPickerPlugin.java:62: 
+error: unmappable character (0xE9) for encoding UTF-8
+                    callbackContext.error("URI da pasta ∩┐╜ nulo");
+                                                        ^
+D:\workspace\repertorio-pouchdb\platforms\android\app\src\main\java\br\seuapp\plugins\FolderPickerPlugin.java:65: 
+error: unmappable character (0xE1) for encoding UTF-8
+                callbackContext.error("Usu∩┐╜rio cancelou ou erro ao escolher pasta");
+                                          ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: D:\workspace\repertorio-pouchdb\platforms\android\app\src\main\java\org\apache\cordova\file\AssetFilesystem.java 
+uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :app:desugarDebugFileDependencies
+> Task :app:checkDebugDuplicateClasses
+> Task :CordovaLib:bundleLibRuntimeToDirDebug
+> Task :app:mergeDebugJavaResource
+> Task :app:dexBuilderDebug
+> Task :app:mergeDebugJniLibFolders
+> Task :CordovaLib:mergeDebugJniLibFolders
+> Task :CordovaLib:mergeDebugNativeLibs NO-SOURCE
+> Task :CordovaLib:copyDebugJniLibsProjectOnly
+> Task :app:validateSigningDebug
+> Task :app:mergeLibDexDebug
+> Task :app:mergeProjectDexDebug
+> Task :app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:stripDebugDebugSymbols NO-SOURCE
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+> Task :CordovaLib:stripDebugDebugSymbols NO-SOURCE
+> Task :CordovaLib:copyDebugJniLibsProjectAndLocalJars
+> Task :app:mergeExtDexDebug
+> Task :CordovaLib:extractDebugAnnotations
+> Task :CordovaLib:extractDeepLinksForAarDebug
+> Task :CordovaLib:mergeDebugGeneratedProguardFiles
+> Task :CordovaLib:mergeDebugConsumerProguardFiles
+> Task :CordovaLib:prepareDebugArtProfile
+> Task :CordovaLib:prepareLintJarForPublish
+> Task :CordovaLib:mergeDebugJavaResource
+> Task :CordovaLib:syncDebugLibJars
+> Task :CordovaLib:bundleDebugAar
+> Task :CordovaLib:assembleDebug
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+
+BUILD SUCCESSFUL in 1m 4s
+60 actionable tasks: 60 executed

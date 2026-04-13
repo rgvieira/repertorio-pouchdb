@@ -105,6 +105,48 @@ async function onDeviceReady() {
         if (busca) busca.addEventListener('input', carregarMusicas);
         if (selecao) selecao.addEventListener('change', carregarMusicas);
         
+        // Lógica do botão de teste do FolderPicker (exclusivo da config.html)
+        const btnTestar = document.getElementById('btnTestarFolderPicker');
+        if (btnTestar && typeof Scanner !== 'undefined') {
+            btnTestar.addEventListener('click', async () => {
+                console.log("App: Testando FolderPicker...");
+                const resDiv = document.getElementById('testeResultado');
+                
+                if (resDiv) {
+                    resDiv.style.display = 'block';
+                    resDiv.style.background = '#f0f0f0';
+                    resDiv.style.color = '#333';
+                    resDiv.innerText = "Aguardando seleção do usuário...";
+                }
+
+                try {
+                    // Scanner.abrirPicker lida com Electron ou Android automaticamente
+                    const path = await Scanner.abrirPicker();
+                    
+                    if (path) {
+                        if (resDiv) {
+                            resDiv.style.background = '#d4edda';
+                            resDiv.style.color = '#155724';
+                            resDiv.innerText = "Sucesso! Pasta selecionada:\n" + path;
+                        }
+                    } else {
+                        if (resDiv) {
+                            resDiv.style.background = '#fff3cd';
+                            resDiv.style.color = '#856404';
+                            resDiv.innerText = "Seleção cancelada ou nenhum caminho retornado.";
+                        }
+                    }
+                } catch (err) {
+                    console.error("Erro no teste do FolderPicker:", err);
+                    if (resDiv) {
+                        resDiv.style.background = '#f8d7da';
+                        resDiv.style.color = '#721c24';
+                        resDiv.innerText = "Erro: " + err.message;
+                    }
+                }
+            });
+        }
+        
     } catch (error) {
         console.error("Erro na inicialização:", error);
     }

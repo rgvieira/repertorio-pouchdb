@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="cordova-plugin-folder-picker"
+        version="1.0.0">
+    
+    <name>FolderPicker</name>
+    <description>Folder Picker via SAF (Storage Access Framework) para Android</description>
+    <license>MIT</license>
+    <author>Roberto</author>
+    
+    <!-- Módulo JavaScript -->
+    <js-module src="www/folderpicker.js" name="folderpicker">
+        <clobbers target="cordova.plugins.FolderPicker"/>
+    </js-module>
+    
+    <!-- Plataforma Android -->
+    <platform name="android">
+        <!-- Registro do feature no config.xml -->
+        <config-file parent="/*" target="config.xml">
+            <feature name="FolderPicker">
+                <param name="android-package" value="br.seuapp.plugins.FolderPickerPlugin"/>
+            </feature>
+        </config-file>
+        
+        <!-- Cópia do arquivo Java -->
+        <source-file src="src/android/FolderPickerPlugin.java" 
+                     target-dir="src/br/seuapp/plugins"/>
+    </platform>
+</plugin>

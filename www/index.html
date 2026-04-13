@@ -165,7 +165,7 @@ td {
     white-space: nowrap;
     z-index: 1002;
 }
-    </style>
+        </style>
 </head>
 <body>
 
@@ -175,22 +175,27 @@ td {
             <span>Biblioteca</span>
         </div>
         
-<div class="fab-container">
-    <button class="fab-trigger" onclick="toggleFabMenu()">
-        <span class="material-icons">add</span>
-    </button>
-    <div class="fab-menu" id="fab-menu">
-        <a href="config.html" title="Config">
-            <span class="material-icons" style="color: var(--primary);">settings</span>
-        </a>
-        <a href="repertorio.html" title="Repertórios">
-            <span class="material-icons" style="color: #fbc02d;">format_list_bulleted</span>
-        </a>
-    </div>
-</div>
+        <div class="fab-container">
+            <button class="fab-trigger" onclick="toggleFabMenu()">
+                <span class="material-icons">add</span>
+            </button>
+            <div class="fab-menu" id="fab-menu">
+                <a href="config.html" title="Config">
+                    <span class="material-icons" style="color: var(--primary);">settings</span>
+                </a>
+                <a href="repertorio.html" title="Repertórios">
+                    <span class="material-icons" style="color: #fbc02d;">format_list_bulleted</span>
+                </a>
+            </div>
+        </div>
     </div>
 
     <main style="max-width: 900px; margin: 0 auto; padding: 16px;">
+        <!-- BOTÃO DE TESTE -->
+        <button id="btnTestarFolderPicker" style="margin: 10px 0; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px;">
+            🧪 TESTAR FOLDERPICKER
+        </button>
+        <div id="testeResultado" style="margin: 10px 0; padding: 10px; display: none;"></div>  
         <div class="search-filter-container" style="display: flex; gap: 10px; margin-bottom: 16px;">
             <input class="search-input" id="busca" placeholder="Buscar música..." type="text" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
             <select id="genero-select" style="padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
@@ -221,14 +226,49 @@ td {
         <button onclick="document.getElementById('modal-favoritos').style.display='none'" style="margin-top:15px; width:100%; padding:10px; border:none; background:#eee; border-radius:8px;">Cancelar</button>
     </div>
 </div>
-<script src="cordova.js"></script>
+       <script src="cordova.js"></script>
+        
+        <!-- INJEÇÃO MANUAL DO FOLDERPICKER (depois de cordova.js) -->
+  <script>
+// FORÇA REGISTRO DO FOLDERPICKER
+(function() {
+    if (!window.cordova) return;
+    
+    // Cria namespace se não existe
+    if (!cordova.plugins) {
+        cordova.plugins = {};
+    }
+    
+    // Se FolderPicker já existe, pula
+    if (cordova.plugins.FolderPicker) {
+        console.log('FolderPicker já cadastrado');
+        return;
+    }
+    
+    // Cria o objeto FolderPicker que chama exec direto
+    cordova.plugins.FolderPicker = {
+        openFolderPicker: function(success, error) {
+            cordova.exec(
+                success, 
+                error, 
+                'FolderPicker',      // Nome do feature no Android
+                'openFolderPicker',  // Método no Java
+                []
+            );
+        }
+    };
+    
+    console.log('✅ FolderPicker forçado via cordova.plugins.FolderPicker');
+})();
+</script>
+        
+        <script src="js/pouchdb.min.js"></script>
+        <script src="js/pouchdb.find.min.js"></script>
+        <script src="js/database.js"></script>
+        <script src="js/scanner.js"></script>
+        <script src="js/app.js"></script>
 
-    <script src="js/pouchdb.min.js"></script>
-    <script src="js/pouchdb.find.min.js"></script>
-    <script src="js/database.js"></script>
-    <script src="js/app.js"></script>
-
-    <script>
+        <script>
         function toggleFabMenu() {
             const menu = document.getElementById('fab-menu');
             const isVisible = menu.style.display === 'block';
@@ -245,10 +285,12 @@ td {
                 }, 10);
             }
         }
-
+        
         function fecharModal() {
             document.getElementById('modal-favoritos').style.display = 'none';
         }
-    </script>
+        </script>
+    </main>
+
 </body>
 </html>

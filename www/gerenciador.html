@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerador de Scripts</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #222; color: #eee; padding: 20px; }
+    h1 { color: #0f0; }
+    button {
+      display: block;
+      margin: 10px 0;
+      padding: 10px 20px;
+      background: #333;
+      color: #0f0;
+      border: 1px solid #0f0;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover { background: #444; }
+    pre { background: #111; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Executar Scripts PowerShell</h1>
+
+  <button onclick="executar('add_wrapper.ps1')">add_wrapper.ps1</button>
+  <button onclick="executar('build-debug.ps1')">build-debug.ps1</button>
+  <button onclick="executar('build-release-aab.ps1')">build-release-aab.ps1</button>
+  <button onclick="executar('build-release-apk.ps1')">build-release-apk.ps1</button>
+  <button onclick="executar('clear.ps1')">clear.ps1</button>
+  <button onclick="executar('Como utilizar .ps1')">Como utilizar .ps1</button>
+  <button onclick="executar('createPlugin.ps1')">createPlugin.ps1</button>
+  <button onclick="executar('full_install.ps1')">full_install.ps1</button>
+  <button onclick="executar('install-debug.ps1')">install-debug.ps1</button>
+  <button onclick="executar('install_plugin.ps1')">install_plugin.ps1</button>
+
+  <h2>Saída:</h2>
+  <pre id="saida">Clique em um botão para executar o script...</pre>
+
+  <script>
+    function executar(script) {
+      // Aqui você precisa de backend ou Node/Electron para rodar PowerShell
+      // No navegador puro não dá para executar .ps1 diretamente
+      document.getElementById('saida').textContent =
+        "Executando: " + script + "\n\n" +
+        "Use o comando:\n" +
+        "powershell -ExecutionPolicy Bypass -File " + script;
+    }
+  </script>
+</body>
+</html>

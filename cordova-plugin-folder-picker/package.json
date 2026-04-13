@@ -1,0 +1,17 @@
+{
+  "name": "cordova-plugin-folder-picker",
+  "version": "1.0.0",
+  "description": "Folder Picker via SAF para Android",
+  "cordova": {
+    "id": "cordova-plugin-folder-picker",
+    "platforms": ["android"]
+  },
+  "keywords": [
+    "cordova",
+    "folder",
+    "picker",
+    "android"
+  ],
+  "author": "Roberto",
+  "license": "MIT"
+}

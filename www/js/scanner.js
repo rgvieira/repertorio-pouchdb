@@ -1,154 +1,245 @@
 /**
- * scanner.js - Versão RASTREÁVEL (Logs em tempo real)
+ * js/scanner.js - Versão Definitiva Híbrida
+ * Suporta Electron (Zorin OS) e Cordova (Android)
  */
-const Scanner = {
-    sistemaPronto: false,
 
-    async esperarProntidao() {
-        console.log("DEBUG: Iniciando esperarProntidao...");
-        return new Promise((resolve) => {
-            if (window.electronAPI) {
-                console.log("DEBUG: Ambiente Electron detectado.");
-                this.sistemaPronto = true;
-                return resolve();
-            }
+/**
+ * js/folderpicker.js - O Seletor de Pastas para Android
+ */
+const FolderPicker = {
+    raiz: "cdvfile://localhost/sdcard/",
+    caminhoAtual: "cdvfile://localhost/sdcard/",
+    callback: null,
 
-            let tentativas = 0;
-const checar = () => {
-    tentativas++;
-    console.log(`DEBUG: Tentativa ${tentativas} de encontrar plugins...`);
-    
-    // Procura o plugin de permissões em múltiplos locais possíveis
-    const permissions = window.plugins?.permissions || window.cordova?.plugins?.permissions;
-    
-    // Procura o FilePicker (ele pode estar no window ou dentro de plugins)
-    const hasPicker = !!(window.FilePicker || window.plugins?.filePicker || window.cordova?.plugins?.filePicker);
+    abrir(cb) {
+        this.callback = cb;
+        const modal = document.getElementById('modalPicker');
+        if (modal) modal.style.display = 'block';
+        this.navegar(this.raiz);
+    },
 
-    if (permissions && hasPicker) {
-        console.log("DEBUG: Plugins Permissions e Picker detectados!");
-        this.sistemaPronto = true;
-        resolve();
-    } else if (tentativas > 30) { // Aumentei para 30 tentativas (6 segundos)
-        console.error("DEBUG: Timeout! Plugins essenciais não encontrados.");
-        resolve(); 
-    } else {
-        setTimeout(checar, 200);
+    navegar(path) {
+        this.caminhoAtual = path;
+        const label = document.getElementById('currentPathLabel');
+        if (label) label.innerText = path.replace("cdvfile://localhost/sdcard/", "/armazenamento/");
+        
+        const lista = document.getElementById('listaPastas');
+        lista.innerHTML = "<p style='padding:15px; color:#fff;'>Lendo diretório...</p>";
+
+        window.resolveLocalFileSystemURL(path, (dirEntry) => {
+            const reader = dirEntry.createReader();
+            reader.readEntries((entries) => {
+                lista.innerHTML = "";
+                const pastas = entries
+                    .filter(e => e.isDirectory && !e.name.startsWith('.'))
+                    .sort((a, b) => a.name.localeCompare(b.name));
+
+                pastas.forEach(p => {
+                    const item = document.createElement('div');
+                    item.style = "padding:16px; border-bottom:1px solid #2c3e50; cursor:pointer; display:flex; align-items:center; color:white;";
+                    item.innerHTML = `<span class="material-icons" style="margin-right:12px; color:#f39c12;">folder</span> <span>${p.name}</span>`;
+                    item.onclick = () => this.navegar(p.nativeURL);
+                    lista.appendChild(item);
+                });
+            }, (err) => { alert("Erro ao ler pastas: " + err.code); });
+        }, (err) => { alert("Erro ao acessar: " + err.code); });
+    },
+
+    voltar() {
+        if (this.caminhoAtual === this.raiz) return;
+        let temp = this.caminhoAtual.replace(/\/$/, ""); 
+        let novoPath = temp.substring(0, temp.lastIndexOf("/") + 1);
+        if (novoPath.includes("sdcard")) this.navegar(novoPath);
+    },
+
+    confirmar() { 
+        if (this.callback) this.callback(this.caminhoAtual); 
+        this.fechar(); 
+    },
+
+    fechar() { 
+        const modal = document.getElementById('modalPicker');
+        if (modal) modal.style.display = 'none'; 
     }
 };
-            checar();
+
+window.FolderPicker = FolderPicker;
+
+/**
+ * Busca todas as pastas configuradas no banco e inicia a varredura nelas
+ */
+async function iniciarVarreduraGeral() {
+    console.log("Iniciando varredura em todas as pastas vinculadas...");
+    
+    try {
+        // 1. Pega a lista de pastas que você salvou via addFolder
+        const pastasVinculadas = await DBManager.listFolders();
+        
+        if (pastasVinculadas.length === 0) {
+            console.warn("Nenhuma pasta vinculada para escanear.");
+            if (window.showToast) window.showToast("Nenhuma pasta configurada", "warning");
+            return;
+        }
+
+        // 2. Para cada pasta, executa o motor de varredura
+        for (const pastaDoc of pastasVinculadas) {
+            console.log("Escaneando diretório: " + pastaDoc.path);
+            await Scanner.escanearPasta(pastaDoc.path);
+        }
+
+        console.log("✅ Varredura geral concluída.");
+        
+    } catch (err) {
+        console.error("Erro na varredura geral:", err);
+    }
+}
+
+// Expõe para o window para você chamar no botão "Sincronizar"
+window.iniciarVarreduraGeral = iniciarVarreduraGeral;
+
+const Scanner = {
+    /**
+     * Escolhe o diretório inicial dependendo da plataforma
+     */
+    
+    async abrirPicker() {
+        if (window.nodeRequire) {
+            // AMBIENTE DESKTOP (Electron)
+            const { remote } = window.nodeRequire('electron');
+            const res = await remote.dialog.showOpenDialog({ 
+                properties: ['openDirectory'] 
+            });
+            return res.canceled ? null : res.filePaths[0];
+        } else {
+            // AMBIENTE MOBILE (Android)
+            return new Promise(res => {
+                if (typeof FolderPicker !== 'undefined') {
+                    FolderPicker.abrir(path => res(path));
+                } else {
+                    console.error("Erro: FolderPicker não definido no HTML.");
+                    res(null);
+                }
+            });
+        }
+    },
+
+    /**
+     * Motor principal de varredura
+     */
+    async escanearPasta(diretorioAlvo) {
+        if (!diretorioAlvo) return;
+        console.log("Scanner: Iniciando varredura em " + diretorioAlvo);
+
+        if (window.nodeRequire) {
+            // Lógica para Zorin OS (Node.js FS)
+            const fs = window.nodeRequire('fs');
+            const path = window.nodeRequire('path');
+            await this.walkDesktop(diretorioAlvo, diretorioAlvo, fs, path);
+        } else {
+            // Lógica para Android (Cordova File Plugin)
+            await this.walkAndroid(diretorioAlvo);
+        }
+        
+        if (window.showToast) window.showToast("Sincronização concluída!", "success");
+    },
+
+    /**
+     * Varredura Recursiva - Desktop (Zorin OS)
+     */
+    async walkDesktop(dir, raiz, fs, path) {
+        const files = fs.readdirSync(dir);
+
+        for (const file of files) {
+            const caminhoCompleto = path.join(dir, file);
+            const stat = fs.statSync(caminhoCompleto);
+
+            if (stat.isDirectory()) {
+                if (!file.startsWith('.')) {
+                    await this.walkDesktop(caminhoCompleto, raiz, fs, path);
+                }
+            } else if (file.toLowerCase().endsWith('.pdf')) {
+                const nomeDaPasta = (dir === raiz) 
+                    ? path.basename(raiz) 
+                    : path.basename(dir);
+
+                // A CORRETA DEFINIÇÃO DE MUSICA
+                const musica = {
+                    _id: caminhoCompleto,
+                    nome: file.replace(/\.[^/.]+$/, "").replace(/_/g, ' '),
+                    pasta: nomeDaPasta,
+                    path: caminhoCompleto,
+                    tipo: 'musica'
+                };
+
+                await window.DBManager.inserirMusica(musica);
+            }
+        }
+    },
+
+    /**
+     * Varredura Recursiva - Android (Cordova)
+     */
+    async walkAndroid(pathAlvo) {
+        return new Promise((resolve) => {
+            window.resolveLocalFileSystemURL(pathAlvo, (dirEntry) => {
+                const reader = dirEntry.createReader();
+                reader.readEntries(async (entries) => {
+                    for (let entry of entries) {
+                        if (entry.isDirectory) {
+                            if (!entry.name.startsWith('.')) {
+                                await this.walkAndroid(entry.nativeURL);
+                            }
+                        } else if (entry.name.toLowerCase().endsWith('.pdf')) {
+                            // Extrai o nome da pasta pai pela URL
+                            const partes = entry.nativeURL.split('/');
+                            const nomeDaPasta = partes[partes.length - 2] || "Raiz";
+
+                            // A CORRETA DEFINIÇÃO DE MUSICA (Versão Android)
+                            const musica = {
+                                _id: entry.nativeURL,
+                                nome: entry.name.replace(/\.[^/.]+$/, "").replace(/_/g, ' '),
+                                pasta: nomeDaPasta,
+                                path: entry.nativeURL,
+                                tipo: 'musica'
+                            };
+
+                            // No Android, como o PouchDB precisa do binário para exibir offline:
+                            await this.processarAnexoAndroid(entry, musica);
+                        }
+                    }
+                    resolve();
+                });
+            }, (err) => {
+                console.error("Erro ao acessar pasta Android:", err);
+                resolve();
+            });
         });
     },
-async garantirPermissoes() {
-    // Se estiver no Android, o plugin de permissões seria ideal, 
-    // mas se ele não carregar, o Seletor HTML5 assume a responsabilidade.
-    const permissions = window.plugins?.permissions || window.cordova?.plugins?.permissions;
-    
-    if (window.cordova && permissions) {
-        console.log("DEBUG: Usando plugin de permissões Cordova.");
-        // Sua lógica de permissões atual aqui...
-        return true; 
-    }
-    
-    console.log("DEBUG: Pulando permissões (Nativo/Desktop).");
-    return true;
-},
 
-async abrirPicker() {
-    console.log("DEBUG: Iniciando Picker de PASTA (SelectMode: folder)...");
+    /**
+     * Lê o arquivo PDF no Android e anexa ao documento do PouchDB
+     */
+    async processarAnexoAndroid(fileEntry, musicaDoc) {
+        return new Promise((resolve) => {
+            fileEntry.file(file => {
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    const blob = new Blob([reader.result], { type: 'application/pdf' });
+                    
+                    // Estrutura de anexo para o PouchDB
+                    musicaDoc._attachments = {
+                        'partitura.pdf': {
+                            content_type: 'application/pdf',
+                            data: blob
+                        }
+                    };
 
-    // 1. ESTRATÉGIA DESKTOP (ELECTRON)
-    if (window.nodeRequire) {
-        const { remote } = window.nodeRequire('electron');
-        const dialog = remote ? remote.dialog : null;
-        if (dialog) {
-            const result = await dialog.showOpenDialog({ properties: ['openDirectory'] });
-            return result.canceled ? null : result.filePaths[0];
-        }
-    }
-
-    // 2. ESTRATÉGIA ANDROID (FILEBROWSER COM SELECTMODE)
-    return new Promise((resolve) => {
-        if (window.OurCodeWorld && window.OurCodeWorld.Filebrowser) {
-            
-            window.OurCodeWorld.Filebrowser.open(
-                function(result) {
-                    if (result && result.length > 0) {
-                        // O plugin costuma retornar um array com o caminho: ["/storage/emulated/0/..."]
-                        const path = Array.isArray(result) ? result[0] : result;
-                        console.log("DEBUG: Path escolhido:", path);
-                        resolve(path);
-                    } else {
-                        resolve(null);
-                    }
-                },
-                function(error) {
-                    console.error("DEBUG: Erro no Picker:", error);
-                    resolve(null);
-                },
-                {
-                    selectMode: "folder" // ISSO É O QUE GARANTE A PASTA
-                }
-            );
-        } else {
-            console.error("ERROR: Plugin OurCodeWorld.Filebrowser não carregado.");
-            alert("Plugin de pasta não inicializou corretamente.");
-            resolve(null);
-        }
-    });
-},
-
-
-    async escanearPasta(entrada) {
-        console.log("DEBUG: Iniciando escanearPasta para:", entrada);
-        if (!entrada) return;
-
-        try {
-            if (window.electronAPI) {
-                await walk(entrada, entrada);
-            } else {
-                await this.processarAndroid(entrada);
-            }
-            this.exibirToast("Sincronização concluída!");
-        } catch (err) {
-            console.error("DEBUG: Erro no escanearPasta:", err);
-        }
-    },
-
-    async processarAndroid(uri) {
-        const partes = uri.split('/');
-        const nomeDaPasta = decodeURIComponent(partes[partes.length - 1]);
-        const musica = { _id: uri, nome: "Pasta Android", pasta: nomeDaPasta, tipo: 'musica' };
-        if (window.DBManager) await window.DBManager.inserirMusica(musica);
-    },
-
-    exibirToast(msg) {
-        if (window.plugins && window.plugins.toast) {
-            window.plugins.toast.showShortBottom(msg);
-        } else {
-            console.log("TOAST:", msg);
-        }
-    }
-};
-
-const walk = async (dir, raizEscolhida) => {
-    try {
-        const files = await window.electronAPI.lerDiretorio(dir);
-        for (const file of files) {
-            const separador = navigator.platform.includes('Win') ? '\\' : '/';
-            const caminhoCompleto = dir.endsWith(separador) ? dir + file : dir + separador + file;
-            const stat = await window.electronAPI.obterStatus(caminhoCompleto);
-            if (stat.isDirectory) {
-                if (!file.startsWith('.')) await walk(caminhoCompleto, raizEscolhida);
-            } else if (stat.isFile && file.toLowerCase().endsWith('.pdf')) {
-                const partes = caminhoCompleto.split(/[\\/]/);
-                const nomeDaPasta = partes[partes.length - 2];
-                const nomeLimpo = file.replace(/\.[^/.]+$/, "").replace(/_/g, ' ');
-                const musica = { _id: caminhoCompleto, nome: nomeLimpo, pasta: nomeDaPasta, tipo: 'musica' };
-                if (window.DBManager) await window.DBManager.inserirMusica(musica);
-            }
-        }
-    } catch (err) {
-        console.error("Erro walk:", err);
+                    await window.DBManager.inserirMusica(musicaDoc);
+                    resolve();
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        });
     }
 };
 

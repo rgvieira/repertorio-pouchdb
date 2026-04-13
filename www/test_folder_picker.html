@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste FolderPicker</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .result { margin-top: 20px; padding: 15px; border-radius: 5px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; }
+        button { padding: 15px 30px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>GAM Teste do FolderPicker (SAF)</h1>
+
+    <div class="info">
+        <strong>Instrucoes:</strong>
+        <ol>
+            <li>Toque no botao abaixo</li>
+            <li>Se o FolderPicker funcionar, abrira o seletor de pastas do Android</li>
+            <li>Selecione qualquer pasta e dou "Usar esta pasta"</li>
+            <li>O URI da pasta aparecera abaixo</li>
+        </ol>
+    </div>
+
+    <button id="btnTestar">GAM Testar FolderPicker</button>
+
+    <div id="resultado" class="result" style="display: none;"></div>
+
+    <script src="cordova.js"></script>
+    <script>
+        document.getElementById('btnTestar').addEventListener('click', function() {
+            var resultado = document.getElementById('resultado');
+            resultado.style.display = 'block';
+            resultado.className = 'result info';
+            resultado.innerHTML = 'GAM Abrindo seletor de pasta...';
+
+            if (!window.cordova) {
+                mostrarResultado('erro', 'GAM GAM Nao esta rodando no Cordova (nao carregou cordova.js)');
+                return;
+            }
+
+            if (!cordova.plugins || !cordova.plugins.FolderPicker) {
+                mostrarResultado('erro', 
+                    'GAM Plugin FolderPicker nao encontrado!<br>' +
+                    '<strong>Solucao:</strong> Instale o plugin:<br>' +
+                    '<code>cordova plugin add cordova-plugin-folder-picker</code><br><br>' +
+                    'Plugins disponiveis: ' + JSON.stringify(cordova.plugins));
+                return;
+            }
+
+            console.log('GAM FolderPicker encontrado! Abrindo...');
+
+            cordova.plugins.FolderPicker.openFolderPicker(
+                function(uri) {
+                    console.log('GAM Pasta escolhida:', uri);
+                    mostrarResultado('sucesso', 
+                        '✅ <strong>Sucesso!</strong> FolderPicker funcionou!<br><br>' +
+                        'URI da pasta: <code>' + uri + '</code><br><br>' +
+                        '<strong>O que isso significa:</strong><br>' +
+                        '- O SAF (Storage Access Framework) esta funcionando<br>' +
+                        '- Voce pode usar este URI para acessar arquivos<br>' +
+                        '- Nao precisa de permissao READ_EXTERNAL_STORAGE');
+                },
+                function(err) {
+                    console.error('GAM Erro no FolderPicker:', err);
+                    mostrarResultado('erro', 
+                        'GAM <strong>Erro ao abrir FolderPicker:</strong><br>' +
+                        '<code>' + JSON.stringify(err) + '</code><br><br>' +
+                        '<strong>Possiveis causas:</strong><br>' +
+                        '- Plugin nao esta instalado corretamente<br>' +
+                        '- Versao do Android incompativel<br>' +
+                        '- Recrie o projeto: <code>cordova platform rm android && cordova platform add android</code>');
+                }
+            );
+        });
+
+        function mostrarResultado(tipo, html) {
+            var resultado = document.getElementById('resultado');
+            resultado.className = 'result ' + (tipo === 'sucesso' ? 'success' : 'error');
+            resultado.innerHTML = html;
+        }
+
+        console.log('Teste FolderPicker carregado');
+    </script>
+</body>
+</html>

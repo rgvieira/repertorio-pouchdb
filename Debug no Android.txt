@@ -1,3 +1,7 @@
+cordova plugin add cordova-plugin-file
+cordova run android --device
+
+
 Como você já instalou o app com sucesso e o computador reconhece o dispositivo (`adb devices` deu OK), o caminho agora é abrir as "entranhas" do código pelo Chrome. 
 
 Aqui está o roteiro definitivo para você debugar o seu **Repertório PouchDB**:

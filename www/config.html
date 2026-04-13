@@ -8,251 +8,229 @@
     <title>Configurações</title>
     <link rel="stylesheet" href="css/style.css">
     <script>
-        // Compatibilidade Electron/Node
+        // Suporte para Electron/Zorin
         window.nodeRequire = (typeof require !== 'undefined') ? require : (window.require ? window.require : null);
-        if (typeof module === 'object') { window.electronModule = module; window.module = undefined; }
     </script>
     <style>
-        #loader-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.8); z-index: 9999;
-            display: none; align-items: center; justify-content: center; flex-direction: column;
-        }
-        .spinner {
-            width: 50px; height: 50px; border: 5px solid #f3f3f3;
-            border-top: 5px solid #186879; border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+        #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; color: white; }
+        .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #1abc9c; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Ajuste para não quebrar o layout no Android com Notch */
-        body { padding-top: env(safe-area-inset-top); }
+        body { padding-top: env(safe-area-inset-top); font-family: 'Manrope', sans-serif; background: #f5f5f5; margin: 0; color: #333; }
+        .card { background: #fff; padding: 20px; border-radius: 12px; margin: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .folder-card { background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
+        .folder-card span { font-size: 13px; color: #555; word-break: break-all; margin-right: 10px; }
+        
+        /* Modal Style Corrigido */
+        #modalPicker { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; }
+        .modal-content { background:#2c3e50; margin:5% auto; width:90%; height:85%; padding:15px; border-radius:12px; display:flex; flex-direction:column; color: white; box-sizing: border-box; }
+        #listaPastas { flex-grow:1; overflow-y:auto; margin:15px 0; background:#34495e; border-radius:8px; }
+        
+        .btn-main { display: flex; align-items: center; gap: 8px; padding: 15px; background: #186879; color: #fff; border: none; border-radius: 8px; width: 100%; justify-content: center; font-weight: bold; cursor: pointer; }
+        .btn-danger { margin-top: 20px; width: 100%; padding: 15px; background: #c0392b; color: white; border: none; border-radius: 8px; display:flex; align-items:center; justify-content:center; gap:8px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div id="loader-overlay">
     <div class="spinner"></div>
-    <p style="color: #186879; font-weight: bold; margin-top: 10px;">Processando...</p>
+    <p id="loader-text">Sincronizando arquivos...</p>
 </div>
 
-<div class="top-bar" style="display: flex; align-items: center; padding: 0 16px; height: 56px; background: #fff; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 1000;">
-    <a href="index.html" style="text-decoration: none; color: #186879; display: flex; align-items: center; margin-right: 12px;">
-        <span class="material-icons">arrow_back</span>
-    </a>
-    <div style="font-weight: 800; color: #186879; font-size: 1.1rem;">Configurações</div>
+<div class="top-bar" style="display: flex; align-items: center; padding: 0 16px; height: 56px; background: #fff; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 100;">
+    <a href="index.html" style="text-decoration: none; color: #186879;"><span class="material-icons">arrow_back</span></a>
+    <div style="font-weight: 800; color: #186879; font-size: 1.1rem; margin-left:15px;">Configurações da Biblioteca</div>
 </div>
 
-<div class="config-content" style="padding: 16px; max-width: 800px; margin: 0 auto;">
-    <div id="desktop-section" class="card">
-        <h2>Biblioteca</h2>
-        <p>Selecione  para sincronizar.</p>
-        
-  <div class="form-row" style="margin-bottom: 20px;">
-    <label for="html5-picker" style="display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: #186879; color: #fff; border: none; border-radius: 8px; cursor: pointer; width: 100%; justify-content: center;">
-        <span class="material-icons">folder_open</span> 
-        <span id="btn-label">Selecionar Pasta de Partituras</span>
-        <input type="file" id="html5-picker" webkitdirectory directory multiple style="display:none">
-    </label>
-</div>
+<div class="config-content">
+    <div class="card">
+        <h2 style="margin-top:0; font-size: 1.2rem; color: #186879;">Pastas de Partituras</h2>
+        <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Adicione as pastas do seu dispositivo que contêm arquivos PDF.</p>
 
-        <div style="margin-top: 24px;">
-            
-            <div id="folders-list"></div>
-        </div>
+         <button id="btnFolderPicker" style="margin: 10px 0; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px;">
+            <span class="material-icons">create_new_folder</span> Nova Pasta
+        </button>
+
+        <div id="folders-list" style="margin-top: 20px;"></div>
     </div>
 
-    <button id="btn-clear" class="btn-danger" style="margin-top: 40px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: #f44336; color: white; border: none; border-radius: 8px;">
-        <span class="material-icons">delete_forever</span> Limpar Banco de Dados
-    </button>
+    <div style="padding: 0 15px;">
+        <button onclick="ConfigApp.instance.clearAll()" class="btn-danger">
+            <span class="material-icons">delete_sweep</span> Limpar Tudo e Recomeçar
+        </button>
+    </div>
 </div>
+
+
 
 <script src="cordova.js"></script>
 <script src="js/pouchdb.min.js"></script>
-<script src="js/pouchdb.find.min.js"></script>
+<script src="js/pouchdb.find.js"></script>
 <script src="js/database.js"></script>
 <script src="js/scanner.js"></script>
+<script src="js/app.js"></script>
 
 <script>
-
-
 class ConfigApp {
     constructor() {
         this.foldersListEl = document.getElementById('folders-list');
-        this.selectBtnEl = document.getElementById('select-folder-btn');
-        this.clearBtnEl = document.getElementById('btn-clear');
         this.loader = document.getElementById('loader-overlay');
-        
-        this.init();
+        this.loaderText = document.getElementById('loader-text');
     }
 
-   async init() {
-    try {
-        console.log("DEBUG: ConfigApp Init iniciado.");
-        
-        // 1. Inicializa o Banco de Dados
-        if (typeof DBManager !== 'undefined') {
-            await DBManager.init();
+    async init() {
+        console.log("ConfigApp: Iniciando...");
+        // Garante que o banco está pronto antes de listar
+        const ok = await DBManager.init();
+        if (ok) {
+            await this.loadFoldersList();
+        } else {
+            alert("Erro ao conectar ao banco de dados.");
         }
-
-        // 2. Carrega a lista de pastas já salvas
-        await this.loadFoldersList();
-
-        // 3. SELETOR DE PASTA (NOVO MÉTODO HTML5)
-        // Pegamos o input escondido que colocamos no HTML
-        const realPicker = document.getElementById('html5-picker');
-        
-        if (realPicker) {
-            realPicker.addEventListener('change', async (e) => {
-                console.log("DEBUG: Mudança detectada no seletor de arquivos.");
-                const files = e.target.files;
-                
-                if (files && files.length > 0) {
-                    // No Android 12, pegamos o nome da pasta raiz do primeiro arquivo
-                    const nomePasta = files[0].webkitRelativePath.split('/')[0] || "Pasta Selecionada";
-                    console.log("DEBUG: Pasta selecionada:", nomePasta);
-
-                    this.showLoader(true);
-                    try {
-                        const added = await DBManager.addFolder(nomePasta);
-                        if (added) {
-                            // Se o Scanner.js estiver pronto, enviamos os arquivos direto
-                            if (typeof Scanner !== 'undefined') {
-                                await Scanner.escanearArquivosDireto(files);
-                            }
-                            await this.loadFoldersList();
-                        }
-                    } catch (err) {
-                        console.error("Erro ao processar pasta:", err);
-                        alert("Erro ao processar arquivos.");
-                    } finally {
-                        this.showLoader(false);
-                        // Limpa o input para permitir selecionar a mesma pasta de novo se precisar
-                        realPicker.value = '';
-                    }
-                }
-            });
-        }
-
-        // 4. Botão de Limpar Banco
-        if (this.clearBtnEl) {
-            this.clearBtnEl.addEventListener('click', () => this.clearAll());
-        }
-
-    } catch (err) { 
-        console.error("Erro no Init:", err); 
     }
-}
 
     async loadFoldersList() {
-        if (!this.foldersListEl) return;
         try {
             const folders = await DBManager.listFolders();
-            this.foldersListEl.innerHTML = folders.length ? '' : '<p style="padding:10px; color:#999; text-align:center;">Nenhuma pasta ativa</p>';
+            this.foldersListEl.innerHTML = folders.length ? '' : '<p style="text-align:center;color:#999;padding:20px;">Nenhuma pasta vinculada ainda.</p>';
             
-            folders.forEach(folder => {
+            folders.forEach(f => {
                 const div = document.createElement('div');
                 div.className = 'folder-card';
-                div.style = "display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: #fff; margin-bottom: 8px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);";
-                
-                const pathExibicao = folder.path;
-                // Escapa barras invertidas para o Windows no Desktop
-                const pathParaScript = folder.path.replace(/\\/g, '\\\\');
-
                 div.innerHTML = `
-                    <div class="folder-info" style="display:flex; align-items:center; gap:10px; overflow:hidden; flex:1;">
-                        <span class="material-icons" style="color:#186879">folder</span>
-                        <span class="folder-path" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.85rem; color: #333;">${pathExibicao}</span>
-                    </div>
-                    <div class="folder-actions" style="display:flex; gap:12px; margin-left:10px;">
-                        <span class="material-icons" style="color: #186879; cursor: pointer; font-size: 20px;" 
-                              onclick="ConfigApp.instance.handleRefresh('${folder._id}', '${pathParaScript}')">refresh</span>
-                        <span class="material-icons" style="color: #f44336; cursor: pointer; font-size: 20px;" 
-                              onclick="ConfigApp.instance.handleDelete('${folder._id}')">delete</span>
-                    </div>
+                    <span>${f.path}</span>
+                    <span class="material-icons" style="color:#e74c3c; cursor:pointer; padding:5px;" 
+                          onclick="ConfigApp.instance.handleDelete('${f._id}')">delete</span>
                 `;
                 this.foldersListEl.appendChild(div);
             });
-        } catch (err) { 
-            console.error("Erro ao listar pastas:", err); 
+        } catch (e) {
+            console.error("Erro ao carregar lista de pastas:", e);
         }
     }
 
     async selectFolder() {
-        console.log("DEBUG: Entrou em selectFolder");
         try {
-            // Chama o Scanner (que tem a trava de segurança que te mandei)
             const path = await Scanner.abrirPicker();
-            
             if (path) {
-                console.log("DEBUG: Pasta selecionada:", path);
-                this.showLoader(true);
+                this.showLoader(true, "Viculando e Escaneando...");
                 const added = await DBManager.addFolder(path);
                 if (added) {
+                    // Varre apenas a nova pasta adicionada
                     await Scanner.escanearPasta(path);
                     await this.loadFoldersList();
                 }
-            } else {
-                console.log("DEBUG: Picker fechado sem seleção.");
             }
-        } catch (err) {
-            console.error("DEBUG: Erro no Picker:", err);
-            alert("Erro ao selecionar pasta: " + err);
-        } finally {
-            this.showLoader(false);
-        }
-    }
-
-    async handleRefresh(id, path) {
-        if (confirm('Rescanear esta pasta?')) {
-            this.showLoader(true);
-            try {
-                await Scanner.escanearPasta(path);
-                alert("Sincronização concluída!");
-            } catch (err) {
-                alert("Erro ao escanear: " + err.message);
-            } finally {
-                this.showLoader(false);
-                await this.loadFoldersList();
-            }
+        } catch (e) { 
+            alert("Erro ao processar pasta: " + e); 
+        } finally { 
+            this.showLoader(false); 
         }
     }
 
     async handleDelete(id) {
-        if (confirm('Remover esta pasta da biblioteca?')) {
-            await DBManager.deleteFolder(id);
-            await this.loadFoldersList();
+        if (confirm('Deseja desvincular esta pasta? As músicas continuarão no banco até a próxima limpeza.')) { 
+            await DBManager.deleteFolder(id); 
+            await this.loadFoldersList(); 
         }
     }
 
     async clearAll() {
-        if (confirm('ATENÇÃO: Isso apagará todos os dados salvos no App. Continuar?')) {
-            this.showLoader(true);
-            try {
-                await DBManager.limparBanco();
-                await this.loadFoldersList();
-                alert("Banco de dados limpo com sucesso.");
-            } catch(e) {
-                alert("Erro ao limpar: " + e.message);
-            } finally {
-                this.showLoader(false);
-            }
+        if (confirm('Isso apagará todas as músicas e pastas configuradas. Tem certeza?')) { 
+            this.showLoader(true, "Limpando banco...");
+            await DBManager.limparBanco(); 
+            location.reload(); 
         }
+    }
+
+    showLoader(show, text = "Processando...") { 
+        this.loaderText.innerText = text;
+        this.loader.style.display = show ? 'flex' : 'none'; 
     }
 }
 
-// INICIALIZAÇÃO SEGURA
-const startApp = () => {
-    console.log("DEBUG: DOM/Cordova pronto. Criando instância do ConfigApp.");
-    if (!ConfigApp.instance) {
-        ConfigApp.instance = new ConfigApp();
-    }
-};
+// Inicialização segura
+document.addEventListener('deviceready', () => { 
+    ConfigApp.instance = new ConfigApp();
+    ConfigApp.instance.init();
+}, false);
+document.addEventListener("DOMContentLoaded", () => {
+    const btnPick = document.getElementById("btnFolderPicker");
+    const foldersDiv = document.getElementById("folders-list");
 
-if (window.cordova) {
-    document.addEventListener('deviceready', startApp, false);
-} else {
-    window.onload = startApp;
+    if (btnPick && foldersDiv) {
+        btnPick.addEventListener("click", async () => {
+            foldersDiv.style.display = 'block';
+            foldersDiv.style.background = '#d1ecf1';
+            foldersDiv.style.border = '1px solid #bee5eb';
+            foldersDiv.style.borderRadius = '5px';
+            foldersDiv.innerHTML = '⏳ Testando FolderPicker...';
+
+            try {
+                // Verifica Cordova e plugin
+                if (!window.cordova || !cordova.plugins || !cordova.plugins.FolderPicker) {
+                    foldersDiv.style.background = '#f8d7da';
+                    foldersDiv.style.borderColor = '#f5c6cb';
+                    foldersDiv.innerHTML = `
+                        <strong>❌ FALHA: Cordova/FolderPicker não disponível</strong><br>
+                        Plugins: ${JSON.stringify(cordova.plugins ? Object.keys(cordova.plugins) : [])}
+                    `;
+                    return;
+                }
+
+                // Abrir seletor
+                cordova.plugins.FolderPicker.openFolderPicker(
+                    async function(path) {
+                        console.log("📂 Pasta escolhida:", path);
+
+                        // Fluxo igual ao antigo selectFolder()
+                        ConfigApp.instance.showLoader(true, "Vinculando e Escaneando...");
+                        const added = await DBManager.addFolder(path);
+                        if (added) {
+                            await Scanner.escanearPasta(path);
+                            await ConfigApp.instance.loadFoldersList();
+                        }
+                        ConfigApp.instance.showLoader(false);
+
+                        foldersDiv.style.background = '#d4edda';
+                        foldersDiv.style.borderColor = '#c3e6cb';
+                        foldersDiv.innerHTML = `
+                            <strong>✅ Pasta vinculada com sucesso!</strong><br>
+                            URI: <code>${path}</code>
+                        `;
+                    },
+                    function(err) {
+                        console.error("❌ Erro FolderPicker:", err);
+                        foldersDiv.style.background = '#f8d7da';
+                        foldersDiv.style.borderColor = '#f5c6cb';
+                        foldersDiv.innerHTML = `
+                            <strong>❌ FALHA ao abrir FolderPicker</strong><br>
+                            Erro: ${JSON.stringify(err)}
+                        `;
+                    }
+                );
+            } catch (e) {
+                console.error("Erro geral:", e);
+                foldersDiv.style.background = '#f8d7da';
+                foldersDiv.style.borderColor = '#f5c6cb';
+                foldersDiv.innerHTML = `
+                    <strong>❌ Erro ao processar pasta</strong><br>
+                    Detalhes: ${e}
+                `;
+                ConfigApp.instance.showLoader(false);
+            }
+        });
+    }
+});
+
+// Fallback para navegador/Zorin
+if (!window.cordova) {
+    window.onload = () => {
+        if (!ConfigApp.instance) {
+            ConfigApp.instance = new ConfigApp();
+            ConfigApp.instance.init();
+        }
+    };
 }
 </script>
 </body>
