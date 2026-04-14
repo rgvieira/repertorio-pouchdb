@@ -5,50 +5,48 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-<hook src="hooks/after_prepare/add_tools_namespace_to_manifest.js" type="after_prepare" />
+    <name>Repertorio</name>
+    <description>Banco de partituras PouchDB</description>
+    <author email="rgvieira63@yahoo.com.br">Roberto</author>
+    
+    <content src="index.html" />
+    <icon src="www/img/logo.png" />
 
-        <!-- ADICIONA ISTO AGORA -->
+    <hook src="hooks/after_prepare/add_tools_namespace_to_manifest.js" type="after_prepare" />
+
     <feature name="FolderPicker">
         <param name="android-package" value="br.seuapp.plugins.FolderPickerPlugin"/>
     </feature>
 
-    <hook src="hooks/after_prepare/add_tools_namespace_to_manifest.js" type="after_prepare" />
-
-    <name>Repertorio</name>
-
-    <description>Banco de partituras PouchDB</description>
-    <author email="rgvieira63@yahoo.com.br">Roberto</author>
-    <content src="index.html" />
-
-    <icon src="www/img/logo.png" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
 
     <platform name="android">
         <config-file target="AndroidManifest.xml" parent="/*">
-            <!-- Permissões de acesso a arquivos -->
             <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-            
             <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
             <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
             <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
-            <!-- Intents necessários para SAF e PDFs -->
             <queries>
                 <intent>
                     <action android:name="android.intent.action.OPEN_DOCUMENT_TREE" />
                 </intent>
                 <intent>
                     <action android:name="android.intent.action.SEND" />
-                    <data mimeType="application/pdf" />
+                    <data android:mimeType="application/pdf" />
                 </intent>
                 <intent>
                     <action android:name="android.intent.action.VIEW" />
-                    <data mimeType="application/pdf" />
+                    <data android:mimeType="application/pdf" />
                 </intent>
             </queries>
         </config-file>
 
-        <!-- Preferências da plataforma Android -->
         <preference name="android-minSdkVersion" value="24" />
         <preference name="android-targetSdkVersion" value="33" />
         <preference name="AndroidXEnabled" value="true" />
@@ -62,10 +60,4 @@
         <preference name="ElectronContextIsolation" value="false" />
     </platform>
 
-    <!-- Acessos permitidos -->
-    <access origin="*" />
-    <allow-intent href="http://*/*" />
-    <allow-intent href="https://*/*" />
-    <allow-intent href="mailto:*" />
-    <allow-intent href="geo:*" />
 </widget>

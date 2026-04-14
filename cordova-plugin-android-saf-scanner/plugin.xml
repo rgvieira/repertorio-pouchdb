@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        id="cordova-plugin-android-saf-scanner"
+        version="1.0.0">
+
+    <name>Android SAF Scanner</name>
+    <description>Android Storage Access Framework Scanner for PDFs</description>
+    <license>MIT</license>
+    <keywords>cordova,android,saf,scanner,pdf</keywords>
+
+    <js-module src="www/safScanner.js" name="SAFScanner">
+        <clobbers target="AndroidSAFScanner" />
+    </js-module>
+
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="SAFScanner">
+                <param name="android-package" value="br.seuapp.safscanner.SAFScannerPlugin" />
+            </feature>
+        </config-file>
+
+        <source-file src="src/java/SAFScannerPlugin.java" target-dir="src/br/seuapp/safscanner" />
+        
+        <framework src="com.android.support:support-v4:28.0.0" />
+    </platform>
+
+</plugin>

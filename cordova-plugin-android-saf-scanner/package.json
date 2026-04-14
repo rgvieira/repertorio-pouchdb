@@ -1,0 +1,12 @@
+{
+  "name": "cordova-plugin-android-saf-scanner",
+  "version": "1.0.0",
+  "description": "Android SAF Scanner",
+  "cordova": {
+    "id": "cordova-plugin-android-saf-scanner",
+    "platforms": ["android"]
+  },
+  "keywords": ["cordova", "android", "saf"],
+  "author": "Roberto",
+  "license": "MIT"
+}

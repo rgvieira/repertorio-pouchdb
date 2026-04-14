@@ -8,7 +8,6 @@
     <title>Configurações</title>
     <link rel="stylesheet" href="css/style.css">
     <script>
-        // Suporte para Electron/Zorin
         window.nodeRequire = (typeof require !== 'undefined') ? require : (window.require ? window.require : null);
     </script>
     <style>
@@ -21,11 +20,6 @@
         .folder-card { background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
         .folder-card span { font-size: 13px; color: #555; word-break: break-all; margin-right: 10px; }
         
-        /* Modal Style Corrigido */
-        #modalPicker { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; }
-        .modal-content { background:#2c3e50; margin:5% auto; width:90%; height:85%; padding:15px; border-radius:12px; display:flex; flex-direction:column; color: white; box-sizing: border-box; }
-        #listaPastas { flex-grow:1; overflow-y:auto; margin:15px 0; background:#34495e; border-radius:8px; }
-        
         .btn-main { display: flex; align-items: center; gap: 8px; padding: 15px; background: #186879; color: #fff; border: none; border-radius: 8px; width: 100%; justify-content: center; font-weight: bold; cursor: pointer; }
         .btn-danger { margin-top: 20px; width: 100%; padding: 15px; background: #c0392b; color: white; border: none; border-radius: 8px; display:flex; align-items:center; justify-content:center; gap:8px; cursor: pointer; }
     </style>
@@ -34,7 +28,7 @@
 
 <div id="loader-overlay">
     <div class="spinner"></div>
-    <p id="loader-text">Sincronizando arquivos...</p>
+    <p id="loader-text">Processando...</p>
 </div>
 
 <div class="top-bar" style="display: flex; align-items: center; padding: 0 16px; height: 56px; background: #fff; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 100;">
@@ -47,8 +41,8 @@
         <h2 style="margin-top:0; font-size: 1.2rem; color: #186879;">Pastas de Partituras</h2>
         <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Adicione as pastas do seu dispositivo que contêm arquivos PDF.</p>
 
-         <button id="btnFolderPicker" style="margin: 10px 0; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px;">
-            <span class="material-icons">create_new_folder</span> Nova Pasta
+        <button id="btnFolderPicker" class="btn-main">
+            <span class="material-icons">create_new_folder</span> Vincular Nova Pasta
         </button>
 
         <div id="folders-list" style="margin-top: 20px;"></div>
@@ -61,8 +55,6 @@
     </div>
 </div>
 
-
-
 <script src="cordova.js"></script>
 <script src="js/pouchdb.min.js"></script>
 <script src="js/pouchdb.find.js"></script>
@@ -71,6 +63,59 @@
 <script src="js/app.js"></script>
 
 <script>
+
+    // ========== FUNÇÃO UTILITÁRIA (ANTES do ConfigApp) ==========
+window.getFolderNameFromUri = function(uri) {
+    try {
+        let decoded = decodeURIComponent(uri);
+        const parts = decoded.split('/');
+        const name = parts[parts.length - 1];
+        
+        const cleanName = name
+            .replace(/^primary:/i, '')
+            .replace(/^tree:/i, '')
+            .replace(/^document:/i, '')
+            .trim();
+        
+        return cleanName || 'Pasta';
+    } catch (e) {
+        return 'Pasta';
+    }
+};
+
+function showToast(message, duration = 3000) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 20px; left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        z-index: 9999;
+        animation: fadeIn 0.3s ease;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'fadeOut 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
+window.showToast = showToast;
+
+// Adicione CSS para animação
+const style = document.createElement('style');
+style.textContent = `
+@keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+`;
+document.head.appendChild(style);
+
 class ConfigApp {
     constructor() {
         this.foldersListEl = document.getElementById('folders-list');
@@ -80,25 +125,34 @@ class ConfigApp {
 
     async init() {
         console.log("ConfigApp: Iniciando...");
-        // Garante que o banco está pronto antes de listar
         const ok = await DBManager.init();
         if (ok) {
             await this.loadFoldersList();
         } else {
-            alert("Erro ao conectar ao banco de dados.");
+            window.showToast("Erro ao conectar ao banco de dados.");
         }
     }
 
     async loadFoldersList() {
         try {
             const folders = await DBManager.listFolders();
-            this.foldersListEl.innerHTML = folders.length ? '' : '<p style="text-align:center;color:#999;padding:20px;">Nenhuma pasta vinculada ainda.</p>';
+            
+            if (folders.length === 0) {
+                this.foldersListEl.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">Nenhuma pasta vinculada ainda.</p>';
+                return;
+            }
+
+            this.foldersListEl.innerHTML = '<h3 style="font-size:1rem;color:#186879;margin-bottom:10px;">Pastas vinculadas:</h3>';
             
             folders.forEach(f => {
                 const div = document.createElement('div');
                 div.className = 'folder-card';
+                
+                // Mostra apenas o último segmento do URI
+                const displayName = f.name;
+                
                 div.innerHTML = `
-                    <span>${f.path}</span>
+                    <span>${displayName}<br><small style="color:#999">${displayName}...</small></span>
                     <span class="material-icons" style="color:#e74c3c; cursor:pointer; padding:5px;" 
                           onclick="ConfigApp.instance.handleDelete('${f._id}')">delete</span>
                 `;
@@ -109,118 +163,107 @@ class ConfigApp {
         }
     }
 
-    async selectFolder() {
-        try {
-            const path = await Scanner.abrirPicker();
-            if (path) {
-                this.showLoader(true, "Viculando e Escaneando...");
-                const added = await DBManager.addFolder(path);
-                if (added) {
-                    // Varre apenas a nova pasta adicionada
-                    await Scanner.escanearPasta(path);
-                    await this.loadFoldersList();
-                }
-            }
-        } catch (e) { 
-            alert("Erro ao processar pasta: " + e); 
-        } finally { 
-            this.showLoader(false); 
-        }
-    }
-
     async handleDelete(id) {
-        if (confirm('Deseja desvincular esta pasta? As músicas continuarão no banco até a próxima limpeza.')) { 
-            await DBManager.deleteFolder(id); 
-            await this.loadFoldersList(); 
+        if (!confirm('Deseja desvincular esta pasta? As músicas continuarão no banco até a próxima limpeza.')) {
+            return;
         }
+        
+        await DBManager.deleteFolder(id);
+        await this.loadFoldersList();
+        window.showToast('✅ Pasta desvinculada!');
     }
 
     async clearAll() {
-        if (confirm('Isso apagará todas as músicas e pastas configuradas. Tem certeza?')) { 
-            this.showLoader(true, "Limpando banco...");
-            await DBManager.limparBanco(); 
-            location.reload(); 
+        if (!confirm('⚠️ Isso apagará TODAS as músicas e pastas configuradas. Tem certeza?')) {
+            return;
         }
+        
+        this.showLoader(true, "Limpando banco...");
+        await DBManager.limparBanco();
+        this.showLoader(false);
+        location.reload();
     }
 
-    showLoader(show, text = "Processando...") { 
+    showLoader(show, text = "Processando...") {
         this.loaderText.innerText = text;
-        this.loader.style.display = show ? 'flex' : 'none'; 
+        this.loader.style.display = show ? 'flex' : 'none';
     }
 }
 
-// Inicialização segura
-document.addEventListener('deviceready', () => { 
+// Inicialização
+document.addEventListener('deviceready', async () => {
+    console.log('--- Config: Deviceready ---');
+    
     ConfigApp.instance = new ConfigApp();
-    ConfigApp.instance.init();
+    await ConfigApp.instance.init();
+    
+    // Sobrescreve FolderPicker SE necessário
+    if (!cordova.plugins || !cordova.plugins.FolderPicker) {
+        cordova.plugins = cordova.plugins || {};
+        cordova.plugins.FolderPicker = {
+            openFolderPicker: function(success, error) {
+                cordova.exec(success, error, 'FolderPicker', 'openFolderPicker', []);
+            }
+        };
+    }
+    
+    console.log('✅ ConfigApp inicializado');
 }, false);
+
+// Botão Vincular Nova Pasta
 document.addEventListener("DOMContentLoaded", () => {
     const btnPick = document.getElementById("btnFolderPicker");
-    const foldersDiv = document.getElementById("folders-list");
-
-    if (btnPick && foldersDiv) {
-        btnPick.addEventListener("click", async () => {
-            foldersDiv.style.display = 'block';
-            foldersDiv.style.background = '#d1ecf1';
-            foldersDiv.style.border = '1px solid #bee5eb';
-            foldersDiv.style.borderRadius = '5px';
-            foldersDiv.innerHTML = '⏳ Testando FolderPicker...';
-
-            try {
-                // Verifica Cordova e plugin
-                if (!window.cordova || !cordova.plugins || !cordova.plugins.FolderPicker) {
-                    foldersDiv.style.background = '#f8d7da';
-                    foldersDiv.style.borderColor = '#f5c6cb';
-                    foldersDiv.innerHTML = `
-                        <strong>❌ FALHA: Cordova/FolderPicker não disponível</strong><br>
-                        Plugins: ${JSON.stringify(cordova.plugins ? Object.keys(cordova.plugins) : [])}
-                    `;
-                    return;
-                }
-
-                // Abrir seletor
-                cordova.plugins.FolderPicker.openFolderPicker(
-                    async function(path) {
-                        console.log("📂 Pasta escolhida:", path);
-
-                        // Fluxo igual ao antigo selectFolder()
-                        ConfigApp.instance.showLoader(true, "Vinculando e Escaneando...");
-                        const added = await DBManager.addFolder(path);
-                        if (added) {
-                            await Scanner.escanearPasta(path);
-                            await ConfigApp.instance.loadFoldersList();
-                        }
-                        ConfigApp.instance.showLoader(false);
-
-                        foldersDiv.style.background = '#d4edda';
-                        foldersDiv.style.borderColor = '#c3e6cb';
-                        foldersDiv.innerHTML = `
-                            <strong>✅ Pasta vinculada com sucesso!</strong><br>
-                            URI: <code>${path}</code>
-                        `;
-                    },
-                    function(err) {
-                        console.error("❌ Erro FolderPicker:", err);
-                        foldersDiv.style.background = '#f8d7da';
-                        foldersDiv.style.borderColor = '#f5c6cb';
-                        foldersDiv.innerHTML = `
-                            <strong>❌ FALHA ao abrir FolderPicker</strong><br>
-                            Erro: ${JSON.stringify(err)}
-                        `;
+    
+    if (!btnPick) return;
+    
+    btnPick.addEventListener("click", async () => {
+        console.log("📂 Botão clicado -abrindo FolderPicker...");
+        
+        if (!window.cordova || !cordova.plugins || !cordova.plugins.FolderPicker) {
+            window.showToast("❌ FolderPicker não disponível.\nPlugins: " + JSON.stringify(cordova.plugins ? Object.keys(cordova.plugins) : []));
+            return;
+        }
+        
+        ConfigApp.instance.showLoader(true, "Abrindo seletor de pasta...");
+        
+        cordova.plugins.FolderPicker.openFolderPicker(
+            async function(uri) {
+                console.log("📂 Pasta escolhida:", uri);
+                
+                ConfigApp.instance.showLoader(true, "Vinculando pasta...");
+                
+                try {
+                    // 1. Salva no PouchDB
+                    const added = await DBManager.addFolder(uri);
+                    
+                    if (!added) {
+                        throw new Error("Falha ao salvar pasta no banco");
                     }
-                );
-            } catch (e) {
-                console.error("Erro geral:", e);
-                foldersDiv.style.background = '#f8d7da';
-                foldersDiv.style.borderColor = '#f5c6cb';
-                foldersDiv.innerHTML = `
-                    <strong>❌ Erro ao processar pasta</strong><br>
-                    Detalhes: ${e}
-                `;
+                    
+                    // 2. Escaneia a pasta em busca de PDFs
+                    ConfigApp.instance.showLoader(true, "Escaneando pasta em busca de PDFs...");
+                    await Scanner.escanearPasta(uri);
+                    
+                    // 3. Atualiza lista
+                    await ConfigApp.instance.loadFoldersList();
+                    
+                    ConfigApp.instance.showLoader(false);
+                    
+                    window.showToast("✅ Pasta vinculada com sucesso!\n\nPDFs encontrados e salvos no banco.");
+                    
+                } catch (e) {
+                    console.error("❌ Erro ao processar pasta:", e);
+                    ConfigApp.instance.showLoader(false);
+                    window.showToast("❌ Erro: " + e.message);
+                }
+            },
+            function(err) {
+                console.error("❌ Erro FolderPicker:", err);
                 ConfigApp.instance.showLoader(false);
+                window.showToast("❌ Erro ao escolher pasta: " + JSON.stringify(err));
             }
-        });
-    }
+        );
+    });
 });
 
 // Fallback para navegador/Zorin

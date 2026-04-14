@@ -14,9 +14,8 @@
   "devDependencies": {
     "cordova-android": "^12.0.1",
     "cordova-electron": "^4.0.0",
-    "cordova-ourcodeworld-filebrowser": "github:ourcodeworld/cordova-ourcodeworld-filebrowser",
-    "cordova-plugin-android-permissions": "^1.1.5",
     "cordova-plugin-file": "^8.1.3",
+    "cordova-plugin-file-transfer": "^2.0.0",
     "cordova-plugin-filepicker": "^1.1.6",
     "cordova-plugin-folder-picker": "file:cordova-plugin-folder-picker",
     "cordova-plugin-inappbrowser": "^6.0.0",
@@ -25,17 +24,19 @@
     "nodemon": "^3.1.0"
   },
   "cordova": {
-    "plugins": {
-      "cordova-plugin-file": {},
-      "cordova-plugin-inappbrowser": {},
-      "cordova-plugin-x-toast": {},
-      "cordova-plugin-android-permissions": {},
-      "cordova-plugin-filepicker": {},
-      "cordova-plugin-folder-picker": {}
-    },
     "platforms": [
       "electron",
       "android"
-    ]
+    ],
+    "plugins": {
+      "cordova-plugin-folder-picker": {},
+      "cordova-plugin-android-permissions": {},
+      "cordova-plugin-file": {},
+      "cordova-plugin-file-transfer": {},
+      "cordova-plugin-filepicker": {},
+      "cordova-plugin-inappbrowser": {},
+      "cordova-plugin-x-toast": {},
+      "cordova-plugin-android-saf-scanner": {}
+    }
   }
 }

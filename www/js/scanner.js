@@ -3,9 +3,7 @@
  * Suporta Electron (Zorin OS) e Cordova (Android)
  */
 
-/**
- * js/folderpicker.js - O Seletor de Pastas para Android
- */
+
 const FolderPicker = {
     raiz: "cdvfile://localhost/sdcard/",
     caminhoAtual: "cdvfile://localhost/sdcard/",
@@ -65,14 +63,10 @@ const FolderPicker = {
 
 window.FolderPicker = FolderPicker;
 
-/**
- * Busca todas as pastas configuradas no banco e inicia a varredura nelas
- */
 async function iniciarVarreduraGeral() {
     console.log("Iniciando varredura em todas as pastas vinculadas...");
     
     try {
-        // 1. Pega a lista de pastas que você salvou via addFolder
         const pastasVinculadas = await DBManager.listFolders();
         
         if (pastasVinculadas.length === 0) {
@@ -81,7 +75,6 @@ async function iniciarVarreduraGeral() {
             return;
         }
 
-        // 2. Para cada pasta, executa o motor de varredura
         for (const pastaDoc of pastasVinculadas) {
             console.log("Escaneando diretório: " + pastaDoc.path);
             await Scanner.escanearPasta(pastaDoc.path);
@@ -94,24 +87,22 @@ async function iniciarVarreduraGeral() {
     }
 }
 
-// Expõe para o window para você chamar no botão "Sincronizar"
 window.iniciarVarreduraGeral = iniciarVarreduraGeral;
+// NO COMEÇO do scanner.js, APÓS o const Scanner = {
 
+// Verifica se SAF plugin está disponível
+const hasSAFPlugin = typeof window.SAFMediaStore !== 'undefined';
+console.log('🔌 SAF Plugin disponível:', hasSAFPlugin);
 const Scanner = {
-    /**
-     * Escolhe o diretório inicial dependendo da plataforma
-     */
     
     async abrirPicker() {
         if (window.nodeRequire) {
-            // AMBIENTE DESKTOP (Electron)
             const { remote } = window.nodeRequire('electron');
             const res = await remote.dialog.showOpenDialog({ 
                 properties: ['openDirectory'] 
             });
             return res.canceled ? null : res.filePaths[0];
         } else {
-            // AMBIENTE MOBILE (Android)
             return new Promise(res => {
                 if (typeof FolderPicker !== 'undefined') {
                     FolderPicker.abrir(path => res(path));
@@ -123,102 +114,185 @@ const Scanner = {
         }
     },
 
-    /**
-     * Motor principal de varredura
-     */
-    async escanearPasta(diretorioAlvo) {
-        if (!diretorioAlvo) return;
-        console.log("Scanner: Iniciando varredura em " + diretorioAlvo);
-
-        if (window.nodeRequire) {
-            // Lógica para Zorin OS (Node.js FS)
-            const fs = window.nodeRequire('fs');
-            const path = window.nodeRequire('path');
-            await this.walkDesktop(diretorioAlvo, diretorioAlvo, fs, path);
-        } else {
-            // Lógica para Android (Cordova File Plugin)
-            await this.walkAndroid(diretorioAlvo);
-        }
+    async escanearPasta(pathAlvo) {
+        console.log('🔍 Scanner.escanearPasta chamado:', pathAlvo);
         
-        if (window.showToast) window.showToast("Sincronização concluída!", "success");
-    },
-
-    /**
-     * Varredura Recursiva - Desktop (Zorin OS)
-     */
-    async walkDesktop(dir, raiz, fs, path) {
-        const files = fs.readdirSync(dir);
-
-        for (const file of files) {
-            const caminhoCompleto = path.join(dir, file);
-            const stat = fs.statSync(caminhoCompleto);
-
-            if (stat.isDirectory()) {
-                if (!file.startsWith('.')) {
-                    await this.walkDesktop(caminhoCompleto, raiz, fs, path);
-                }
-            } else if (file.toLowerCase().endsWith('.pdf')) {
-                const nomeDaPasta = (dir === raiz) 
-                    ? path.basename(raiz) 
-                    : path.basename(dir);
-
-                // A CORRETA DEFINIÇÃO DE MUSICA
-                const musica = {
-                    _id: caminhoCompleto,
-                    nome: file.replace(/\.[^/.]+$/, "").replace(/_/g, ' '),
-                    pasta: nomeDaPasta,
-                    path: caminhoCompleto,
-                    tipo: 'musica'
-                };
-
-                await window.DBManager.inserirMusica(musica);
+        this.docCount = 0;
+        this.totalSize = 0;
+        
+        try {
+            if (pathAlvo.startsWith('content://')) {
+                console.log('📱 Android - chamando walkAndroid');
+                await this.walkAndroid(pathAlvo);
+            } else {
+                console.log('💻 Desktop - chamando walkDesktop');
+                await this.walkDesktop(pathAlvo);
             }
+            
+            console.log('✅ Escaneamento completo:', {
+                arquivos: this.docCount,
+                tamanho: this.totalSize
+            });
+            
+            return true;
+        } catch (e) {
+            console.error('❌ Erro em escanearPasta:', e.name, '-', e.message);
+            console.error('❌ Stack:', e.stack);
+            return false;
         }
     },
 
-    /**
-     * Varredura Recursiva - Android (Cordova)
-     */
-    async walkAndroid(pathAlvo) {
-        return new Promise((resolve) => {
-            window.resolveLocalFileSystemURL(pathAlvo, (dirEntry) => {
-                const reader = dirEntry.createReader();
-                reader.readEntries(async (entries) => {
-                    for (let entry of entries) {
-                        if (entry.isDirectory) {
-                            if (!entry.name.startsWith('.')) {
-                                await this.walkAndroid(entry.nativeURL);
-                            }
-                        } else if (entry.name.toLowerCase().endsWith('.pdf')) {
-                            // Extrai o nome da pasta pai pela URL
-                            const partes = entry.nativeURL.split('/');
-                            const nomeDaPasta = partes[partes.length - 2] || "Raiz";
 
-                            // A CORRETA DEFINIÇÃO DE MUSICA (Versão Android)
-                            const musica = {
-                                _id: entry.nativeURL,
-                                nome: entry.name.replace(/\.[^/.]+$/, "").replace(/_/g, ' '),
-                                pasta: nomeDaPasta,
-                                path: entry.nativeURL,
-                                tipo: 'musica'
-                            };
+async walkAndroid(pathAlvo) {
+    console.log('\n=== walkAndroid (SAF Android 14) ===');
+    console.log('pathAlvo:', pathAlvo);
+    
+    // Usa SAF plugin para content:// URIs
+    if (pathAlvo.startsWith('content://') && typeof AndroidSAFScanner !== 'undefined') {
+        console.log('📱 Usando SAF plugin...');
+        return await this.walkAndroidSAF(pathAlvo);
+    }
+    
+    // Fallback para file://
+    let fileURI;
+    
+    if (pathAlvo.startsWith('content://')) {
+        const decoded = decodeURIComponent(pathAlvo);
+        const match = decoded.match(/primary:(.*)/i);
+        if (match) {
+            const relativePath = match[1].replace(/:/g, '/');
+            fileURI = 'file:///storage/emulated/0/' + relativePath;
+        } else {
+            console.error('❌ Não consegue extrair caminho');
+            return;
+        }
+    } else if (pathAlvo.startsWith('file://')) {
+        fileURI = pathAlvo;
+    } else {
+        fileURI = 'file:///storage/emulated/0' + (pathAlvo.startsWith('/') ? pathAlvo : '/' + pathAlvo);
+    }
+    
+    console.log('fileURI:', fileURI);
+    
+    return new Promise((resolve) => {
+        window.resolveLocalFileSystemURL(fileURI, async (dirEntry) => {
+            console.log('✅ Pasta:', dirEntry.name);
+            
+            const reader = dirEntry.createReader();
+            const entries = [];
+            const readAll = () => {
+                reader.readEntries((batch) => {
+                    if (batch.length > 0) {
+                        entries.push(...batch);
+                        readAll();
+                    } else {
+                        processEntries(entries);
+                    }
+                }, () => processEntries(entries));
+            };
+            readAll();
+            
+            const processEntries = async (entries) => {
+                console.log('📋 Total:', entries.length);
+                
+                for (let entry of entries) {
+                    console.log('→', entry.isDirectory ? '📁' : '📄', entry.name);
+                    
+                    if (entry.isDirectory && !entry.name.startsWith('.')) {
+                        await this.walkAndroid(entry.nativeURL);
+                    } else if (entry.isFile && entry.name.toLowerCase().endsWith('.pdf')) {
+                        this.docCount++;
+                        const partes = entry.fullPath.split('/');
+                        const nomeDaPasta = partes[partes.length - 2] || "Raiz";
+                        
+                        const musica = {
+                            _id: entry.fullPath,
+                            nome: entry.name.replace(/\.[^/.]+$/, "").replace(/_/g, ' '),
+                            pasta: nomeDaPasta,
+                            path: entry.fullPath,
+                            tipo: 'musica'
+                        };
+                        
+                        await this.processarAnexoAndroid(entry, musica);
+                    }
+                }
+                
+                console.log('📊 PDFs nesta pasta:', this.docCount, '\n');
+                resolve();
+            };
+        }, (err) => {
+            console.error('❌ resolveFileSystemURL:', err.code);
+            resolve();
+        });
+    });
+},
 
-                            // No Android, como o PouchDB precisa do binário para exibir offline:
-                            await this.processarAnexoAndroid(entry, musica);
+async walkAndroidSAF(contentUri) {
+    console.log('🔧 SAF Scanner:', contentUri);
+    
+    return new Promise((resolve) => {
+        AndroidSAFScanner.scanDirectory(
+            contentUri,
+            async (result) => {
+                console.log('📊 SAF Result:', result);
+                
+                try {
+                    const data = typeof result === 'string' ? JSON.parse(result) : result;
+                    
+                    if (data.files && data.files.length > 0) {
+                        console.log('📄 PDFs encontrados:', data.files.length);
+                        
+                        for (let file of data.files) {
+                            console.log('✅ PDF:', file.nome || file.name, '| Pasta:', file.pasta);
+                            this.docCount++;
+                            this.totalSize += file.size || 0;
+                            this.updateProgress();
+                            
+                            // Ler e salvar PDF
+                            AndroidSAFScanner.readPdfBlob(
+                                file.path,
+                                async (pdfData) => {
+                                    const pdfBase64 = typeof pdfData === 'string' ? 
+                                        JSON.parse(pdfData).base64 : pdfData.base64;
+                                    
+                                    const musica = {
+                                        _id: file.path,
+                                        nome: file.nome || file.name,
+                                        pasta: file.pasta || "Raiz",
+                                        path: file.path,
+                                        tipo: 'musica',
+                                        _attachments: {
+                                            'partitura.pdf': {
+                                                content_type: 'application/pdf',
+                                                data: pdfBase64
+                                            }
+                                        }
+                                    };
+                                    
+                                    await window.DBManager.inserirMusica(musica);
+                                    console.log('✅ PDF salvo:', musica.nome);
+                                },
+                                (err) => console.error('❌ Erro ler PDF:', err)
+                            );
                         }
                     }
+                    
+                    console.log('📊 Total PDFs:', this.docCount);
+                    this.updateProgress();
                     resolve();
-                });
-            }, (err) => {
-                console.error("Erro ao acessar pasta Android:", err);
+                    
+                } catch (e) {
+                    console.error('❌ Erro SAF:', e);
+                    resolve();
+                }
+            },
+            (err) => {
+                console.error('❌ SAF Error:', err);
                 resolve();
-            });
-        });
-    },
-
-    /**
-     * Lê o arquivo PDF no Android e anexa ao documento do PouchDB
-     */
+            }
+        );
+    });
+},
     async processarAnexoAndroid(fileEntry, musicaDoc) {
         return new Promise((resolve) => {
             fileEntry.file(file => {
@@ -226,7 +300,6 @@ const Scanner = {
                 reader.onloadend = async () => {
                     const blob = new Blob([reader.result], { type: 'application/pdf' });
                     
-                    // Estrutura de anexo para o PouchDB
                     musicaDoc._attachments = {
                         'partitura.pdf': {
                             content_type: 'application/pdf',

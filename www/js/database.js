@@ -40,21 +40,36 @@ const DBManager = {
         }
     },
 
-    async inserirMusica(musica) {
-        if (!db) return;
-        const doc = {
-            _id: musica._id, // O CAMINHO REAL É O ID
-            nome: musica.nome,
-            pasta: musica.pasta,
-            tipo: 'musica',
-            _attachments: musica._attachments || null
-        };
-        try {
-            const ext = await db.get(doc._id).catch(() => null);
-            if (ext) doc._rev = ext._rev;
-            await db.put(doc);
-        } catch (e) { console.error(e); }
-    },
+ async inserirMusica(musica) {
+    console.log('🔍 inserirMusica chamada com:', musica);
+    console.log('🔍 musica._id =', musica._id);
+    console.log('🔍 musica.path =', musica.path);
+    
+    try {
+        if (!musica._id) {
+            console.warn('⚠️ _id faltando! Gerando de path:', musica.path);
+            musica._id = musica.path || Date.now().toString();
+        }
+        
+        musica.nome = musica.nome || 'Sem nome';
+        musica.pasta = musica.pasta || 'Outros';
+        musica.path = musica.path || musica._id;
+        musica.tipo = musica.tipo || 'musica';
+        musica.dataInsercao = musica.dataInsercao || new Date().toISOString();
+        
+        console.log('💾 Salvando:', musica._id);
+        const doc = await db.put(musica);
+        console.log('✅ Salvo:', doc.id);
+        return true;
+    } catch (e) {
+        console.error('❌ Erro detalhado:', {
+            nome: e.name,
+            msg: e.message,
+            Musica: musica
+        });
+        return false;
+    }
+} ,
 
     async listarMusicas(filtro = "", pasta = "") {
         if (!db) return [];
@@ -71,23 +86,58 @@ const DBManager = {
         } catch (e) { return []; }
     },
 
-    async addFolder(path) {
-        if (!db) return;
-        const safeId = 'folder_' + btoa(path).replace(/[/=+]/g, '');
-        try {
-            await db.put({ _id: safeId, type: 'folder', path: path });
+async addFolder(uri) {
+    const folderName = getFolderNameFromUri(uri);
+    
+    if (!db) return false;
+    
+    try {
+        const existing = await db.find({ 
+            selector: { 
+                type: 'folder',
+                path: uri
+            }
+        });
+        
+        if (existing.docs.length > 0) {
+            console.log('✅ Pasta já existe:', folderName);
             return true;
-        } catch (e) { return false; }
-    },
+        }
+        
+        const doc = {
+            _id: uri,
+            type: 'folder',
+            path: uri,
+            name: folderName,
+            created: new Date().toISOString()
+        };
+        
+        await db.put(doc);
+        return true;
+    } catch (e) {
+        console.error('Erro ao salvar pasta:', e);
+        return false;
+    }
+},
 
-    async listFolders() {
-        if (!db) return [];
-        try {
-            const res = await db.find({ selector: { type: 'folder' } });
-            return res.docs;
-        } catch (e) { return []; }
-    },
-
+async listFolders() {
+    if (!db) return [];
+    try {
+        const res = await db.find({ selector: { type: 'folder' } }); 
+        return res.docs;
+    } catch (e) { return []; }
+},
+async deleteFolder(id) {
+    if (!db) return false;
+    try {
+        const folder = await db.get(id);
+        await db.remove(folder);
+        return true;
+    } catch (e) { 
+        console.error('Erro ao deletar pasta:', e);
+        return false; 
+    }
+},
     async limparBanco() {
         if (!db) return;
         try {
